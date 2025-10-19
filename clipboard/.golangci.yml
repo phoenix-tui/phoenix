@@ -1,0 +1,27 @@
+# Phoenix Clipboard - Go vet configuration
+#
+# This file configures golangci-lint for the clipboard package.
+# We disable unsafeptr checks for Windows native implementation
+# because it triggers false positives when working with Windows API memory.
+
+linters-settings:
+  govet:
+    # Disable unsafe pointer checks for Windows syscall patterns
+    # The clipboard_windows.go file converts uintptr (from GlobalLock)
+    # to unsafe.Pointer, which is SAFE but triggers go vet warnings.
+    #
+    # This is a known issue: https://github.com/golang/go/issues/41205
+    disable:
+      - unsafeptr
+
+linters:
+  enable:
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
+    - gosimple
+    - structcheck
+    - varcheck
+    - ineffassign
+    - deadcode

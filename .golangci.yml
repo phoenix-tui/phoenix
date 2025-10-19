@@ -1,0 +1,209 @@
+# GolangCI-Lint v2.5 Configuration for Phoenix TUI Framework
+# Documentation: https://golangci-lint.run/docs/configuration/
+# AGGRESSIVE CONFIGURATION - Domain-Driven Design + High Quality Standards
+
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  # Enable comprehensive set of linters for production-quality framework
+  enable:
+    # Code quality and complexity
+    - gocyclo       # Check cyclomatic complexity
+    - gocognit      # Check cognitive complexity
+    - funlen        # Check function length
+    - maintidx      # Maintainability index
+    - cyclop        # Check cyclomatic complexity (alternative)
+    - nestif        # Reports deeply nested if statements
+
+    # Bug detection
+    - govet         # Standard Go vet (includes copylocks!)
+    - staticcheck   # Comprehensive static analysis
+    - errcheck      # Check that errors are handled
+    - errorlint     # Check error wrapping
+    - gosec         # Security issues
+    - nilnil        # Check that functions don't return nil both ways
+    - nilerr        # Check nil error returns
+    - nilnesserr    # Check nil error returns patterns
+
+    # Code style and consistency
+    - misspell      # Check for misspelled words
+    - whitespace    # Check for trailing whitespace
+    - unconvert     # Remove unnecessary type conversions
+    - unparam       # Detect unused function parameters
+    - ineffassign   # Detect ineffectual assignments
+
+    # Naming conventions
+    - errname       # Check error naming conventions
+    - revive        # Fast, configurable, extensible linter
+
+    # Performance
+    - prealloc      # Find slice declarations that could be preallocated
+    - bodyclose     # Check HTTP response bodies are closed
+    - makezero      # Find slice declarations with non-zero initial length
+
+    # Code practices
+    - goconst       # Find repeated strings that could be constants
+    - gocritic      # Comprehensive code checker
+    - goprintffuncname  # Check printf-like function names
+    - nolintlint    # Check nolint directives are used correctly
+    - nakedret      # Checks for naked returns
+
+    # Comments and documentation
+    - godot         # Check comments end in periods
+    # godox disabled - TODO comments are acceptable during development
+
+    # Additional quality checkers
+    - dupl          # Detect duplicate code
+    - dogsled       # Check for assignments with too many blank identifiers
+    - durationcheck # Check for two durations multiplied together
+
+  settings:
+    govet:
+      # EXPLICITLY ENABLE copylocks to catch mutex copying issues
+      enable:
+        - copylocks
+      # Disable fieldalignment (memory optimization not critical for clarity)
+      disable:
+        - fieldalignment
+
+    gocyclo:
+      # Lower threshold for production framework code
+      min-complexity: 12
+
+    cyclop:
+      # Max complexity (stricter than gosh)
+      max-complexity: 12
+
+    funlen:
+      # Allow reasonably long functions, but encourage shorter
+      lines: 80
+      statements: 40
+
+    gocognit:
+      # Cognitive complexity threshold (stricter)
+      min-complexity: 15
+
+    misspell:
+      locale: US
+
+    nestif:
+      # Max nesting level (encourage flat code)
+      min-complexity: 3
+
+    revive:
+      # Enable important rules for code quality
+      rules:
+        - name: var-naming
+        - name: exported
+        - name: error-return
+        - name: error-naming
+        - name: if-return
+        - name: increment-decrement
+        - name: var-declaration
+        - name: package-comments
+        - name: range
+        - name: receiver-naming
+        - name: time-naming
+        - name: unexported-return
+        - name: indent-error-flow
+        - name: errorf
+        - name: empty-block
+        - name: superfluous-else
+        - name: unused-parameter
+        - name: unreachable-code
+        - name: redefines-builtin-id
+
+    gocritic:
+      # Enable important checks, tune for DDD + Rich Models pattern
+      enabled-tags:
+        - diagnostic
+        - style
+        - performance
+
+      # Disable overly opinionated/experimental checks
+      disabled-checks:
+        - commentFormatting  # Too opinionated about comment style
+        - whyNoLint          # We document nolints when needed
+        - unnamedResult      # Named results can reduce readability
+
+      settings:
+        hugeParam:
+          # DDD Rich Models can be large (Terminal, Style, etc.)
+          # Value objects passed by value is DDD pattern
+          sizeThreshold: 256
+
+  # Exclusions (v2 structure)
+  exclusions:
+    rules:
+      # Beta release - relax style enforcement for public API
+      - path: core/api/.*\.go
+        linters:
+          - gocritic      # Style checks deferred to v0.2.0
+          - godot         # Comment periods deferred to v0.2.0
+      # Test files - allow more complexity for comprehensive testing
+      - path: _test\.go
+        linters:
+          - gocyclo
+          - gocognit    # Cognitive complexity acceptable in tests
+          - cyclop
+          - funlen
+          - maintidx
+          - errcheck
+          - gosec
+          - goconst
+          - dupl
+          - godot       # Test comments can skip periods
+          - gocritic    # Test code style acceptable (octal literals, comments, etc)
+
+      # Generated files (protobuf, etc.)
+      - path: ".*\\.pb\\.go"
+        linters:
+          - revive
+          - gocritic
+
+      # Domain services - business logic can be complex
+      - path: domain/service/.*\.go
+        linters:
+          - gocyclo      # Cyclomatic complexity acceptable for domain logic
+          - gocognit     # Domain logic can have cognitive complexity
+          - cyclop       # Business rules complexity acceptable
+
+      # Infrastructure layer - platform-specific complexity
+      - path: infrastructure/platform/.*\.go
+        linters:
+          - gocyclo      # Platform-specific logic
+          - nestif       # Platform conditionals (Windows/Unix)
+          - gosec        # Platform syscalls acceptable
+
+      # Infrastructure parser - tokenization inherently complex
+      - path: infrastructure/parser/.*\.go
+        linters:
+          - gocyclo      # Parsing complexity
+          - cyclop       # Parser state machine
+          - funlen       # Parser functions naturally longer
+
+      # Example applications - demos can be less strict
+      - path: examples/.*\.go
+        linters:
+          - errcheck     # Examples simplify error handling
+          - gosec        # Examples use simplified security
+          - funlen       # Example main() can be long
+
+      # Benchmarks - performance tests have different standards
+      - path: benchmarks/.*\.go
+        linters:
+          - errcheck
+          - funlen
+          - gocyclo
+
+issues:
+  # Show all issues (no hiding)
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+  # Don't hide new issues in existing files
+  new: false

@@ -1,0 +1,253 @@
+# Taskfile for Phoenix TUI Framework
+# Install Task: https://taskfile.dev/installation/
+# Usage: task <task-name>
+# Example: task test, task lint, task bench
+
+version: '3'
+
+vars:
+  # Coverage threshold (fail if below)
+  COVERAGE_THRESHOLD: 90
+
+  # Linter timeout
+  LINT_TIMEOUT: 5m
+
+tasks:
+  # Default task (runs when you type just "task")
+  default:
+    desc: Show available tasks
+    cmds:
+      - task --list
+
+  # ========================================
+  # Testing
+  # ========================================
+
+  test:
+    desc: Run all tests with coverage
+    cmds:
+      - go test -v -cover ./...
+
+  test:race:
+    desc: Run all tests with race detector (requires CGO)
+    cmds:
+      - go test -v -race -cover ./...
+
+  test:core:
+    desc: Run core package tests with coverage
+    dir: core
+    cmds:
+      - go test -v -coverprofile=coverage.out ./...
+      - go tool cover -func=coverage.out
+
+  test:coverage:
+    desc: Run tests and generate HTML coverage report
+    cmds:
+      - go test -v -coverprofile=coverage.out ./...
+      - go tool cover -html=coverage.out -o coverage.html
+      - cmd: echo "Coverage report generated at coverage.html"
+        silent: true
+
+  test:watch:
+    desc: Run tests in watch mode (requires entr or fswatch)
+    cmds:
+      - |
+        find . -name "*.go" | entr -c go test -v ./...
+
+  # ========================================
+  # Linting & Code Quality
+  # ========================================
+
+  lint:
+    desc: Run golangci-lint on all packages
+    cmds:
+      - golangci-lint run --config .golangci.yml --timeout={{.LINT_TIMEOUT}} ./...
+
+  lint:core:
+    desc: Run golangci-lint on core package only
+    cmds:
+      - golangci-lint run --config .golangci.yml ./core/...
+
+  lint:fix:
+    desc: Run golangci-lint and auto-fix issues
+    cmds:
+      - golangci-lint run --config .golangci.yml --fix ./...
+
+  fmt:
+    desc: Format all Go code with gofmt
+    cmds:
+      - go fmt ./...
+
+  vet:
+    desc: Run go vet on all packages
+    cmds:
+      - go vet ./...
+
+  check:
+    desc: Run all quality checks (fmt, vet, lint, test)
+    cmds:
+      - task: fmt
+      - task: vet
+      - task: lint
+      - task: test
+
+  # ========================================
+  # Building
+  # ========================================
+
+  build:
+    desc: Build all packages
+    cmds:
+      - go build ./...
+
+  build:examples:
+    desc: Build all example applications
+    cmds:
+      - go build -o bin/basic.exe ./examples/basic
+      - go build -o bin/unicode.exe ./examples/unicode
+      - cmd: echo "Examples built in bin/"
+        silent: true
+
+  # ========================================
+  # Dependencies
+  # ========================================
+
+  deps:
+    desc: Download and tidy all dependencies
+    cmds:
+      - go mod download
+      - go mod tidy
+
+  deps:update:
+    desc: Update all dependencies to latest
+    cmds:
+      - go get -u ./...
+      - go mod tidy
+
+  deps:verify:
+    desc: Verify dependencies haven't been modified
+    cmds:
+      - go mod verify
+
+  # ========================================
+  # Benchmarking (Week 4 Day 5-6)
+  # ========================================
+
+  bench:
+    desc: Run all benchmarks
+    cmds:
+      - go test -bench=. -benchmem ./...
+
+  bench:core:
+    desc: Run core package benchmarks
+    dir: core
+    cmds:
+      - go test -bench=. -benchmem ./...
+
+  bench:unicode:
+    desc: Run Unicode benchmarks with detailed stats
+    dir: core/domain/service
+    cmds:
+      - go test -bench=BenchmarkUnicode -benchmem -benchtime=5s .
+
+  bench:compare:
+    desc: Run benchmarks and compare with previous results
+    cmds:
+      - go test -bench=. -benchmem ./... | tee bench-new.txt
+      - cmd: echo "Compare with 'benchstat bench-old.txt bench-new.txt'"
+        silent: true
+
+  # ========================================
+  # Cleaning
+  # ========================================
+
+  clean:
+    desc: Remove build artifacts and coverage files
+    cmds:
+      - cmd: echo "Cleaning build artifacts..."
+        silent: true
+      - rm -f coverage.out coverage.html
+      - rm -f **/*.test
+      - rm -f **/*.coverprofile
+      - rm -f bench-*.txt
+      - rm -rf bin/
+      - cmd: echo "Clean complete!"
+        silent: true
+
+  # ========================================
+  # Development Helpers
+  # ========================================
+
+  dev:
+    desc: Run development checks before commit
+    cmds:
+      - task: fmt
+      - task: vet
+      - task: lint:fix
+      - task: test
+      - cmd: echo "✅ All checks passed! Ready to commit."
+        silent: true
+
+  ci:
+    desc: Run CI checks (same as GitHub Actions)
+    cmds:
+      - task: fmt
+      - task: vet
+      - task: lint
+      - task: test:coverage
+      - task: build
+
+  # ========================================
+  # Examples
+  # ========================================
+
+  run:basic:
+    desc: Run basic example
+    dir: examples/basic
+    cmds:
+      - go run main.go
+
+  run:unicode:
+    desc: Run Unicode example
+    dir: examples/unicode
+    cmds:
+      - go run main.go
+
+  # ========================================
+  # Release (for future use)
+  # ========================================
+
+  release:check:
+    desc: Check if ready for release
+    cmds:
+      - task: ci
+      - go mod verify
+      - cmd: echo "✅ Ready for release!"
+        silent: true
+
+  # ========================================
+  # Documentation
+  # ========================================
+
+  docs:serve:
+    desc: Serve documentation locally (if using godoc)
+    cmds:
+      - godoc -http=:6060
+      - cmd: echo "Documentation at http://localhost:6060/pkg/github.com/phoenix-tui/phoenix/"
+        silent: true
+
+  # ========================================
+  # Workspace Management
+  # ========================================
+
+  workspace:sync:
+    desc: Sync workspace dependencies
+    cmds:
+      - go work sync
+      - cmd: echo "Workspace synced!"
+        silent: true
+
+  workspace:check:
+    desc: Check workspace status
+    cmds:
+      - go work edit -print

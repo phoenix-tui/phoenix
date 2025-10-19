@@ -1,0 +1,66 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*.test
+*.out
+
+# Go workspace (local development)
+go.work
+go.work.sum
+
+# Coverage
+coverage.out
+*.coverprofile
+coverage.html
+*.html
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build output
+dist/
+build/
+bin/
+
+# Benchmarks
+*.bench
+benchstat.txt
+
+# Windows temp files
+nul
+
+# Log files
+*.log
+
+# AI local settings
+.claude/
+.goco/
+.goda/
+
+# Local dev docs (internal, not for public)
+docs/dev
+INDEX.md
+
+# Development/test artifacts
+tmp/
+**/WEEK*_REPORT.md
+**/WEEK*_SUMMARY.md
+**/IMPLEMENTATION_SUMMARY.md
+test_output.txt
+test_*.txt
+**/test_results.txt
+setup-*.sh
+setup-*.bat
