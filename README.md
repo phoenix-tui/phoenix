@@ -1,7 +1,7 @@
 # Phoenix TUI Framework
 
 [![Go Version](https://img.shields.io/github/go-mod/go-version/phoenix-tui/phoenix)](https://github.com/phoenix-tui/phoenix)
-[![Release](https://img.shields.io/github/v/release/phoenix-tui/phoenix)](https://github.com/phoenix-tui/phoenix/releases)
+[![Release](https://img.shields.io/github/v/release/phoenix-tui/phoenix?include_prereleases)](https://github.com/phoenix-tui/phoenix/releases)
 [![CI](https://github.com/phoenix-tui/phoenix/actions/workflows/test.yml/badge.svg)](https://github.com/phoenix-tui/phoenix/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/phoenix-tui/phoenix)](https://goreportcard.com/report/github.com/phoenix-tui/phoenix)
 [![License](https://img.shields.io/github/license/phoenix-tui/phoenix)](https://github.com/phoenix-tui/phoenix/blob/main/LICENSE)
