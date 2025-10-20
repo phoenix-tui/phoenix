@@ -1,6 +1,6 @@
 # TextArea Cursor Control API
 
-**Status**: ✅ Implemented (2025-01-19)
+**Status**: ✅ Released in v0.1.0-beta.2 (2025-10-20)
 **Priority**: HIGH - Enables GoSh shell REPL development
 **Specification**: docs/dev/TEXTAREA_CURSOR_CONTROL_IMPLEMENTATION.md
 
