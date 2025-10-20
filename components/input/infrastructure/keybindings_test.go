@@ -113,7 +113,7 @@ func TestDefaultKeyBindings_InsertMultipleRunes(t *testing.T) {
 	kb := NewDefaultKeyBindings()
 	input := model.New(40).SetContent("", 0)
 
-	// Insert "hello" one rune at a time
+	// Insert "hello" one rune at a time.
 	runes := []rune{'h', 'e', 'l', 'l', 'o'}
 	result := input
 	for _, r := range runes {
@@ -134,7 +134,7 @@ func TestDefaultKeyBindings_SelectAll(t *testing.T) {
 	kb := NewDefaultKeyBindings()
 	input := model.New(40).SetContent("hello world", 5)
 
-	// Ctrl-A
+	// Ctrl-A.
 	msg := tea.KeyMsg{Ctrl: true, Rune: 'a'}
 
 	result := kb.Handle(input, msg)
@@ -153,11 +153,11 @@ func TestDefaultKeyBindings_UnhandledKey(t *testing.T) {
 	kb := NewDefaultKeyBindings()
 	input := model.New(40).SetContent("hello", 5)
 
-	// Unhandled key should return input unchanged
+	// Unhandled key should return input unchanged.
 	msg := tea.KeyMsg{Type: tea.KeyF1}
 	result := kb.Handle(input, msg)
 
-	// Check that input is unchanged
+	// Check that input is unchanged.
 	if result.Content() != input.Content() {
 		t.Errorf("Content changed for unhandled key: got %q, want %q", result.Content(), input.Content())
 	}
@@ -217,7 +217,7 @@ func TestIsEditingKey(t *testing.T) {
 }
 
 func TestCustomKeyBindings(t *testing.T) {
-	// Create a custom handler that intercepts Ctrl-D to duplicate line
+	// Create a custom handler that intercepts Ctrl-D to duplicate line.
 	customHandler := func(input model.TextInput, msg tea.KeyMsg) model.TextInput {
 		if msg.Ctrl && (msg.Rune == 'd' || msg.Rune == 'D') {
 			content := input.Content()
@@ -229,7 +229,7 @@ func TestCustomKeyBindings(t *testing.T) {
 	kb := NewCustomKeyBindings(customHandler)
 	input := model.New(40).SetContent("hello", 5)
 
-	// Test custom handler - Ctrl-D
+	// Test custom handler - Ctrl-D.
 	msg := tea.KeyMsg{Ctrl: true, Rune: 'd'}
 	result := kb.Handle(input, msg)
 
@@ -237,7 +237,7 @@ func TestCustomKeyBindings(t *testing.T) {
 		t.Errorf("Content() = %q, want %q", result.Content(), "hellohello")
 	}
 
-	// Test fallback to default
+	// Test fallback to default.
 	msg2 := tea.KeyMsg{Type: tea.KeyLeft}
 	result2 := kb.Handle(input, msg2)
 
@@ -249,7 +249,7 @@ func TestCustomKeyBindings(t *testing.T) {
 func TestCustomKeyBindings_AddHandler(t *testing.T) {
 	kb := NewCustomKeyBindings()
 
-	// Add handler dynamically - Ctrl-X
+	// Add handler dynamically - Ctrl-X.
 	handler := func(input model.TextInput, msg tea.KeyMsg) model.TextInput {
 		if msg.Ctrl && (msg.Rune == 'x' || msg.Rune == 'X') {
 			return input.Clear()
@@ -268,7 +268,7 @@ func TestCustomKeyBindings_AddHandler(t *testing.T) {
 }
 
 func TestCustomKeyBindings_MultipleHandlers(t *testing.T) {
-	// First handler handles ctrl+1
+	// First handler handles ctrl+1.
 	handler1 := func(input model.TextInput, msg tea.KeyMsg) model.TextInput {
 		if msg.Ctrl && msg.Rune == '1' {
 			return input.WithContent("one")
@@ -276,7 +276,7 @@ func TestCustomKeyBindings_MultipleHandlers(t *testing.T) {
 		return input
 	}
 
-	// Second handler handles ctrl+2
+	// Second handler handles ctrl+2.
 	handler2 := func(input model.TextInput, msg tea.KeyMsg) model.TextInput {
 		if msg.Ctrl && msg.Rune == '2' {
 			return input.WithContent("two")
@@ -287,14 +287,14 @@ func TestCustomKeyBindings_MultipleHandlers(t *testing.T) {
 	kb := NewCustomKeyBindings(handler1, handler2)
 	input := *model.New(40) // Dereference pointer
 
-	// Test first handler - Ctrl-1
+	// Test first handler - Ctrl-1.
 	msg1 := tea.KeyMsg{Ctrl: true, Rune: '1'}
 	result1 := kb.Handle(input, msg1)
 	if result1.Content() != "one" {
 		t.Error("first handler failed")
 	}
 
-	// Test second handler - Ctrl-2
+	// Test second handler - Ctrl-2.
 	msg2 := tea.KeyMsg{Ctrl: true, Rune: '2'}
 	result2 := kb.Handle(input, msg2)
 	if result2.Content() != "two" {

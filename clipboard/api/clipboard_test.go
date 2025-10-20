@@ -7,7 +7,7 @@ import (
 	"github.com/phoenix-tui/phoenix/clipboard/domain/model"
 )
 
-// MockProvider for testing
+// MockProvider for testing.
 type MockProvider struct {
 	name      string
 	available bool
@@ -264,7 +264,7 @@ func TestGlobalFunctions(t *testing.T) {
 		readFunc: func() (*model.ClipboardContent, error) {
 			return model.NewTextContent("global test")
 		},
-		writeFunc: func(content *model.ClipboardContent) error {
+		writeFunc: func(_ *model.ClipboardContent) error {
 			return nil
 		},
 	}
@@ -351,7 +351,7 @@ func TestGlobalWrite_NilClipboard(t *testing.T) {
 	mockProvider := &MockProvider{
 		name:      "mock",
 		available: true,
-		writeFunc: func(content *model.ClipboardContent) error {
+		writeFunc: func(_ *model.ClipboardContent) error {
 			return nil
 		},
 	}
@@ -428,14 +428,11 @@ func TestNew_ErrorHandling(t *testing.T) {
 	clipboard, err := New()
 
 	// Just verify it handles errors gracefully
-	if err != nil {
-		if clipboard != nil {
-			t.Error("expected nil clipboard on error")
-		}
-	} else {
-		if clipboard == nil {
-			t.Error("expected non-nil clipboard on success")
-		}
+	if err != nil && clipboard != nil {
+		t.Error("expected nil clipboard on error")
+	}
+	if err == nil && clipboard == nil {
+		t.Error("expected non-nil clipboard on success")
 	}
 }
 

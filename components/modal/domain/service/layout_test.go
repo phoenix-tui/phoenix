@@ -115,7 +115,7 @@ func TestCalculatePositionCustom(t *testing.T) {
 
 	x, y := service.CalculatePosition(position, 80, 24, 40, 10)
 
-	// Custom position should be returned as-is
+	// Custom position should be returned as-is.
 	if x != 10 || y != 5 {
 		t.Errorf("Expected position (10, 5), got (%d, %d)", x, y)
 	}

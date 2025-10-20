@@ -11,7 +11,7 @@ type Range struct {
 // NewRange creates a new range from start to end.
 // The range is normalized so start is always before or equal to end.
 func NewRange(start, end Position) Range {
-	// Normalize: ensure start <= end
+	// Normalize: ensure start <= end.
 	if end.IsBefore(start) {
 		start, end = end, start
 	}

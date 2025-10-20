@@ -79,7 +79,7 @@ func TestBarWithPercentage(t *testing.T) {
 			if newBar.Percentage() != tt.expected {
 				t.Errorf("WithPercentage(%d) = %d, expected %d", tt.pct, newBar.Percentage(), tt.expected)
 			}
-			// Verify immutability
+			// Verify immutability.
 			if bar.Percentage() != 0 {
 				t.Errorf("WithPercentage() mutated original")
 			}
@@ -90,7 +90,7 @@ func TestBarWithPercentage(t *testing.T) {
 func TestBarWithChars(t *testing.T) {
 	bar := NewBar(40)
 
-	// Test fill char
+	// Test fill char.
 	newBar := bar.WithFillChar('▓')
 	if newBar.FillChar() != '▓' {
 		t.Errorf("WithFillChar('▓') = %c, expected '▓'", newBar.FillChar())
@@ -99,7 +99,7 @@ func TestBarWithChars(t *testing.T) {
 		t.Errorf("WithFillChar() mutated original")
 	}
 
-	// Test empty char
+	// Test empty char.
 	newBar = bar.WithEmptyChar('▒')
 	if newBar.EmptyChar() != '▒' {
 		t.Errorf("WithEmptyChar('▒') = %c, expected '▒'", newBar.EmptyChar())
@@ -160,7 +160,7 @@ func TestBarIncrement(t *testing.T) {
 				t.Errorf("Increment(%d) from %d = %d, expected %d",
 					tt.delta, tt.initial, newBar.Percentage(), tt.expected)
 			}
-			// Verify immutability
+			// Verify immutability.
 			if bar.Percentage() != tt.initial {
 				t.Errorf("Increment() mutated original")
 			}
@@ -190,7 +190,7 @@ func TestBarDecrement(t *testing.T) {
 				t.Errorf("Decrement(%d) from %d = %d, expected %d",
 					tt.delta, tt.initial, newBar.Percentage(), tt.expected)
 			}
-			// Verify immutability
+			// Verify immutability.
 			if bar.Percentage() != tt.initial {
 				t.Errorf("Decrement() mutated original")
 			}
@@ -260,7 +260,7 @@ func TestBarImmutability(t *testing.T) {
 		WithShowPercent(true).
 		WithLabel("Test")
 
-	// Apply all mutations
+	// Apply all mutations.
 	_ = bar.WithPercentage(75)
 	_ = bar.WithFillChar('█')
 	_ = bar.WithEmptyChar('░')
@@ -271,7 +271,7 @@ func TestBarImmutability(t *testing.T) {
 	_ = bar.SetComplete()
 	_ = bar.Reset()
 
-	// Original should be unchanged
+	// Original should be unchanged.
 	if bar.Percentage() != 50 {
 		t.Errorf("Percentage mutated: %d != 50", bar.Percentage())
 	}

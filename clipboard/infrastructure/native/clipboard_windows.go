@@ -1,16 +1,19 @@
 //go:build windows
 
+// Package native provides platform-specific clipboard implementations using native OS APIs.
+//
+//nolint:gosec // Windows API requires unsafe.Pointer for syscall memory operations - this is safe and documented
 package native
 
 // NOTE ON GO VET WARNINGS:
-// This file triggers "possible misuse of unsafe.Pointer" warnings from go vet
+// This file triggers "possible misuse of unsafe.Pointer" warnings from go vet.
 // when converting uintptr (returned from Windows syscalls) to unsafe.Pointer.
 //
 // This is a KNOWN FALSE POSITIVE when working with Windows API memory:
 // - Memory from GlobalLock points to Windows heap (not Go heap)
-// - Not subject to Go garbage collection
-// - Safe to convert uintptr->unsafe.Pointer in same function scope
-// - We use //go:uintptrescapes correctly to document escape behavior
+// - Not subject to Go garbage collection.
+// - Safe to convert uintptr->unsafe.Pointer in same function scope.
+// - We use //go:uintptrescapes correctly to document escape behavior.
 //
 // References:
 // - https://github.com/golang/go/issues/41205 (go vet false positives)
@@ -47,22 +50,22 @@ const (
 	gmemMoveable  = 0x0002
 )
 
-// Provider implements clipboard operations using Windows native API
+// Provider implements clipboard operations using Windows native API.
 type Provider struct{}
 
-// NewProvider creates a new Windows native clipboard provider
+// NewProvider creates a new Windows native clipboard provider.
 func NewProvider() *Provider {
 	return &Provider{}
 }
 
-// Read reads content from the Windows clipboard
+// Read reads content from the Windows clipboard.
 func (p *Provider) Read() (*model.ClipboardContent, error) {
 	// Open clipboard
 	ret, _, err := openClipboard.Call(0)
 	if ret == 0 {
 		return nil, fmt.Errorf("failed to open clipboard: %w", err)
 	}
-	defer closeClipboard.Call()
+	defer func() { _, _, _ = closeClipboard.Call() }() // Explicit ignore: cleanup must run
 
 	// Get clipboard data handle
 	handle, _, err := getClipboardData.Call(cfUnicodeText)
@@ -75,7 +78,7 @@ func (p *Provider) Read() (*model.ClipboardContent, error) {
 	if r1 == 0 {
 		return nil, fmt.Errorf("failed to lock global memory: %w", err)
 	}
-	defer globalUnlock.Call(handle)
+	defer func() { _, _, _ = globalUnlock.Call(handle) }() // Explicit ignore: cleanup must run
 
 	// Convert UTF-16 to UTF-8
 	// Pass uintptr directly to helper function that does conversion internally
@@ -84,7 +87,7 @@ func (p *Provider) Read() (*model.ClipboardContent, error) {
 	return model.NewTextContent(text)
 }
 
-// Write writes content to the Windows clipboard
+// Write writes content to the Windows clipboard.
 func (p *Provider) Write(content *model.ClipboardContent) error {
 	if content == nil {
 		return fmt.Errorf("content cannot be nil")
@@ -109,22 +112,23 @@ func (p *Provider) Write(content *model.ClipboardContent) error {
 	// Lock the memory
 	r1, _, err := globalLock.Call(handle)
 	if r1 == 0 {
-		globalFree.Call(handle)
+		_, _, _ = globalFree.Call(handle) // Explicit ignore: cleanup in error path
 		return fmt.Errorf("failed to lock global memory: %w", err)
 	}
 
 	// Copy data to global memory
 	// Pass uintptr directly to helper function that does conversion internally
 	copyMemoryFromUintptr(r1, utf16Text, utf16Len)
-	globalUnlock.Call(handle)
+	//nolint:dogsled // Windows API cleanup pattern requires ignoring all 3 return values
+	_, _, _ = globalUnlock.Call(handle)
 
 	// Open clipboard
 	ret, _, err := openClipboard.Call(0)
 	if ret == 0 {
-		globalFree.Call(handle)
+		_, _, _ = globalFree.Call(handle) // Explicit ignore: cleanup in error path
 		return fmt.Errorf("failed to open clipboard: %w", err)
 	}
-	defer closeClipboard.Call()
+	defer func() { _, _, _ = closeClipboard.Call() }() // Explicit ignore: cleanup must run
 
 	// Empty clipboard
 	ret, _, err = emptyClipboard.Call()
@@ -141,17 +145,17 @@ func (p *Provider) Write(content *model.ClipboardContent) error {
 	return nil
 }
 
-// IsAvailable returns true if the Windows clipboard is available
+// IsAvailable returns true if the Windows clipboard is available.
 func (p *Provider) IsAvailable() bool {
 	return true // Always available on Windows
 }
 
-// Name returns the provider name
+// Name returns the provider name.
 func (p *Provider) Name() string {
 	return "Windows Native"
 }
 
-// stringToUTF16Ptr converts a Go string to a null-terminated UTF-16 pointer
+// stringToUTF16Ptr converts a Go string to a null-terminated UTF-16 pointer.
 func stringToUTF16Ptr(s string) *uint16 {
 	// Convert to UTF-16
 	runes := []rune(s)
@@ -163,8 +167,7 @@ func stringToUTF16Ptr(s string) *uint16 {
 		} else {
 			// Surrogate pair for runes >= 0x10000
 			r -= 0x10000
-			utf16 = append(utf16, uint16(0xD800+(r>>10)))
-			utf16 = append(utf16, uint16(0xDC00+(r&0x3FF)))
+			utf16 = append(utf16, uint16(0xD800+(r>>10)), uint16(0xDC00+(r&0x3FF)))
 		}
 	}
 
@@ -174,9 +177,9 @@ func stringToUTF16Ptr(s string) *uint16 {
 	return &utf16[0]
 }
 
-// utf16UintptrToString converts a uintptr pointing to null-terminated UTF-16 to a Go string
-// The uintptr parameter comes from syscall.LazyProc.Call() return value
-// We use //go:uintptrescapes to tell the compiler this is intentional
+// utf16UintptrToString converts a uintptr pointing to null-terminated UTF-16 to a Go string.
+// The uintptr parameter comes from syscall.LazyProc.Call() return value.
+// We use //go:uintptrescapes to tell the compiler this is intentional.
 //
 //go:uintptrescapes
 func utf16UintptrToString(ptr uintptr) string {
@@ -187,6 +190,7 @@ func utf16UintptrToString(ptr uintptr) string {
 	// Count length first (need to know size for unsafe.Slice)
 	// We keep the conversion in the loop condition to satisfy go vet
 	length := 0
+	//nolint:govet // Safe: uintptr from Windows API, same function scope
 	for p := (*uint16)(unsafe.Pointer(ptr)); *p != 0; p = (*uint16)(unsafe.Pointer(uintptr(unsafe.Pointer(p)) + 2)) {
 		length++
 	}
@@ -196,6 +200,7 @@ func utf16UintptrToString(ptr uintptr) string {
 	}
 
 	// Convert to slice - conversion happens in function call expression
+	//nolint:govet // Safe: uintptr from Windows API, same function scope
 	utf16Slice := unsafe.Slice((*uint16)(unsafe.Pointer(ptr)), length)
 
 	// Convert UTF-16 to runes
@@ -221,52 +226,15 @@ func utf16UintptrToString(ptr uintptr) string {
 	return string(runes)
 }
 
-// utf16PtrToString converts a null-terminated UTF-16 pointer to a Go string
-func utf16PtrToString(ptr *uint16) string {
-	if ptr == nil {
-		return ""
-	}
-
-	// Count length
-	length := 0
-	for p := ptr; *p != 0; p = (*uint16)(unsafe.Pointer(uintptr(unsafe.Pointer(p)) + 2)) {
-		length++
-	}
-
-	// Convert to slice
-	utf16Slice := unsafe.Slice(ptr, length)
-
-	// Convert UTF-16 to runes
-	runes := make([]rune, 0, length)
-	for i := 0; i < len(utf16Slice); i++ {
-		r := utf16Slice[i]
-
-		// Check for high surrogate (0xD800-0xDBFF)
-		if r >= 0xD800 && r < 0xDC00 && i+1 < len(utf16Slice) {
-			// Low surrogate (0xDC00-0xDFFF)
-			low := utf16Slice[i+1]
-			if low >= 0xDC00 && low < 0xE000 {
-				// Combine surrogates
-				runes = append(runes, ((rune(r)-0xD800)<<10|(rune(low)-0xDC00))+0x10000)
-				i++ // Skip low surrogate
-				continue
-			}
-		}
-
-		runes = append(runes, rune(r))
-	}
-
-	return string(runes)
-}
-
-// copyMemoryFromUintptr copies data from source to destination
-// The dst parameter comes from syscall.LazyProc.Call() return value
-// We use //go:uintptrescapes to tell the compiler this is intentional
+// copyMemoryFromUintptr copies data from source to destination.
+// The dst parameter comes from syscall.LazyProc.Call() return value.
+// We use //go:uintptrescapes to tell the compiler this is intentional.
 //
 //go:uintptrescapes
 func copyMemoryFromUintptr(dst uintptr, src *uint16, size int) {
 	// Create slices with conversion happening in function call expression
 	srcSlice := unsafe.Slice(src, size/2)
+	//nolint:govet // Safe: uintptr from Windows API, same function scope
 	dstSlice := unsafe.Slice((*uint16)(unsafe.Pointer(dst)), size/2)
 	copy(dstSlice, srcSlice)
 }

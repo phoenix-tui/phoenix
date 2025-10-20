@@ -5,7 +5,7 @@ import (
 )
 
 // LayoutService handles modal positioning and centering calculations.
-// This is a domain service because positioning logic is part of the business rules
+// This is a domain service because positioning logic is part of the business rules.
 // for how modals should be displayed.
 type LayoutService struct{}
 
@@ -18,17 +18,17 @@ func NewLayoutService() *LayoutService {
 // Returns (x, y) coordinates for the top-left corner of the modal.
 //
 // Parameters:
-//   - terminalWidth: Width of the terminal in characters
-//   - terminalHeight: Height of the terminal in rows
-//   - modalWidth: Width of the modal in characters
-//   - modalHeight: Height of the modal in rows
+//   - terminalWidth: Width of the terminal in characters.
+//   - terminalHeight: Height of the terminal in rows.
+//   - modalWidth: Width of the modal in characters.
+//   - modalHeight: Height of the modal in rows.
 //
 // Returns the x, y coordinates for the top-left corner to center the modal.
 func (s *LayoutService) CenterPosition(terminalWidth, terminalHeight, modalWidth, modalHeight int) (x, y int) {
 	x = (terminalWidth - modalWidth) / 2
 	y = (terminalHeight - modalHeight) / 2
 
-	// Ensure non-negative coordinates
+	// Ensure non-negative coordinates.
 	if x < 0 {
 		x = 0
 	}
@@ -45,10 +45,10 @@ func (s *LayoutService) CenterPosition(terminalWidth, terminalHeight, modalWidth
 //
 // Parameters:
 //   - position: The position value object (center or custom)
-//   - terminalWidth: Width of the terminal in characters
-//   - terminalHeight: Height of the terminal in rows
-//   - modalWidth: Width of the modal in characters
-//   - modalHeight: Height of the modal in rows
+//   - terminalWidth: Width of the terminal in characters.
+//   - terminalHeight: Height of the terminal in rows.
+//   - modalWidth: Width of the modal in characters.
+//   - modalHeight: Height of the modal in rows.
 //
 // Returns the x, y coordinates for the top-left corner of the modal.
 func (s *LayoutService) CalculatePosition(position *value.Position, terminalWidth, terminalHeight, modalWidth, modalHeight int) (x, y int) {

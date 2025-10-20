@@ -134,7 +134,7 @@ func (t *Table) MoveUp() *Table {
 	newIndex := t.selectedIndex - 1
 	newOffset := t.scrollOffset
 
-	// Scroll up if needed
+	// Scroll up if needed.
 	if newIndex < t.scrollOffset {
 		newOffset = newIndex
 	}
@@ -162,7 +162,7 @@ func (t *Table) MoveDown() *Table {
 	newIndex := t.selectedIndex + 1
 	newOffset := t.scrollOffset
 
-	// Scroll down if needed
+	// Scroll down if needed.
 	visibleRows := t.height
 	if t.showHeader {
 		visibleRows-- // Header takes one row

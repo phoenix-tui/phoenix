@@ -8,8 +8,8 @@ import (
 func TestValidationService_Validate(t *testing.T) {
 	svc := NewValidationService()
 
-	alwaysValid := func(s string) error { return nil }
-	alwaysInvalid := func(s string) error { return errors.New("invalid") }
+	alwaysValid := func(_ string) error { return nil }
+	alwaysInvalid := func(_ string) error { return errors.New("invalid") }
 
 	tests := []struct {
 		name      string
@@ -36,8 +36,8 @@ func TestValidationService_Validate(t *testing.T) {
 func TestValidationService_IsValid(t *testing.T) {
 	svc := NewValidationService()
 
-	alwaysValid := func(s string) error { return nil }
-	alwaysInvalid := func(s string) error { return errors.New("invalid") }
+	alwaysValid := func(_ string) error { return nil }
+	alwaysInvalid := func(_ string) error { return errors.New("invalid") }
 
 	tests := []struct {
 		name      string
@@ -170,7 +170,7 @@ func TestRange(t *testing.T) {
 }
 
 func TestChain(t *testing.T) {
-	// Create a chain of validators
+	// Create a chain of validators.
 	validator := Chain(
 		NotEmpty(),
 		MinLength(3),
@@ -206,7 +206,7 @@ func TestChain(t *testing.T) {
 
 func TestChain_StopsAtFirstError(t *testing.T) {
 	callCount := 0
-	countingValidator := func(s string) error {
+	countingValidator := func(_ string) error {
 		callCount++
 		return errors.New("error")
 	}
@@ -219,7 +219,7 @@ func TestChain_StopsAtFirstError(t *testing.T) {
 
 	_ = validator("test")
 
-	// Should only call first validator
+	// Should only call first validator.
 	if callCount != 1 {
 		t.Errorf("Chain called %d validators, expected 1 (should stop at first error)", callCount)
 	}

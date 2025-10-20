@@ -65,7 +65,7 @@ func TestBarSetProgress(t *testing.T) {
 		t.Errorf("SetProgress(100): Progress() = %d", bar.Progress())
 	}
 
-	// Clamping
+	// Clamping.
 	bar = bar.SetProgress(150) // Reassignment!
 	if bar.Progress() != 100 {
 		t.Errorf("SetProgress(150): Progress() = %d, expected 100", bar.Progress())
@@ -90,7 +90,7 @@ func TestBarIncrement(t *testing.T) {
 		t.Errorf("After Increment(20): Progress() = %d", bar.Progress())
 	}
 
-	// Clamping at 100
+	// Clamping at 100.
 	bar = bar.Increment(100) // Reassignment!
 	if bar.Progress() != 100 {
 		t.Errorf("After Increment(100): Progress() = %d, expected 100", bar.Progress())
@@ -110,7 +110,7 @@ func TestBarDecrement(t *testing.T) {
 		t.Errorf("After Decrement(20): Progress() = %d", bar.Progress())
 	}
 
-	// Clamping at 0
+	// Clamping at 0.
 	bar = bar.Decrement(100) // Reassignment!
 	if bar.Progress() != 0 {
 		t.Errorf("After Decrement(100): Progress() = %d, expected 0", bar.Progress())
@@ -144,7 +144,7 @@ func TestBarInit(t *testing.T) {
 }
 
 func TestBarUpdate(t *testing.T) {
-	// NewBar().SetProgress() returns Bar after first method call
+	// NewBar().SetProgress() returns Bar after first method call.
 	bar := NewBar(40).SetProgress(50)
 
 	// Update should return self and no cmd (value semantics)
@@ -185,7 +185,7 @@ func TestBarView(t *testing.T) {
 		{
 			name: "Bar with percentage",
 			setup: func() Bar {
-				// First call returns Bar after method chaining
+				// First call returns Bar after method chaining.
 				return NewBarWithProgress(10, 75).ShowPercent(true)
 			},
 			contains: []string{"█", "░", "075%"},
@@ -193,7 +193,7 @@ func TestBarView(t *testing.T) {
 		{
 			name: "Bar with label",
 			setup: func() Bar {
-				// First call returns Bar after method chaining
+				// First call returns Bar after method chaining.
 				return NewBar(10).Label("Loading")
 			},
 			contains: []string{"Loading", "░"},
@@ -244,7 +244,7 @@ func TestBarView(t *testing.T) {
 
 func TestBarMethodChaining(t *testing.T) {
 	// Verify all methods return Bar for chaining (value semantics)
-	// Pointer chaining from NewBar
+	// Pointer chaining from NewBar.
 	bar := NewBar(40).
 		FillChar('▓').
 		EmptyChar('▒').
@@ -257,7 +257,7 @@ func TestBarMethodChaining(t *testing.T) {
 	}
 
 	// Value chaining (must reassign)
-	// After first method call, we have Bar value
+	// After first method call, we have Bar value.
 	barValue := bar.Increment(10) // bar is *Bar, returns Bar
 	if barValue.Progress() != 60 {
 		t.Errorf("After Increment: Progress() = %d, expected 60", barValue.Progress())
@@ -269,11 +269,11 @@ func TestBarMethodChaining(t *testing.T) {
 	}
 }
 
-func TestBarTeaModelContract(t *testing.T) {
+func TestBarTeaModelContract(_ *testing.T) {
 	// Verify Bar implements tea model contract (Init, Update, View)
 	bar := *NewBar(40) // Dereference to get value
 
-	// Init returns Cmd
+	// Init returns Cmd.
 	cmd := bar.Init()
 	_ = cmd
 
@@ -282,7 +282,7 @@ func TestBarTeaModelContract(t *testing.T) {
 	_ = updated
 	_ = cmd2
 
-	// View returns string
+	// View returns string.
 	view := bar.View()
 	_ = view
 }
@@ -290,7 +290,7 @@ func TestBarTeaModelContract(t *testing.T) {
 func TestBarProgressRange(t *testing.T) {
 	bar := *NewBar(100) // Dereference to get value
 
-	// Test all percentages 0-100
+	// Test all percentages 0-100.
 	for pct := 0; pct <= 100; pct++ {
 		bar = bar.SetProgress(pct) // Reassignment!
 		if bar.Progress() != pct {

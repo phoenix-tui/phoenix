@@ -59,12 +59,12 @@ func TestList_WithItems(t *testing.T) {
 
 	l2 := l.WithItems(items)
 
-	// Original unchanged
+	// Original unchanged.
 	if len(l.Items()) != 0 {
 		t.Error("WithItems() should not modify original list")
 	}
 
-	// New list has items
+	// New list has items.
 	if len(l2.Items()) != 3 {
 		t.Errorf("WithItems() item count = %d, want 3", len(l2.Items()))
 	}
@@ -110,7 +110,7 @@ func TestList_WithFilter(t *testing.T) {
 
 	l := NewListWithItems(items, value.SelectionModeSingle)
 
-	// Custom filter: starts with 'a'
+	// Custom filter: starts with 'a'.
 	customFilter := func(item *value.Item, query string) bool {
 		return len(item.Label()) > 0 && item.Label()[0] == 'a'
 	}
@@ -126,7 +126,7 @@ func TestList_MoveUp(t *testing.T) {
 	items := createTestItems(5)
 	l := NewListWithItems(items, value.SelectionModeSingle)
 
-	// Move down twice, then up once
+	// Move down twice, then up once.
 	l = l.MoveDown().MoveDown().MoveUp()
 
 	if l.FocusedIndex() != 1 {
@@ -138,7 +138,7 @@ func TestList_MoveUp_WrapAround(t *testing.T) {
 	items := createTestItems(5)
 	l := NewListWithItems(items, value.SelectionModeSingle)
 
-	// At index 0, moving up should wrap to last
+	// At index 0, moving up should wrap to last.
 	l = l.MoveUp()
 
 	if l.FocusedIndex() != 4 {
@@ -161,7 +161,7 @@ func TestList_MoveDown_WrapAround(t *testing.T) {
 	items := createTestItems(3)
 	l := NewListWithItems(items, value.SelectionModeSingle)
 
-	// Move to last item and then down should wrap to first
+	// Move to last item and then down should wrap to first.
 	l = l.MoveToEnd().MoveDown()
 
 	if l.FocusedIndex() != 0 {
@@ -173,7 +173,7 @@ func TestList_MovePageUp(t *testing.T) {
 	items := createTestItems(30)
 	l := NewListWithItems(items, value.SelectionModeSingle).WithHeight(10)
 
-	// Move to middle
+	// Move to middle.
 	l = l.MoveToEnd().MovePageUp()
 
 	// Should be at index 19 (29 - 10)
@@ -188,7 +188,7 @@ func TestList_MovePageDown(t *testing.T) {
 
 	l = l.MovePageDown()
 
-	// Should be at index 10
+	// Should be at index 10.
 	if l.FocusedIndex() != 10 {
 		t.Errorf("MovePageDown() focused index = %d, want 10", l.FocusedIndex())
 	}
@@ -220,7 +220,7 @@ func TestList_ToggleSelection_Single(t *testing.T) {
 	items := createTestItems(5)
 	l := NewListWithItems(items, value.SelectionModeSingle)
 
-	// Select first item
+	// Select first item.
 	l = l.ToggleSelection()
 
 	selected := l.SelectedItems()
@@ -247,10 +247,10 @@ func TestList_ToggleSelection_Multi(t *testing.T) {
 	items := createTestItems(5)
 	l := NewListWithItems(items, value.SelectionModeMulti)
 
-	// Select first item
+	// Select first item.
 	l = l.ToggleSelection()
 
-	// Select third item
+	// Select third item.
 	l = l.MoveDown().MoveDown().ToggleSelection()
 
 	selected := l.SelectedItems()
@@ -285,7 +285,7 @@ func TestList_SelectAll_SingleMode(t *testing.T) {
 
 	l = l.SelectAll()
 
-	// Should not select all in single mode
+	// Should not select all in single mode.
 	selected := l.SelectedItems()
 	if len(selected) != 0 {
 		t.Errorf("SelectAll() in single mode should not select, got %d items", len(selected))
@@ -319,7 +319,7 @@ func TestList_SetFilterQuery(t *testing.T) {
 		t.Errorf("SetFilterQuery() filtered count = %d, want 2", len(filtered))
 	}
 
-	// Check filtered items
+	// Check filtered items.
 	expectedLabels := []string{"apple", "apricot"}
 	for i, item := range filtered {
 		if item.Label() != expectedLabels[i] {
@@ -372,7 +372,7 @@ func TestList_RenderItem(t *testing.T) {
 
 	rendered := l.RenderItem(0)
 
-	// Default renderer should include "> " for focused item
+	// Default renderer should include "> " for focused item.
 	if rendered != "> Test Item" {
 		t.Errorf("RenderItem() = %q, want %q", rendered, "> Test Item")
 	}
@@ -382,13 +382,13 @@ func TestList_RenderVisibleItems(t *testing.T) {
 	items := createTestItems(20)
 	l := NewListWithItems(items, value.SelectionModeSingle).WithHeight(5)
 
-	// At start
+	// At start.
 	rendered := l.RenderVisibleItems()
 	if len(rendered) != 5 {
 		t.Errorf("RenderVisibleItems() count = %d, want 5", len(rendered))
 	}
 
-	// Move down to trigger scrolling
+	// Move down to trigger scrolling.
 	l = l.MoveToEnd()
 	rendered = l.RenderVisibleItems()
 	if len(rendered) != 5 {
@@ -409,7 +409,7 @@ func TestList_ScrollOffset(t *testing.T) {
 	items := createTestItems(30)
 	l := NewListWithItems(items, value.SelectionModeSingle).WithHeight(10)
 
-	// Move to middle
+	// Move to middle.
 	l = l.MovePageDown().MovePageDown()
 
 	offset := l.ScrollOffset()
@@ -422,12 +422,12 @@ func TestList_Immutability(t *testing.T) {
 	items := createTestItems(5)
 	l1 := NewListWithItems(items, value.SelectionModeSingle)
 
-	// Perform various operations
+	// Perform various operations.
 	l2 := l1.MoveDown()
 	l3 := l1.ToggleSelection()
 	l4 := l1.WithHeight(20)
 
-	// Original should be unchanged
+	// Original should be unchanged.
 	if l1.FocusedIndex() != 0 {
 		t.Error("Original list focus should not change")
 	}
@@ -438,7 +438,7 @@ func TestList_Immutability(t *testing.T) {
 		t.Error("Original list height should not change")
 	}
 
-	// New instances should have changes
+	// New instances should have changes.
 	if l2.FocusedIndex() != 1 {
 		t.Error("New list after MoveDown should have changed focus")
 	}
@@ -454,7 +454,7 @@ func TestList_SelectedIndices(t *testing.T) {
 	items := createTestItems(5)
 	l := NewListWithItems(items, value.SelectionModeMulti)
 
-	// Select first and third items
+	// Select first and third items.
 	l = l.ToggleSelection().MoveDown().MoveDown().ToggleSelection()
 
 	indices := l.SelectedIndices()
@@ -462,7 +462,7 @@ func TestList_SelectedIndices(t *testing.T) {
 		t.Errorf("SelectedIndices() count = %d, want 2", len(indices))
 	}
 
-	// Check that indices contain 0 and 2
+	// Check that indices contain 0 and 2.
 	hasZero := false
 	hasTwo := false
 	for _, idx := range indices {
@@ -482,16 +482,16 @@ func TestList_FilterResetsSelection(t *testing.T) {
 	items := createTestItems(5)
 	l := NewListWithItems(items, value.SelectionModeMulti)
 
-	// Select all items
+	// Select all items.
 	l = l.SelectAll()
 	if len(l.SelectedItems()) != 5 {
 		t.Fatal("Setup: SelectAll should select 5 items")
 	}
 
-	// Apply filter
+	// Apply filter.
 	l = l.SetFilterQuery("Item A")
 
-	// Selection should be cleared after filter
+	// Selection should be cleared after filter.
 	selected := l.SelectedItems()
 	if len(selected) != 0 {
 		t.Errorf("Filter should clear selection, got %d selected items", len(selected))
@@ -501,7 +501,7 @@ func TestList_FilterResetsSelection(t *testing.T) {
 func TestList_Navigation_EmptyList(t *testing.T) {
 	l := NewList(value.SelectionModeSingle)
 
-	// All navigation operations should not panic on empty list
+	// All navigation operations should not panic on empty list.
 	l = l.MoveUp()
 	l = l.MoveDown()
 	l = l.MovePageUp()
@@ -509,7 +509,7 @@ func TestList_Navigation_EmptyList(t *testing.T) {
 	l = l.MoveToStart()
 	l = l.MoveToEnd()
 
-	// Focus should remain 0
+	// Focus should remain 0.
 	if l.FocusedIndex() != 0 {
 		t.Errorf("Navigation on empty list should keep focus at 0, got %d", l.FocusedIndex())
 	}
@@ -518,7 +518,7 @@ func TestList_Navigation_EmptyList(t *testing.T) {
 func TestList_Selection_EmptyList(t *testing.T) {
 	l := NewList(value.SelectionModeSingle)
 
-	// Selection operations should not panic on empty list
+	// Selection operations should not panic on empty list.
 	l = l.ToggleSelection()
 	l = l.SelectAll()
 	l = l.ClearSelection()
@@ -560,7 +560,7 @@ func TestList_Items_ReturnsCopy(t *testing.T) {
 	retrieved := l.Items()
 	retrieved[0] = value.NewItem(999, "Modified")
 
-	// Original should be unchanged
+	// Original should be unchanged.
 	original := l.Items()
 	if !reflect.DeepEqual(original[0], items[0]) {
 		t.Error("Items() should return a copy, not allow modification of original")
@@ -574,7 +574,7 @@ func TestList_FilteredItems_ReturnsCopy(t *testing.T) {
 	retrieved := l.FilteredItems()
 	retrieved[0] = value.NewItem(999, "Modified")
 
-	// Original should be unchanged
+	// Original should be unchanged.
 	original := l.FilteredItems()
 	if !reflect.DeepEqual(original[0], items[0]) {
 		t.Error("FilteredItems() should return a copy, not allow modification of original")

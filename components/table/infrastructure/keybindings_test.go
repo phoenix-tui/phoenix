@@ -184,7 +184,7 @@ func TestKeyBindings_IsClearSort(t *testing.T) {
 }
 
 func TestKeyBindings_Custom(t *testing.T) {
-	// Test custom key bindings
+	// Test custom key bindings.
 	kb := KeyBindings{
 		Up:   []string{"w"},
 		Down: []string{"s"},

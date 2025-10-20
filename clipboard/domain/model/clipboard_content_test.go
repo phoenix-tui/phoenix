@@ -281,8 +281,9 @@ func TestClipboardContent_WithMIMEType(t *testing.T) {
 	}
 }
 
-// Helper functions
+// Helper functions.
 
+//nolint:unparam // Test helper accepts any text; current tests happen to use same value
 func mustNewTextContent(text string) *ClipboardContent {
 	content, err := NewTextContent(text)
 	if err != nil {

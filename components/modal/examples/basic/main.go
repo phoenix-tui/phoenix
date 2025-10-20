@@ -1,11 +1,11 @@
 // Package main demonstrates a basic modal dialog.
 //
 // This example shows:
-//   - Creating a simple modal with content
-//   - Showing and hiding the modal
-//   - Closing with Esc key
+//   - Creating a simple modal with content.
+//   - Showing and hiding the modal.
+//   - Closing with Esc key.
 //
-// Run: go run main.go
+// Run: go run main.go.
 package main
 
 import (
@@ -30,25 +30,25 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		// Check for quit keys when modal is not visible
+		// Check for quit keys when modal is not visible.
 		if !m.modal.IsVisible() && (msg.String() == "q" || msg.String() == "ctrl+c") {
 			return m, tea.Quit()
 		}
 
-		// Show modal on spacebar
+		// Show modal on spacebar.
 		if msg.String() == " " && !m.modal.IsVisible() {
 			m.modal = m.modal.Show()
 			return m, nil
 		}
 
 	case tea.WindowSizeMsg:
-		// Pass window size to modal
+		// Pass window size to modal.
 		updatedModal, cmd := m.modal.Update(msg)
 		m.modal = updatedModal
 		return m, cmd
 	}
 
-	// Forward all messages to modal when visible
+	// Forward all messages to modal when visible.
 	if m.modal.IsVisible() {
 		updatedModal, cmd := m.modal.Update(msg)
 		m.modal = updatedModal
@@ -71,15 +71,15 @@ Press Q or Ctrl+C to quit`
 }
 
 func main() {
-	// Create modal
+	// Create modal.
 	m := modal.New("This is a simple modal dialog.\n\nPress Esc to close.").
 		Size(40, 10).
 		DimBackground(true)
 
-	// Create program
+	// Create program.
 	p := tea.New(Model{modal: m}, tea.WithAltScreen[Model]())
 
-	// Run
+	// Run.
 	if err := p.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)

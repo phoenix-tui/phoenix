@@ -46,18 +46,18 @@ func (r *TextAreaRenderer) renderContent(ta *model.TextArea) string {
 	for i, line := range visibleLines {
 		actualRow := i // TODO: adjust for scroll offset
 
-		// Render line number if enabled
+		// Render line number if enabled.
 		if ta.ShowLineNumbers() {
 			lineNum := fmt.Sprintf("%4d ", actualRow+1)
 			b.WriteString(lineNum)
 		}
 
-		// Render line content
+		// Render line content.
 		if actualRow == cursorRow && ta.ShowCursor() {
 			// Render line with cursor (only if ShowCursor enabled)
 			b.WriteString(r.renderLineWithCursor(line, cursorCol))
 		} else {
-			// Render line without cursor
+			// Render line without cursor.
 			b.WriteString(line)
 		}
 
@@ -75,15 +75,15 @@ func (r *TextAreaRenderer) renderLineWithCursor(line string, col int) string {
 	runes := []rune(line)
 
 	if col >= len(runes) {
-		// Cursor at end of line
+		// Cursor at end of line.
 		return line + "█" // Block cursor
 	}
 
-	// Cursor in middle of line
+	// Cursor in middle of line.
 	before := string(runes[:col])
-	// TODO: Style cursor as reverse video
+	// TODO: Style cursor as reverse video.
 	after := string(runes[col+1:])
 
-	// For now, just show cursor as block
+	// For now, just show cursor as block.
 	return before + "█" + after
 }

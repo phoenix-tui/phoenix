@@ -37,7 +37,7 @@ func TestButtonMultipleButtons(t *testing.T) {
 	no := NewButton("No", "n", "cancel")
 	ok := NewButton("OK", "enter", "ok")
 
-	// Verify each button maintains its own state
+	// Verify each button maintains its own state.
 	if yes.Action() != "confirm" {
 		t.Error("Yes button action incorrect")
 	}

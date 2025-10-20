@@ -6,15 +6,15 @@ import (
 	"github.com/phoenix-tui/phoenix/components/list/domain/value"
 )
 
-// FilterService handles list filtering logic
+// FilterService handles list filtering logic.
 type FilterService struct{}
 
-// NewFilterService creates a new filter service
+// NewFilterService creates a new filter service.
 func NewFilterService() *FilterService {
 	return &FilterService{}
 }
 
-// Filter applies the filter function to all items and returns matching items
+// Filter applies the filter function to all items and returns matching items.
 func (s *FilterService) Filter(items []*value.Item, query string,
 	filterFunc func(*value.Item, string) bool) []*value.Item {
 
@@ -36,7 +36,7 @@ func (s *FilterService) Filter(items []*value.Item, query string,
 	return result
 }
 
-// DefaultFilter performs case-insensitive substring matching on item labels
+// DefaultFilter performs case-insensitive substring matching on item labels.
 func (s *FilterService) DefaultFilter(item *value.Item, query string) bool {
 	if query == "" {
 		return true

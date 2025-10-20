@@ -1,3 +1,4 @@
+// Package infrastructure provides pre-defined spinner styles.
 package infrastructure
 
 import "github.com/phoenix-tui/phoenix/components/progress/domain/value"
@@ -7,91 +8,91 @@ import "github.com/phoenix-tui/phoenix/components/progress/domain/value"
 
 var (
 	// SpinnerDots - Unicode Braille pattern dots (most popular)
-	// ⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏
+	// ⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏.
 	SpinnerDots = value.NewSpinnerStyle([]string{
 		"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏",
 	}, 10)
 
-	// SpinnerLine - Classic ASCII line spinner
-	// | / - \
+	// SpinnerLine - Classic ASCII line spinner.
+	// | / - \.
 	SpinnerLine = value.NewSpinnerStyle([]string{
 		"|", "/", "-", "\\",
 	}, 10)
 
-	// SpinnerArrow - Rotating arrow
-	// ← ↖ ↑ ↗ → ↘ ↓ ↙
+	// SpinnerArrow - Rotating arrow.
+	// ← ↖ ↑ ↗ → ↘ ↓ ↙.
 	SpinnerArrow = value.NewSpinnerStyle([]string{
 		"←", "↖", "↑", "↗", "→", "↘", "↓", "↙",
 	}, 8)
 
-	// SpinnerCircle - Rotating circle quarters
-	// ◐ ◓ ◑ ◒
+	// SpinnerCircle - Rotating circle quarters.
+	// ◐ ◓ ◑ ◒.
 	SpinnerCircle = value.NewSpinnerStyle([]string{
 		"◐", "◓", "◑", "◒",
 	}, 8)
 
-	// SpinnerBounce - Bouncing ball effect
-	// ⠁ ⠂ ⠄ ⡀ ⢀ ⠠ ⠐ ⠈
+	// SpinnerBounce - Bouncing ball effect.
+	// ⠁ ⠂ ⠄ ⡀ ⢀ ⠠ ⠐ ⠈.
 	SpinnerBounce = value.NewSpinnerStyle([]string{
 		"⠁", "⠂", "⠄", "⡀", "⢀", "⠠", "⠐", "⠈",
 	}, 10)
 
-	// SpinnerDotPulse - Pulsing dots
-	// ⣾ ⣽ ⣻ ⢿ ⡿ ⣟ ⣯ ⣷
+	// SpinnerDotPulse - Pulsing dots.
+	// ⣾ ⣽ ⣻ ⢿ ⡿ ⣟ ⣯ ⣷.
 	SpinnerDotPulse = value.NewSpinnerStyle([]string{
 		"⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷",
 	}, 12)
 
-	// SpinnerGrowVertical - Vertical growth
-	// ▁ ▃ ▄ ▅ ▆ ▇ █ ▇ ▆ ▅ ▄ ▃
+	// SpinnerGrowVertical - Vertical growth.
+	// ▁ ▃ ▄ ▅ ▆ ▇ █ ▇ ▆ ▅ ▄ ▃.
 	SpinnerGrowVertical = value.NewSpinnerStyle([]string{
 		"▁", "▃", "▄", "▅", "▆", "▇", "█", "▇", "▆", "▅", "▄", "▃",
 	}, 8)
 
-	// SpinnerGrowHorizontal - Horizontal growth
-	// ▏ ▎ ▍ ▌ ▋ ▊ ▉ █ ▉ ▊ ▋ ▌ ▍ ▎
+	// SpinnerGrowHorizontal - Horizontal growth.
+	// ▏ ▎ ▍ ▌ ▋ ▊ ▉ █ ▉ ▊ ▋ ▌ ▍ ▎.
 	SpinnerGrowHorizontal = value.NewSpinnerStyle([]string{
 		"▏", "▎", "▍", "▌", "▋", "▊", "▉", "█", "▉", "▊", "▋", "▌", "▍", "▎",
 	}, 8)
 
-	// SpinnerBoxBounce - Box bouncing
-	// ▖ ▘ ▝ ▗
+	// SpinnerBoxBounce - Box bouncing.
+	// ▖ ▘ ▝ ▗.
 	SpinnerBoxBounce = value.NewSpinnerStyle([]string{
 		"▖", "▘", "▝", "▗",
 	}, 10)
 
-	// SpinnerSimpleDots - Simple ASCII dots
+	// SpinnerSimpleDots - Simple ASCII dots.
 	// .  .. ...
 	SpinnerSimpleDots = value.NewSpinnerStyle([]string{
 		".  ", ".. ", "...",
 	}, 6)
 
-	// SpinnerClock - Clock rotation
-	// 🕐 🕑 🕒 🕓 🕔 🕕 🕖 🕗 🕘 🕙 🕚 🕛
+	// SpinnerClock - Clock rotation.
+	// 🕐 🕑 🕒 🕓 🕔 🕕 🕖 🕗 🕘 🕙 🕚 🕛.
 	SpinnerClock = value.NewSpinnerStyle([]string{
 		"🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚", "🕛",
 	}, 4)
 
-	// SpinnerEarth - Spinning earth
-	// 🌍 🌎 🌏
+	// SpinnerEarth - Spinning earth.
+	// 🌍 🌎 🌏.
 	SpinnerEarth = value.NewSpinnerStyle([]string{
 		"🌍", "🌎", "🌏",
 	}, 6)
 
-	// SpinnerMoon - Moon phases
-	// 🌑 🌒 🌓 🌔 🌕 🌖 🌗 🌘
+	// SpinnerMoon - Moon phases.
+	// 🌑 🌒 🌓 🌔 🌕 🌖 🌗 🌘.
 	SpinnerMoon = value.NewSpinnerStyle([]string{
 		"🌑", "🌒", "🌓", "🌔", "🌕", "🌖", "🌗", "🌘",
 	}, 5)
 
-	// SpinnerToggle - On/off toggle
-	// ⊶ ⊷
+	// SpinnerToggle - On/off toggle.
+	// ⊶ ⊷.
 	SpinnerToggle = value.NewSpinnerStyle([]string{
 		"⊶", "⊷",
 	}, 8)
 
-	// SpinnerHamburger - Hamburger menu animation
-	// ☱ ☲ ☴
+	// SpinnerHamburger - Hamburger menu animation.
+	// ☱ ☲ ☴.
 	SpinnerHamburger = value.NewSpinnerStyle([]string{
 		"☱", "☲", "☴",
 	}, 8)

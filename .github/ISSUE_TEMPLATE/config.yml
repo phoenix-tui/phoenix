@@ -1,0 +1,14 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/phoenix-tui/phoenix/discussions
+    about: Ask questions and discuss Phoenix TUI Framework with the community
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/phoenix-tui/phoenix/security/advisories/new
+    about: Report security vulnerabilities privately (DO NOT open public issues)
+  - name: 📚 Documentation
+    url: https://github.com/phoenix-tui/phoenix/tree/main/docs
+    about: Read the documentation and guides
+  - name: 🎯 Roadmap
+    url: https://github.com/phoenix-tui/phoenix/blob/main/ROADMAP.md
+    about: See what's planned for future releases

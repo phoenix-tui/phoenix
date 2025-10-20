@@ -80,7 +80,7 @@ func TestTextArea_WithSize(t *testing.T) {
 				t.Errorf("Height() = %d, want %d", result.Height(), tt.wantHeight)
 			}
 
-			// Verify immutability
+			// Verify immutability.
 			if ta.Width() != 80 || ta.Height() != 24 {
 				t.Error("Original TextArea was modified")
 			}
@@ -103,7 +103,7 @@ func TestTextArea_WithMaxLines(t *testing.T) {
 			ta := NewTextArea()
 			result := ta.WithMaxLines(tt.max)
 
-			// Verify immutability
+			// Verify immutability.
 			if ta == result {
 				t.Error("WithMaxLines() returned same instance")
 			}
@@ -126,7 +126,7 @@ func TestTextArea_WithMaxChars(t *testing.T) {
 			ta := NewTextArea()
 			result := ta.WithMaxChars(tt.max)
 
-			// Verify immutability
+			// Verify immutability.
 			if ta == result {
 				t.Error("WithMaxChars() returned same instance")
 			}
@@ -137,13 +137,13 @@ func TestTextArea_WithMaxChars(t *testing.T) {
 func TestTextArea_WithWrap(t *testing.T) {
 	ta := NewTextArea()
 
-	// Enable wrap
+	// Enable wrap.
 	wrapped := ta.WithWrap(true)
 	if wrapped == ta {
 		t.Error("WithWrap() returned same instance")
 	}
 
-	// Disable wrap
+	// Disable wrap.
 	nowrapped := wrapped.WithWrap(false)
 	if nowrapped == wrapped {
 		t.Error("WithWrap() returned same instance")
@@ -169,7 +169,7 @@ func TestTextArea_WithPlaceholder(t *testing.T) {
 				t.Errorf("Placeholder() = %q, want %q", result.Placeholder(), tt.placeholder)
 			}
 
-			// Verify immutability
+			// Verify immutability.
 			if ta.Placeholder() != "" {
 				t.Error("Original TextArea was modified")
 			}
@@ -180,7 +180,7 @@ func TestTextArea_WithPlaceholder(t *testing.T) {
 func TestTextArea_WithReadOnly(t *testing.T) {
 	ta := NewTextArea()
 
-	// Enable read-only
+	// Enable read-only.
 	readonly := ta.WithReadOnly(true)
 	if !readonly.IsReadOnly() {
 		t.Error("WithReadOnly(true) should set read-only")
@@ -189,7 +189,7 @@ func TestTextArea_WithReadOnly(t *testing.T) {
 		t.Error("WithReadOnly() returned same instance")
 	}
 
-	// Disable read-only
+	// Disable read-only.
 	editable := readonly.WithReadOnly(false)
 	if editable.IsReadOnly() {
 		t.Error("WithReadOnly(false) should disable read-only")
@@ -199,7 +199,7 @@ func TestTextArea_WithReadOnly(t *testing.T) {
 func TestTextArea_WithLineNumbers(t *testing.T) {
 	ta := NewTextArea()
 
-	// Enable line numbers
+	// Enable line numbers.
 	withNumbers := ta.WithLineNumbers(true)
 	if !withNumbers.ShowLineNumbers() {
 		t.Error("WithLineNumbers(true) should show line numbers")
@@ -208,7 +208,7 @@ func TestTextArea_WithLineNumbers(t *testing.T) {
 		t.Error("WithLineNumbers() returned same instance")
 	}
 
-	// Disable line numbers
+	// Disable line numbers.
 	withoutNumbers := withNumbers.WithLineNumbers(false)
 	if withoutNumbers.ShowLineNumbers() {
 		t.Error("WithLineNumbers(false) should hide line numbers")
@@ -228,13 +228,13 @@ func TestTextArea_WithBuffer(t *testing.T) {
 		t.Errorf("Value() = %q, want %q", result.Value(), "line1\nline2\nline3")
 	}
 
-	// Cursor should be reset
+	// Cursor should be reset.
 	row, col := result.CursorPosition()
 	if row != 0 || col != 0 {
 		t.Errorf("Cursor = (%d, %d), want (0, 0)", row, col)
 	}
 
-	// Selection should be cleared
+	// Selection should be cleared.
 	if result.HasSelection() {
 		t.Error("Selection should be cleared")
 	}
@@ -251,7 +251,7 @@ func TestTextArea_WithCursor(t *testing.T) {
 		t.Errorf("CursorPosition() = (%d, %d), want (1, 3)", row, col)
 	}
 
-	// Verify immutability
+	// Verify immutability.
 	origRow, origCol := ta.CursorPosition()
 	if origRow != 0 || origCol != 0 {
 		t.Error("Original TextArea cursor was modified")
@@ -512,12 +512,12 @@ func TestTextArea_IsEmpty(t *testing.T) {
 }
 
 func TestTextArea_VisibleLines(t *testing.T) {
-	// Create TextArea with 5 lines but height of 3
+	// Create TextArea with 5 lines but height of 3.
 	ta := NewTextArea().
 		WithBuffer(NewBufferFromString("line0\nline1\nline2\nline3\nline4")).
 		WithSize(80, 3)
 
-	// Initially, should show first 3 lines
+	// Initially, should show first 3 lines.
 	visible := ta.VisibleLines()
 	if len(visible) != 3 {
 		t.Errorf("len(VisibleLines()) = %d, want 3", len(visible))
@@ -569,7 +569,7 @@ func TestTextArea_WithKillRing(t *testing.T) {
 		t.Errorf("WithKillRing() kill ring Yank() = %q, want %q", result.GetKillRing().Yank(), "test")
 	}
 
-	// Verify immutability
+	// Verify immutability.
 	if ta.GetKillRing().Yank() == "test" {
 		t.Error("Original TextArea kill ring was modified")
 	}
@@ -578,7 +578,7 @@ func TestTextArea_WithKillRing(t *testing.T) {
 func TestTextArea_Immutability(t *testing.T) {
 	original := NewTextArea()
 
-	// Apply all configuration methods
+	// Apply all configuration methods.
 	sized := original.WithSize(100, 50)
 	maxLines := original.WithMaxLines(10)
 	maxChars := original.WithMaxChars(100)
@@ -590,7 +590,7 @@ func TestTextArea_Immutability(t *testing.T) {
 	cursor := original.WithCursor(NewCursor(1, 1))
 	killRing := original.WithKillRing(NewKillRing(20).Kill("test"))
 
-	// Original should remain unchanged
+	// Original should remain unchanged.
 	if original.Width() != 80 {
 		t.Error("Original Width was modified")
 	}
@@ -614,7 +614,7 @@ func TestTextArea_Immutability(t *testing.T) {
 		t.Error("Original cursor was modified")
 	}
 
-	// Verify all results are different instances
+	// Verify all results are different instances.
 	instances := []*TextArea{sized, maxLines, maxChars, wrapped, placeholder, readonly, lineNumbers, buffer, cursor, killRing}
 	for i, instance := range instances {
 		if instance == original {
@@ -624,7 +624,7 @@ func TestTextArea_Immutability(t *testing.T) {
 }
 
 func TestTextArea_ComplexOperations(t *testing.T) {
-	// Test chaining multiple operations
+	// Test chaining multiple operations.
 	ta := NewTextArea().
 		WithSize(120, 40).
 		WithBuffer(NewBufferFromString("line1\nline2\nline3")).
@@ -633,7 +633,7 @@ func TestTextArea_ComplexOperations(t *testing.T) {
 		WithWrap(true).
 		WithLineNumbers(true)
 
-	// Verify all properties
+	// Verify all properties.
 	if ta.Width() != 120 {
 		t.Errorf("Width = %d, want 120", ta.Width())
 	}
@@ -703,7 +703,7 @@ func TestTextArea_SelectedText(t *testing.T) {
 				WithBuffer(NewBufferFromString(tt.text))
 
 			if tt.hasSelection {
-				// Create selection using value package
+				// Create selection using value package.
 				anchor := value.NewPosition(tt.startRow, tt.startCol)
 				cursor := value.NewPosition(tt.endRow, tt.endCol)
 				selection := NewSelection(anchor, cursor)
@@ -798,12 +798,12 @@ func TestTextArea_EnsureCursorVisible_Vertical(t *testing.T) {
 				WithCursor(NewCursor(tt.cursorRow, 0))
 
 			// Check if scroll was adjusted (need to access internal scrollRow)
-			// Since scrollRow is private, we check indirectly via VisibleLines
+			// Since scrollRow is private, we check indirectly via VisibleLines.
 			visible := ta.VisibleLines()
 
-			// Verify cursor row is in visible range
+			// Verify cursor row is in visible range.
 			if len(visible) > 0 {
-				// The implementation should ensure cursor is visible
+				// The implementation should ensure cursor is visible.
 				t.Logf("Visible lines after cursor move: %v", visible)
 			}
 		})
@@ -812,16 +812,16 @@ func TestTextArea_EnsureCursorVisible_Vertical(t *testing.T) {
 
 // Helper method for testing (internal access)
 func (t *TextArea) withSelection(s *Selection) *TextArea {
-	copy := t.copy()
-	copy.selection = s
-	return copy
+	updated := t.copy()
+	updated.selection = s
+	return updated
 }
 
 func (t *TextArea) withScroll(scrollRow, scrollCol int) *TextArea {
-	copy := t.copy()
-	copy.scrollRow = scrollRow
-	copy.scrollCol = scrollCol
-	return copy
+	updated := t.copy()
+	updated.scrollRow = scrollRow
+	updated.scrollCol = scrollCol
+	return updated
 }
 
 func TestTextArea_EnsureCursorVisible_Horizontal(t *testing.T) {
@@ -887,7 +887,7 @@ func TestTextArea_WithBuffer_ResetsScrollAndCursor(t *testing.T) {
 		WithCursor(NewCursor(1, 5)).
 		withScroll(1, 5)
 
-	// WithBuffer should reset cursor and clear selection
+	// WithBuffer should reset cursor and clear selection.
 	newTa := ta.WithBuffer(NewBufferFromString("new\ntext"))
 
 	row, col := newTa.CursorPosition()

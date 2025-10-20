@@ -1,12 +1,12 @@
 // Package main demonstrates custom button actions.
 //
 // This example shows:
-//   - Modal with multiple custom buttons
-//   - Different button actions
-//   - Handling multiple action types
+//   - Modal with multiple custom buttons.
+//   - Different button actions.
+//   - Handling multiple action types.
 //   - Real-world use case (save/discard/cancel)
 //
-// Run: go run main.go
+// Run: go run main.go.
 package main
 
 import (
@@ -33,9 +33,9 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		// Check for quit keys when modal is not visible
+		// Check for quit keys when modal is not visible.
 		if !m.modal.IsVisible() && (msg.String() == "q" || msg.String() == "ctrl+c") {
-			// If there are unsaved changes, show confirmation modal
+			// If there are unsaved changes, show confirmation modal.
 			if m.hasUnsavedChanges {
 				m.modal = m.modal.Show()
 				return m, nil
@@ -43,7 +43,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			return m, tea.Quit()
 		}
 
-		// Simulate making changes
+		// Simulate making changes.
 		if msg.String() == "e" && !m.modal.IsVisible() {
 			m.hasUnsavedChanges = true
 			m.result = "Document has been edited. Try quitting now (Q or Ctrl+C)."
@@ -51,7 +51,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		}
 
 	case modal.ButtonPressedMsg:
-		// Handle button press
+		// Handle button press.
 		switch msg.Action {
 		case "save":
 			m.result = "Changes saved successfully!"
@@ -70,13 +70,13 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		}
 
 	case tea.WindowSizeMsg:
-		// Pass window size to modal
+		// Pass window size to modal.
 		updatedModal, cmd := m.modal.Update(msg)
 		m.modal = updatedModal
 		return m, cmd
 	}
 
-	// Forward all messages to modal when visible
+	// Forward all messages to modal when visible.
 	if m.modal.IsVisible() {
 		updatedModal, cmd := m.modal.Update(msg)
 		m.modal = updatedModal
@@ -115,7 +115,7 @@ Status: `
 }
 
 func main() {
-	// Create modal with custom buttons
+	// Create modal with custom buttons.
 	m := modal.NewWithTitle("Unsaved Changes", "You have unsaved changes. What would you like to do?").
 		Size(60, 10).
 		Buttons([]modal.Button{
@@ -125,13 +125,13 @@ func main() {
 		}).
 		DimBackground(true)
 
-	// Create program
+	// Create program.
 	p := tea.New(Model{
 		modal:             m,
 		hasUnsavedChanges: false,
 	}, tea.WithAltScreen[Model]())
 
-	// Run
+	// Run.
 	if err := p.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)

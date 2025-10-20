@@ -47,7 +47,7 @@ func TestViewport_WithContent(t *testing.T) {
 
 	v2 := v.WithContent(content)
 
-	// Check new viewport has content
+	// Check new viewport has content.
 	if v2.TotalLines() != 3 {
 		t.Errorf("TotalLines = %d, want 3", v2.TotalLines())
 	}
@@ -61,7 +61,7 @@ func TestViewport_WithContent(t *testing.T) {
 func TestViewport_WithContent_FollowMode(t *testing.T) {
 	v := NewViewport(80, 5).WithFollowMode(true)
 
-	// Content larger than viewport
+	// Content larger than viewport.
 	content := make([]string, 10)
 	for i := range content {
 		content[i] = "Line"
@@ -69,7 +69,7 @@ func TestViewport_WithContent_FollowMode(t *testing.T) {
 
 	v2 := v.WithContent(content)
 
-	// Should scroll to bottom in follow mode
+	// Should scroll to bottom in follow mode.
 	if !v2.IsAtBottom() {
 		t.Error("WithContent in follow mode should scroll to bottom")
 	}
@@ -89,7 +89,7 @@ func TestViewport_WithSize(t *testing.T) {
 		t.Errorf("Height = %d, want 30", v2.size.Height())
 	}
 
-	// Check original is unchanged
+	// Check original is unchanged.
 	if v.size.Width() != 80 || v.size.Height() != 24 {
 		t.Error("Original viewport was mutated")
 	}
@@ -110,7 +110,7 @@ func TestViewport_WithSize_ClampsOffset(t *testing.T) {
 		t.Errorf("Initial offset = %d, want 80", v.ScrollOffset())
 	}
 
-	// Increase height to 50
+	// Increase height to 50.
 	v2 := v.WithSize(80, 50)
 
 	// New max offset should be 50 (100 - 50)
@@ -127,12 +127,12 @@ func TestViewport_WithFollowMode(t *testing.T) {
 
 	v := NewViewport(80, 20).WithContent(content)
 
-	// Initially at top
+	// Initially at top.
 	if v.IsAtBottom() {
 		t.Error("Should not be at bottom initially")
 	}
 
-	// Enable follow mode
+	// Enable follow mode.
 	v2 := v.WithFollowMode(true)
 
 	if !v2.FollowMode() {
@@ -142,7 +142,7 @@ func TestViewport_WithFollowMode(t *testing.T) {
 		t.Error("Enabling follow mode should scroll to bottom")
 	}
 
-	// Original unchanged
+	// Original unchanged.
 	if v.FollowMode() {
 		t.Error("Original viewport was mutated")
 	}
@@ -181,7 +181,7 @@ func TestViewport_ScrollUp(t *testing.T) {
 		t.Errorf("ScrollOffset = %d, want 40", v2.ScrollOffset())
 	}
 
-	// Original unchanged
+	// Original unchanged.
 	if v.ScrollOffset() != 50 {
 		t.Error("Original viewport was mutated")
 	}
@@ -321,7 +321,7 @@ func TestViewport_VisibleLines(t *testing.T) {
 		t.Errorf("VisibleLines = %v, want %v", visible, want)
 	}
 
-	// Scroll down
+	// Scroll down.
 	v2 := v.ScrollDown(2)
 	visible2 := v2.VisibleLines()
 
@@ -344,7 +344,7 @@ func TestViewport_VisibleLines_Truncation(t *testing.T) {
 		t.Errorf("VisibleLines count = %d, want 2", len(visible))
 	}
 
-	// Second line should be truncated
+	// Second line should be truncated.
 	if len(visible[1]) > 20 {
 		t.Errorf("Line was not truncated: length = %d, want <= 20", len(visible[1]))
 	}
@@ -358,12 +358,12 @@ func TestViewport_VisibleLines_Wrapping(t *testing.T) {
 
 	visible := v.VisibleLines()
 
-	// Line should be wrapped into multiple lines
+	// Line should be wrapped into multiple lines.
 	if len(visible) <= 1 {
 		t.Errorf("Line was not wrapped: got %d lines", len(visible))
 	}
 
-	// Each wrapped line should fit in width
+	// Each wrapped line should fit in width.
 	for i, line := range visible {
 		if len(line) > 10 {
 			t.Errorf("Wrapped line %d exceeds width: length = %d", i, len(line))
@@ -447,7 +447,7 @@ func TestViewport_Immutability(t *testing.T) {
 	original := NewViewport(80, 24).
 		WithContent([]string{"Line 1", "Line 2", "Line 3"})
 
-	// Perform various operations
+	// Perform various operations.
 	_ = original.WithContent([]string{"New content"})
 	_ = original.WithSize(100, 30)
 	_ = original.WithFollowMode(true)
@@ -459,7 +459,7 @@ func TestViewport_Immutability(t *testing.T) {
 	_ = original.PageUp()
 	_ = original.PageDown()
 
-	// Original should remain unchanged
+	// Original should remain unchanged.
 	if original.TotalLines() != 3 {
 		t.Error("Content was mutated")
 	}
@@ -531,7 +531,7 @@ func TestViewport_UnicodeContent(t *testing.T) {
 		t.Errorf("VisibleLines count = %d, want 3", len(visible))
 	}
 
-	// Lines should be properly truncated respecting Unicode width
+	// Lines should be properly truncated respecting Unicode width.
 	for i, line := range visible {
 		if strings.Contains(line, "�") {
 			t.Errorf("Line %d contains replacement character: %s", i, line)
@@ -548,13 +548,13 @@ func TestViewport_LargeContent(t *testing.T) {
 
 	v := NewViewport(80, 20).WithContent(content)
 
-	// Should handle large content efficiently
+	// Should handle large content efficiently.
 	visible := v.VisibleLines()
 	if len(visible) != 20 {
 		t.Errorf("VisibleLines count = %d, want 20", len(visible))
 	}
 
-	// Scroll operations should be fast
+	// Scroll operations should be fast.
 	v2 := v.ScrollToBottom()
 	if !v2.IsAtBottom() {
 		t.Error("Failed to scroll to bottom of large content")
@@ -575,19 +575,19 @@ func TestViewport_WithScrollOffset(t *testing.T) {
 
 	v := NewViewport(80, 20).WithContent(content)
 
-	// Set specific offset
+	// Set specific offset.
 	v2 := v.WithScrollOffset(30)
 
 	if v2.ScrollOffset() != 30 {
 		t.Errorf("ScrollOffset = %d, want 30", v2.ScrollOffset())
 	}
 
-	// Follow mode should be disabled
+	// Follow mode should be disabled.
 	if v2.FollowMode() {
 		t.Error("WithScrollOffset should disable follow mode")
 	}
 
-	// Original unchanged
+	// Original unchanged.
 	if v.ScrollOffset() != 0 {
 		t.Error("Original viewport was mutated")
 	}
@@ -601,7 +601,7 @@ func TestViewport_WithScrollOffset_ClampsToZero(t *testing.T) {
 
 	v := NewViewport(80, 20).WithContent(content)
 
-	// Try negative offset
+	// Try negative offset.
 	v2 := v.WithScrollOffset(-10)
 
 	if v2.ScrollOffset() != 0 {
@@ -618,7 +618,7 @@ func TestViewport_WithScrollOffset_ClampsToMaxOffset(t *testing.T) {
 	v := NewViewport(80, 20).WithContent(content)
 
 	// Max offset is 80 (100 lines - 20 height)
-	// Try offset beyond max
+	// Try offset beyond max.
 	v2 := v.WithScrollOffset(200)
 
 	if v2.ScrollOffset() != 80 {
@@ -633,7 +633,7 @@ func TestViewport_Content(t *testing.T) {
 
 	retrievedContent := v.Content()
 
-	// Should return copy of content
+	// Should return copy of content.
 	if !reflect.DeepEqual(retrievedContent, content) {
 		t.Errorf("Content() = %v, want %v", retrievedContent, content)
 	}

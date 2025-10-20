@@ -28,7 +28,7 @@ func (s *ValidationService) IsValid(content string, validator ValidationFunc) bo
 	return s.Validate(content, validator) == nil
 }
 
-// Common validation errors
+// Common validation errors.
 var (
 	ErrEmpty         = errors.New("content cannot be empty")
 	ErrTooShort      = errors.New("content is too short")
@@ -39,7 +39,7 @@ var (
 // NotEmpty returns a validator that ensures content is not empty.
 func NotEmpty() ValidationFunc {
 	return func(content string) error {
-		if len(content) == 0 {
+		if content == "" {
 			return ErrEmpty
 		}
 		return nil
@@ -47,9 +47,9 @@ func NotEmpty() ValidationFunc {
 }
 
 // MinLength returns a validator that ensures content has minimum length.
-func MinLength(min int) ValidationFunc {
+func MinLength(minLen int) ValidationFunc {
 	return func(content string) error {
-		if len(content) < min {
+		if len(content) < minLen {
 			return ErrTooShort
 		}
 		return nil
@@ -57,9 +57,9 @@ func MinLength(min int) ValidationFunc {
 }
 
 // MaxLength returns a validator that ensures content doesn't exceed maximum length.
-func MaxLength(max int) ValidationFunc {
+func MaxLength(maxLen int) ValidationFunc {
 	return func(content string) error {
-		if len(content) > max {
+		if len(content) > maxLen {
 			return ErrTooLong
 		}
 		return nil
@@ -67,13 +67,13 @@ func MaxLength(max int) ValidationFunc {
 }
 
 // Range returns a validator that ensures content length is within range.
-func Range(min, max int) ValidationFunc {
+func Range(minLen, maxLen int) ValidationFunc {
 	return func(content string) error {
 		length := len(content)
-		if length < min {
+		if length < minLen {
 			return ErrTooShort
 		}
-		if length > max {
+		if length > maxLen {
 			return ErrTooLong
 		}
 		return nil

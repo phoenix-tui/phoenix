@@ -1,3 +1,4 @@
+// Package viewport provides a scrollable viewport component for TUI applications.
 package viewport
 
 import (
@@ -90,8 +91,8 @@ func (v *Viewport) SetLines(lines []string) *Viewport {
 // The line is added to the end of existing content.
 func (v *Viewport) AppendLine(line string) *Viewport {
 	currentContent := v.domain.Content()
-	newContent := append(currentContent, line)
-	return v.SetLines(newContent)
+	currentContent = append(currentContent, line)
+	return v.SetLines(currentContent)
 }
 
 // AppendLines appends multiple lines to the viewport content.
@@ -99,8 +100,8 @@ func (v *Viewport) AppendLine(line string) *Viewport {
 // More efficient than multiple AppendLine() calls.
 func (v *Viewport) AppendLines(lines []string) *Viewport {
 	currentContent := v.domain.Content()
-	newContent := append(currentContent, lines...)
-	return v.SetLines(newContent)
+	currentContent = append(currentContent, lines...)
+	return v.SetLines(currentContent)
 }
 
 // ScrollToBottom scrolls the viewport to the bottom (last line).

@@ -23,13 +23,15 @@ func NewEmacsKeybindings() *EmacsKeybindings {
 }
 
 // Handle processes key message and returns updated TextArea.
+//nolint:gocognit,gocyclo,cyclop,funlen // keybindings require state machine logic
 func (e *EmacsKeybindings) Handle(msg api.KeyMsg, ta *model.TextArea) (*model.TextArea, api.Cmd) {
-	// Handle Ctrl key combinations
+	// Handle Ctrl key combinations.
 	if msg.Ctrl {
+		//nolint:gocritic // switch with single case is intentional for Emacs bindings structure
 		switch msg.Type {
 		case api.KeyRune:
 			switch msg.Rune {
-			// Navigation
+			// Navigation.
 			case 'a', 'A':
 				return e.navigation.MoveToLineStart(ta), nil
 
@@ -48,12 +50,12 @@ func (e *EmacsKeybindings) Handle(msg api.KeyMsg, ta *model.TextArea) (*model.Te
 			case 'b', 'B':
 				return e.navigation.MoveLeft(ta), nil
 
-			// Editing
+			// Editing.
 			case 'k', 'K':
 				return e.editing.KillLine(ta), nil
 
 			case 'u', 'U':
-				// Kill from start of line to cursor
+				// Kill from start of line to cursor.
 				ta = e.navigation.MoveToLineStart(ta)
 				return e.editing.KillLine(ta), nil
 
@@ -75,7 +77,7 @@ func (e *EmacsKeybindings) Handle(msg api.KeyMsg, ta *model.TextArea) (*model.Te
 		}
 	}
 
-	// Handle Alt key combinations
+	// Handle Alt key combinations.
 	if msg.Alt {
 		switch msg.Type {
 		case api.KeyRune:
@@ -133,15 +135,15 @@ func (e *EmacsKeybindings) Handle(msg api.KeyMsg, ta *model.TextArea) (*model.Te
 
 		case api.KeySpace:
 			// Insert space character (0x20 is parsed as KeySpace, not KeyRune)
-			// CRITICAL FIX: Without this, spaces are ignored until next character
+			// CRITICAL FIX: Without this, spaces are ignored until next character.
 			return e.editing.InsertChar(ta, ' '), nil
 
 		case api.KeyRune:
-			// Insert character
+			// Insert character.
 			return e.editing.InsertChar(ta, msg.Rune), nil
 		}
 	}
 
-	// Unhandled key
+	// Unhandled key.
 	return ta, nil
 }

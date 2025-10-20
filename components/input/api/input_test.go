@@ -50,7 +50,7 @@ func TestInput_Validator(t *testing.T) {
 		return nil
 	}
 
-	// Pointer chaining from New
+	// Pointer chaining from New.
 	input := New(40).
 		Validator(validator).
 		Content("test")
@@ -59,7 +59,7 @@ func TestInput_Validator(t *testing.T) {
 		t.Error("IsValid() = true, want false (missing @)")
 	}
 
-	// After first method, we have Input value
+	// After first method, we have Input value.
 	input = input.Content("test@example.com")
 	if !input.IsValid() {
 		t.Error("IsValid() = false, want true (has @)")
@@ -110,21 +110,21 @@ func TestInput_Init(t *testing.T) {
 }
 
 func TestInput_Update_Focused(t *testing.T) {
-	// Pointer chaining from New
+	// Pointer chaining from New.
 	input := New(40).Content("hello").Focused(true)
 
-	// Send left arrow key
+	// Send left arrow key.
 	msg := tea.KeyMsg{Type: tea.KeyLeft}
-	updated, cmd := input.Update(msg)
+	_, cmd := input.Update(msg)
 
 	if cmd != nil {
 		t.Error("Update() should return nil cmd")
 	}
 
 	// Cursor should move (assuming default position at end)
-	// After typing "hello", cursor is at 5, left arrow moves to 4
+	// After typing "hello", cursor is at 5, left arrow moves to 4.
 	inputAtEnd := input.SetContent("hello", 5)
-	updated, _ = inputAtEnd.Update(msg)
+	updated, _ := inputAtEnd.Update(msg)
 
 	if updated.CursorPosition() != 4 {
 		t.Errorf("CursorPosition() = %d, want 4 after left arrow", updated.CursorPosition())
@@ -138,17 +138,17 @@ func TestInput_Update_Unfocused(t *testing.T) {
 	msg := tea.KeyMsg{Type: tea.KeyLeft}
 	updated, _ := input.Update(msg)
 
-	// Should be unchanged
+	// Should be unchanged.
 	if updated.Value() != input.Value() {
 		t.Error("unfocused input should ignore keys")
 	}
 }
 
 func TestInput_Update_InsertText(t *testing.T) {
-	// Method chaining returns Input value after first call
+	// Method chaining returns Input value after first call.
 	input := New(40).Content("").Focused(true)
 
-	// Insert 'h'
+	// Insert 'h'.
 	msg := tea.KeyMsg{Type: tea.KeyRune, Rune: 'h'}
 	input, _ = input.Update(msg) // Reassignment!
 
@@ -156,7 +156,7 @@ func TestInput_Update_InsertText(t *testing.T) {
 		t.Errorf("Value() = %q, want %q", input.Value(), "h")
 	}
 
-	// Insert 'i'
+	// Insert 'i'.
 	msg = tea.KeyMsg{Type: tea.KeyRune, Rune: 'i'}
 	input, _ = input.Update(msg) // Reassignment!
 
@@ -166,7 +166,7 @@ func TestInput_Update_InsertText(t *testing.T) {
 }
 
 func TestInput_Update_Backspace(t *testing.T) {
-	// Method chaining returns Input value
+	// Method chaining returns Input value.
 	input := New(40).SetContent("hello", 5).Focused(true)
 
 	msg := tea.KeyMsg{Type: tea.KeyBackspace}
@@ -218,12 +218,12 @@ func TestInput_View_WithCursor(t *testing.T) {
 
 	view := input.View()
 
-	// Should contain the content
+	// Should contain the content.
 	if !strings.Contains(view, "he") {
 		t.Errorf("View() should contain 'he', got %q", view)
 	}
 
-	// Should have some cursor rendering
+	// Should have some cursor rendering.
 	// (exact format depends on renderCursor implementation)
 	if len(view) == 0 {
 		t.Error("View() should not be empty with content and cursor")
@@ -240,18 +240,18 @@ func TestInput_CustomKeyBindings(t *testing.T) {
 		return domain // Return unchanged if not handled
 	}
 
-	// Wrap in KeyBindingHandler interface
+	// Wrap in KeyBindingHandler interface.
 	wrappedHandler := CustomKeyBindings(customHandler)
 
-	// Can't directly test this without exposing more internals
-	// This test verifies the API exists
+	// Can't directly test this without exposing more internals.
+	// This test verifies the API exists.
 	if wrappedHandler == nil {
 		t.Error("CustomKeyBindings() returned nil")
 	}
 }
 
 func TestInput_CommonValidators(t *testing.T) {
-	// Test NotEmpty
+	// Test NotEmpty.
 	input := New(40).Validator(NotEmpty()).Content("")
 	if input.IsValid() {
 		t.Error("empty should be invalid with NotEmpty validator")
@@ -262,7 +262,7 @@ func TestInput_CommonValidators(t *testing.T) {
 		t.Error("non-empty should be valid with NotEmpty validator")
 	}
 
-	// Test MinLength
+	// Test MinLength.
 	input = New(40).Validator(MinLength(5)).Content("abc")
 	if input.IsValid() {
 		t.Error("'abc' should be invalid with MinLength(5)")
@@ -273,7 +273,7 @@ func TestInput_CommonValidators(t *testing.T) {
 		t.Error("'abcde' should be valid with MinLength(5)")
 	}
 
-	// Test MaxLength
+	// Test MaxLength.
 	input = New(40).Validator(MaxLength(5)).Content("abcdef")
 	if input.IsValid() {
 		t.Error("'abcdef' should be invalid with MaxLength(5)")
@@ -284,7 +284,7 @@ func TestInput_CommonValidators(t *testing.T) {
 		t.Error("'abcde' should be valid with MaxLength(5)")
 	}
 
-	// Test Range
+	// Test Range.
 	input = New(40).Validator(Range(3, 7)).Content("ab")
 	if input.IsValid() {
 		t.Error("'ab' should be invalid with Range(3, 7)")
@@ -300,7 +300,7 @@ func TestInput_CommonValidators(t *testing.T) {
 		t.Error("'abcdefgh' should be invalid with Range(3, 7)")
 	}
 
-	// Test Chain
+	// Test Chain.
 	input = New(40).Validator(Chain(NotEmpty(), MinLength(3), MaxLength(10))).Content("")
 	if input.IsValid() {
 		t.Error("empty should be invalid with chained validators")
@@ -318,7 +318,7 @@ func TestInput_CommonValidators(t *testing.T) {
 }
 
 func TestInput_ValidationErrors(t *testing.T) {
-	// Just verify the errors are exported
+	// Just verify the errors are exported.
 	if ErrEmpty == nil {
 		t.Error("ErrEmpty should be exported")
 	}
@@ -334,7 +334,7 @@ func TestInput_ValidationErrors(t *testing.T) {
 }
 
 func TestInput_Immutability(t *testing.T) {
-	// Method chaining returns Input value
+	// Method chaining returns Input value.
 	original := New(40).Content("hello").Focused(true)
 
 	// Apply various operations (don't reassign to original!)
@@ -353,7 +353,7 @@ func TestInput_Immutability(t *testing.T) {
 }
 
 func TestInput_CompleteWorkflow(t *testing.T) {
-	// Simulate a complete user interaction
+	// Simulate a complete user interaction.
 	input := New(40).
 		Placeholder("Enter email...").
 		Validator(func(s string) error {
@@ -389,7 +389,7 @@ func TestInput_CompleteWorkflow(t *testing.T) {
 		t.Errorf("Value() = %q, want %q", input.Value(), "test@example.com")
 	}
 
-	// Should be valid now
+	// Should be valid now.
 	if !input.IsValid() {
 		t.Error("'test@example.com' should be valid email")
 	}

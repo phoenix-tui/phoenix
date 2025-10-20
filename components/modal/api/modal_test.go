@@ -11,12 +11,12 @@ import (
 func TestNew(t *testing.T) {
 	modal := New("Test content")
 
-	// Modal is not visible by default
+	// Modal is not visible by default.
 	if modal.IsVisible() {
 		t.Error("Modal should not be visible by default")
 	}
 
-	// Show modal and check view
+	// Show modal and check view.
 	modal = modal.Show()
 	if !strings.Contains(modal.View(), "Test content") {
 		t.Error("Modal should contain the content in view when visible")
@@ -89,18 +89,18 @@ func TestModalDimBackground(t *testing.T) {
 func TestModalShowHide(t *testing.T) {
 	modal := New("Content")
 
-	// Initially hidden
+	// Initially hidden.
 	if modal.IsVisible() {
 		t.Error("Modal should be hidden initially")
 	}
 
-	// Show
+	// Show.
 	modal = modal.Show()
 	if !modal.IsVisible() {
 		t.Error("Modal should be visible after Show()")
 	}
 
-	// Hide
+	// Hide.
 	modal = modal.Hide()
 	if modal.IsVisible() {
 		t.Error("Modal should be hidden after Hide()")
@@ -144,7 +144,7 @@ func TestModalUpdateWindowSize(t *testing.T) {
 func TestModalUpdateKeyClose(t *testing.T) {
 	modal := New("Content").Show()
 
-	// Press Esc
+	// Press Esc.
 	msg := tea.KeyMsg{Type: tea.KeyEsc}
 	updated, _ := modal.Update(msg)
 
@@ -160,12 +160,12 @@ func TestModalUpdateKeyNextButton(t *testing.T) {
 	}
 	modal := New("Content").Buttons(buttons).Show()
 
-	// Initially focused on first button
+	// Initially focused on first button.
 	if modal.FocusedButton() != "confirm" {
 		t.Error("Should focus on first button initially")
 	}
 
-	// Press Tab to focus next button
+	// Press Tab to focus next button.
 	msg := tea.KeyMsg{Type: tea.KeyTab}
 	updated, _ := modal.Update(msg)
 
@@ -197,7 +197,7 @@ func TestModalUpdateKeyActivateButton(t *testing.T) {
 	}
 	modal := New("Content").Buttons(buttons).Show()
 
-	// Press Enter to activate focused button
+	// Press Enter to activate focused button.
 	msg := tea.KeyMsg{Type: tea.KeyEnter}
 	_, cmd := modal.Update(msg)
 
@@ -205,7 +205,7 @@ func TestModalUpdateKeyActivateButton(t *testing.T) {
 		t.Fatal("Should return command with ButtonPressedMsg")
 	}
 
-	// Execute command and verify message
+	// Execute command and verify message.
 	result := cmd()
 	btnMsg, ok := result.(ButtonPressedMsg)
 	if !ok {
@@ -223,7 +223,7 @@ func TestModalUpdateKeyShortcut(t *testing.T) {
 	}
 	modal := New("Content").Buttons(buttons).Show()
 
-	// Press 'n' shortcut
+	// Press 'n' shortcut.
 	msg := tea.KeyMsg{Type: tea.KeyRune, Rune: 'n'}
 	_, cmd := modal.Update(msg)
 
@@ -231,7 +231,7 @@ func TestModalUpdateKeyShortcut(t *testing.T) {
 		t.Fatal("Should return command with ButtonPressedMsg")
 	}
 
-	// Execute command and verify message
+	// Execute command and verify message.
 	result := cmd()
 	btnMsg, ok := result.(ButtonPressedMsg)
 	if !ok {
@@ -248,7 +248,7 @@ func TestModalUpdateKeyShortcutCaseInsensitive(t *testing.T) {
 	}
 	modal := New("Content").Buttons(buttons).Show()
 
-	// Press 'Y' (uppercase) - should match 'y' shortcut
+	// Press 'Y' (uppercase) - should match 'y' shortcut.
 	msg := tea.KeyMsg{Type: tea.KeyRune, Rune: 'Y'}
 	_, cmd := modal.Update(msg)
 
@@ -269,7 +269,7 @@ func TestModalUpdateKeyShortcutCaseInsensitive(t *testing.T) {
 func TestModalUpdateHidden(t *testing.T) {
 	modal := New("Content") // Not visible
 
-	// Press keys - should have no effect
+	// Press keys - should have no effect.
 	msg := tea.KeyMsg{Type: tea.KeyEnter}
 	updated, cmd := modal.Update(msg)
 
@@ -340,7 +340,7 @@ func TestModalViewDimmedBackground(t *testing.T) {
 }
 
 func TestModalFluentAPI(t *testing.T) {
-	// Test method chaining
+	// Test method chaining.
 	modal := New("Content").
 		Size(60, 15).
 		DimBackground(true).
@@ -364,12 +364,12 @@ func TestModalImmutability(t *testing.T) {
 	original := New("Original")
 	modified := original.Show()
 
-	// Original should be unchanged
+	// Original should be unchanged.
 	if original.IsVisible() {
 		t.Error("Original modal should remain hidden")
 	}
 
-	// Modified should have changes
+	// Modified should have changes.
 	if !modified.IsVisible() {
 		t.Error("Modified modal should be visible")
 	}

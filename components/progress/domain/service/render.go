@@ -1,3 +1,4 @@
+// Package service provides rendering services for progress domain.
 package service
 
 import (
@@ -16,8 +17,8 @@ func NewRenderService() *RenderService {
 }
 
 // RenderBar renders a progress bar to a string.
-// Format: [label] [filled][empty] [percentage]
-// Example: "Downloading... ████████░░░░░░░░ 40%"
+// Format: [label] [filled][empty] [percentage].
+// Example: "Downloading... ████████░░░░░░░░ 40%".
 func (s *RenderService) RenderBar(bar *model.Bar) string {
 	if bar == nil {
 		return ""
@@ -25,21 +26,21 @@ func (s *RenderService) RenderBar(bar *model.Bar) string {
 
 	var parts []string
 
-	// Add label if present
+	// Add label if present.
 	if bar.Label() != "" {
 		parts = append(parts, bar.Label())
 	}
 
-	// Calculate filled and empty widths
+	// Calculate filled and empty widths.
 	filledWidth := s.CalculateFilledWidth(bar.Width(), bar.Percentage())
 	emptyWidth := bar.Width() - filledWidth
 
-	// Build bar string
+	// Build bar string.
 	barStr := strings.Repeat(string(bar.FillChar()), filledWidth) +
 		strings.Repeat(string(bar.EmptyChar()), emptyWidth)
 	parts = append(parts, barStr)
 
-	// Add percentage if enabled
+	// Add percentage if enabled.
 	if bar.ShowPercent() {
 		parts = append(parts, s.formatPercentage(bar.Percentage()))
 	}
@@ -49,7 +50,7 @@ func (s *RenderService) RenderBar(bar *model.Bar) string {
 
 // CalculateFilledWidth calculates the number of characters to fill based on percentage.
 // Returns a value in [0, barWidth].
-func (s *RenderService) CalculateFilledWidth(barWidth int, percentage int) int {
+func (s *RenderService) CalculateFilledWidth(barWidth, percentage int) int {
 	if barWidth <= 0 {
 		return 0
 	}
@@ -60,15 +61,15 @@ func (s *RenderService) CalculateFilledWidth(barWidth int, percentage int) int {
 		return barWidth
 	}
 
-	// Calculate filled width: (percentage / 100) * barWidth
-	// Use integer arithmetic to avoid floating point
+	// Calculate filled width: (percentage / 100) * barWidth.
+	// Use integer arithmetic to avoid floating point.
 	filled := (percentage * barWidth) / 100
 	return filled
 }
 
 // formatPercentage formats a percentage value as a string.
 func (s *RenderService) formatPercentage(pct int) string {
-	// Simple integer formatting
+	// Simple integer formatting.
 	return string(rune('0'+pct/100%10)) +
 		string(rune('0'+pct/10%10)) +
 		string(rune('0'+pct%10)) + "%"

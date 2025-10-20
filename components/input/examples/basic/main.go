@@ -1,3 +1,5 @@
+// Package main demonstrates basic input component usage.
+// This example shows a simple text input with basic editing capabilities.
 package main
 
 import (
@@ -25,18 +27,18 @@ func (m basicModel) Update(msg tea.Msg) (basicModel, tea.Cmd) {
 			return m, tea.Quit()
 
 		case "enter":
-			// Print the value and quit
+			// Print the value and quit.
 			fmt.Printf("\nYou entered: %q\n", m.input.Value())
 			return m, tea.Quit()
 		}
 
 	case tea.WindowSizeMsg:
-		// Adjust input width based on window size
+		// Adjust input width based on window size.
 		m.input = m.input.Width(msg.Width - 4)
 		return m, nil
 	}
 
-	// Forward all other messages to input
+	// Forward all other messages to input.
 	updated, cmd := m.input.Update(msg)
 	m.input = updated
 	return m, cmd
@@ -52,17 +54,17 @@ func (m basicModel) View() string {
 }
 
 func main() {
-	// Create input with placeholder
+	// Create input with placeholder.
 	inputField := input.New(40).
 		Placeholder("Enter your name...").
 		Focused(true)
 
-	// Create model
+	// Create model.
 	model := basicModel{
 		input: inputField,
 	}
 
-	// Run program
+	// Run program.
 	p := tea.New(model)
 	if err := p.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)

@@ -112,17 +112,12 @@ func TestProvider_Write_Timeout(t *testing.T) {
 	provider := NewProvider(1 * time.Millisecond)
 	provider.WithOutput(pw)
 
-	content, err := model.NewTextContent("test data")
-	if err != nil {
-		t.Fatalf("failed to create content: %v", err)
-	}
-
 	// Generate large content to ensure timeout
 	largeData := ""
 	for i := 0; i < 100000; i++ {
 		largeData += "x"
 	}
-	content, _ = model.NewTextContent(largeData)
+	content, _ := model.NewTextContent(largeData)
 
 	// This should timeout due to blocking write
 	err = provider.Write(content)
@@ -174,7 +169,7 @@ func TestProvider_IsAvailable(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(t *testing.T) { //nolint:revive // Table-driven test pattern
 			os.Setenv("SSH_TTY", tt.sshTTY)
 			os.Setenv("SSH_CLIENT", tt.sshClient)
 			os.Setenv("SSH_CONNECTION", tt.sshConnection)
@@ -241,7 +236,7 @@ func TestProvider_WithOutput(t *testing.T) {
 	}
 }
 
-// Helper function to check if a string contains a substring
+// Helper function to check if a string contains a substring.
 func containsString(s, substr string) bool {
 	for i := 0; i <= len(s)-len(substr); i++ {
 		if s[i:i+len(substr)] == substr {

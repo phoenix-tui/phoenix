@@ -5,7 +5,7 @@ import (
 )
 
 // Modal is the aggregate root for modal/overlay component.
-// It represents a dialog box that can be centered or positioned at custom coordinates,
+// It represents a dialog box that can be centered or positioned at custom coordinates,.
 // with optional title, content, buttons, and background dimming.
 //
 // All operations are immutable - methods return new instances rather than modifying in place.

@@ -341,7 +341,7 @@ func TestIsHalfPageDownKey(t *testing.T) {
 }
 
 func TestAllKeyBindingsCovered(t *testing.T) {
-	// Ensure all key binding functions are tested
+	// Ensure all key binding functions are tested.
 	bindings := DefaultKeyBindings()
 
 	testers := map[string]func(tea.KeyMsg) bool{

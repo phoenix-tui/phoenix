@@ -1,12 +1,12 @@
 // Package main demonstrates a confirmation dialog.
 //
 // This example shows:
-//   - Modal with Yes/No buttons
-//   - Handling button press events
+//   - Modal with Yes/No buttons.
+//   - Handling button press events.
 //   - Button navigation (Tab, arrows)
 //   - Keyboard shortcuts ('y', 'n')
 //
-// Run: go run main.go
+// Run: go run main.go.
 package main
 
 import (
@@ -32,12 +32,12 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		// Check for quit keys when modal is not visible
+		// Check for quit keys when modal is not visible.
 		if !m.modal.IsVisible() && (msg.String() == "q" || msg.String() == "ctrl+c") {
 			return m, tea.Quit()
 		}
 
-		// Show modal on spacebar
+		// Show modal on spacebar.
 		if msg.String() == " " && !m.modal.IsVisible() {
 			m.result = "" // Reset result
 			m.modal = m.modal.Show()
@@ -45,7 +45,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		}
 
 	case modal.ButtonPressedMsg:
-		// Handle button press
+		// Handle button press.
 		if msg.Action == "confirm" {
 			m.result = "You clicked YES! File will be deleted."
 			m.modal = m.modal.Hide()
@@ -57,13 +57,13 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 		}
 
 	case tea.WindowSizeMsg:
-		// Pass window size to modal
+		// Pass window size to modal.
 		updatedModal, cmd := m.modal.Update(msg)
 		m.modal = updatedModal
 		return m, cmd
 	}
 
-	// Forward all messages to modal when visible
+	// Forward all messages to modal when visible.
 	if m.modal.IsVisible() {
 		updatedModal, cmd := m.modal.Update(msg)
 		m.modal = updatedModal
@@ -94,7 +94,7 @@ Press Q or Ctrl+C to quit
 }
 
 func main() {
-	// Create confirmation modal
+	// Create confirmation modal.
 	m := modal.NewWithTitle("Confirm Action", "Are you sure you want to delete this file?").
 		Size(50, 8).
 		Buttons([]modal.Button{
@@ -103,10 +103,10 @@ func main() {
 		}).
 		DimBackground(true)
 
-	// Create program
+	// Create program.
 	p := tea.New(Model{modal: m}, tea.WithAltScreen[Model]())
 
-	// Run
+	// Run.
 	if err := p.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)

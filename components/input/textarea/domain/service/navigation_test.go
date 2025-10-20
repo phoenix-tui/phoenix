@@ -621,7 +621,7 @@ func TestNavigationService_Immutability(t *testing.T) {
 		WithBuffer(model.NewBufferFromString("line1\nline2\nline3")).
 		WithCursor(model.NewCursor(1, 2))
 
-	// Apply all navigation operations
+	// Apply all navigation operations.
 	_ = svc.MoveLeft(original)
 	_ = svc.MoveRight(original)
 	_ = svc.MoveUp(original)
@@ -633,7 +633,7 @@ func TestNavigationService_Immutability(t *testing.T) {
 	_ = svc.ForwardWord(original)
 	_ = svc.BackwardWord(original)
 
-	// Original should remain unchanged
+	// Original should remain unchanged.
 	row, col := original.CursorPosition()
 	if row != 1 || col != 2 {
 		t.Errorf("Original cursor changed: (%d, %d), want (1, 2)", row, col)

@@ -1,3 +1,4 @@
+// Package value contains value objects for viewport domain.
 package value
 
 // ScrollOffset represents the current scroll position in a viewport.
@@ -22,14 +23,14 @@ func (s *ScrollOffset) Offset() int {
 
 // Add returns a new ScrollOffset with the given delta added.
 // The result is clamped between 0 and maxOffset.
-func (s *ScrollOffset) Add(delta int, maxOffset int) *ScrollOffset {
+func (s *ScrollOffset) Add(delta, maxOffset int) *ScrollOffset {
 	newOffset := s.offset + delta
 	return s.clamp(newOffset, maxOffset)
 }
 
 // Set returns a new ScrollOffset with the offset set to the given value.
 // The result is clamped between 0 and maxOffset.
-func (s *ScrollOffset) Set(offset int, maxOffset int) *ScrollOffset {
+func (s *ScrollOffset) Set(offset, maxOffset int) *ScrollOffset {
 	return s.clamp(offset, maxOffset)
 }
 
@@ -39,7 +40,7 @@ func (s *ScrollOffset) Clamp(maxOffset int) *ScrollOffset {
 }
 
 // clamp ensures the offset is between 0 and maxOffset (inclusive).
-func (s *ScrollOffset) clamp(offset int, maxOffset int) *ScrollOffset {
+func (s *ScrollOffset) clamp(offset, maxOffset int) *ScrollOffset {
 	if offset < 0 {
 		offset = 0
 	}

@@ -1,3 +1,5 @@
+// Package main demonstrates spinner usage.
+// This example shows animated spinner for long-running operations.
 package main
 
 import (
@@ -8,8 +10,8 @@ import (
 	tea "github.com/phoenix-tui/phoenix/tea/api"
 )
 
-// Simple spinner example
-// Demonstrates animated spinner with tea.Program
+// Simple spinner example.
+// Demonstrates animated spinner with tea.Program.
 type model struct {
 	spinner progress.Spinner
 	count   int
@@ -29,13 +31,13 @@ func (m model) Init() tea.Cmd {
 func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		// Quit on 'q' or Ctrl+C
+		// Quit on 'q' or Ctrl+C.
 		if msg.String() == "q" || msg.String() == "ctrl+c" {
 			return m, tea.Quit()
 		}
 
 	case tea.TickMsg:
-		// Update spinner and increment counter
+		// Update spinner and increment counter.
 		updated, cmd := m.spinner.Update(msg)
 		m.spinner = updated // Already *progress.Spinner type
 		m.count++

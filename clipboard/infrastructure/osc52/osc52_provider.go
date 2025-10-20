@@ -1,3 +1,4 @@
+// Package osc52 implements clipboard access via OSC 52 escape sequences for SSH sessions.
 package osc52
 
 import (
@@ -9,14 +10,14 @@ import (
 	"github.com/phoenix-tui/phoenix/clipboard/domain/model"
 )
 
-// Provider implements clipboard operations using OSC 52 escape sequences
-// This works over SSH connections by sending escape sequences to the terminal
+// Provider implements clipboard operations using OSC 52 escape sequences.
+// This works over SSH connections by sending escape sequences to the terminal.
 type Provider struct {
 	timeout time.Duration
 	output  *os.File // Terminal output (usually os.Stdout)
 }
 
-// NewProvider creates a new OSC 52 clipboard provider
+// NewProvider creates a new OSC 52 clipboard provider.
 func NewProvider(timeout time.Duration) *Provider {
 	return &Provider{
 		timeout: timeout,
@@ -24,15 +25,15 @@ func NewProvider(timeout time.Duration) *Provider {
 	}
 }
 
-// Read attempts to read from clipboard via OSC 52
-// Note: OSC 52 read is not widely supported, so this returns an error
+// Read attempts to read from clipboard via OSC 52.
+// Note: OSC 52 read is not widely supported, so this returns an error.
 func (p *Provider) Read() (*model.ClipboardContent, error) {
 	// OSC 52 clipboard reading is not widely supported by terminals
 	// Most terminals only support writing via OSC 52
 	return nil, fmt.Errorf("OSC 52 clipboard reading is not supported by most terminals")
 }
 
-// Write writes content to the clipboard using OSC 52 escape sequences
+// Write writes content to the clipboard using OSC 52 escape sequences.
 func (p *Provider) Write(content *model.ClipboardContent) error {
 	if content == nil {
 		return fmt.Errorf("content cannot be nil")
@@ -70,7 +71,7 @@ func (p *Provider) Write(content *model.ClipboardContent) error {
 	}
 }
 
-// IsAvailable returns true if OSC 52 can be used
+// IsAvailable returns true if OSC 52 can be used.
 func (p *Provider) IsAvailable() bool {
 	// Check if we have a valid output file
 	if p.output == nil {
@@ -109,12 +110,12 @@ func (p *Provider) IsAvailable() bool {
 	return false
 }
 
-// Name returns the provider name
+// Name returns the provider name.
 func (p *Provider) Name() string {
 	return "OSC52"
 }
 
-// WithOutput sets a custom output file (useful for testing)
+// WithOutput sets a custom output file (useful for testing).
 func (p *Provider) WithOutput(output *os.File) *Provider {
 	p.output = output
 	return p

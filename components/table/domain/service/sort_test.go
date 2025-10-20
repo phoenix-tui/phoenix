@@ -16,7 +16,7 @@ func TestSortService_Sort_String(t *testing.T) {
 		{"name": "Bob"},
 	}
 
-	// Ascending
+	// Ascending.
 	sorted := svc.Sort(rows, "name", value.SortDirectionAsc)
 	if sorted[0]["name"] != "Alice" {
 		t.Errorf("First row = %v, want Alice", sorted[0]["name"])
@@ -28,7 +28,7 @@ func TestSortService_Sort_String(t *testing.T) {
 		t.Errorf("Third row = %v, want Charlie", sorted[2]["name"])
 	}
 
-	// Descending
+	// Descending.
 	sorted = svc.Sort(rows, "name", value.SortDirectionDesc)
 	if sorted[0]["name"] != "Charlie" {
 		t.Errorf("First row = %v, want Charlie", sorted[0]["name"])
@@ -47,7 +47,7 @@ func TestSortService_Sort_Int(t *testing.T) {
 		{"age": 35},
 	}
 
-	// Ascending
+	// Ascending.
 	sorted := svc.Sort(rows, "age", value.SortDirectionAsc)
 	if sorted[0]["age"] != 25 {
 		t.Errorf("First row age = %v, want 25", sorted[0]["age"])
@@ -56,7 +56,7 @@ func TestSortService_Sort_Int(t *testing.T) {
 		t.Errorf("Third row age = %v, want 35", sorted[2]["age"])
 	}
 
-	// Descending
+	// Descending.
 	sorted = svc.Sort(rows, "age", value.SortDirectionDesc)
 	if sorted[0]["age"] != 35 {
 		t.Errorf("First row age = %v, want 35", sorted[0]["age"])
@@ -107,7 +107,7 @@ func TestSortService_Sort_None(t *testing.T) {
 
 	sorted := svc.Sort(rows, "id", value.SortDirectionNone)
 
-	// Should return unchanged
+	// Should return unchanged.
 	if sorted[0]["id"] != 3 {
 		t.Errorf("Rows should be unchanged with SortDirectionNone")
 	}
@@ -135,12 +135,12 @@ func TestSortService_Sort_Immutability(t *testing.T) {
 
 	sorted := svc.Sort(rows, "id", value.SortDirectionAsc)
 
-	// Original unchanged
+	// Original unchanged.
 	if rows[0]["id"] != 3 {
 		t.Errorf("Original rows should be unchanged")
 	}
 
-	// Sorted is different
+	// Sorted is different.
 	if sorted[0]["id"] != 1 {
 		t.Errorf("Sorted first row = %v, want 1", sorted[0]["id"])
 	}
@@ -272,7 +272,7 @@ func TestSortService_Compare_Nil(t *testing.T) {
 func TestSortService_Compare_MixedTypes(t *testing.T) {
 	svc := NewSortService()
 
-	// Mixed types should fall back to string comparison
+	// Mixed types should fall back to string comparison.
 	result := svc.Compare(123, "456")
 	if result == 0 {
 		t.Errorf("Compare should handle mixed types")
@@ -282,7 +282,7 @@ func TestSortService_Compare_MixedTypes(t *testing.T) {
 func TestSortService_Sort_StableSort(t *testing.T) {
 	svc := NewSortService()
 
-	// Rows with same sort key should preserve order
+	// Rows with same sort key should preserve order.
 	rows := []model.Row{
 		{"group": "A", "id": 1},
 		{"group": "A", "id": 2},
@@ -292,7 +292,7 @@ func TestSortService_Sort_StableSort(t *testing.T) {
 
 	sorted := svc.Sort(rows, "group", value.SortDirectionAsc)
 
-	// All "A" should come first, in original order
+	// All "A" should come first, in original order.
 	if sorted[0]["id"] != 1 {
 		t.Errorf("First A should have id=1")
 	}

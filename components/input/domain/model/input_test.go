@@ -27,7 +27,7 @@ func TestNew(t *testing.T) {
 				t.Errorf("Width() = %d, want %d", input.Width(), tt.wantWidth)
 			}
 
-			// Check initial state
+			// Check initial state.
 			if input.Content() != "" {
 				t.Errorf("Content() = %q, want empty", input.Content())
 			}
@@ -69,12 +69,12 @@ func TestTextInput_WithContent(t *testing.T) {
 			original := input
 			result := input.WithContent(tt.newContent)
 
-			// Check immutability
+			// Check immutability.
 			if original.Content() != tt.initial {
 				t.Error("original modified")
 			}
 
-			// Check result
+			// Check result.
 			if result.Content() != tt.newContent {
 				t.Errorf("Content() = %q, want %q", result.Content(), tt.newContent)
 			}
@@ -425,6 +425,7 @@ func TestTextInput_SelectAll(t *testing.T) {
 				SelectAll()
 
 			// Empty content should not have selection (0,0 is empty)
+			//nolint:nestif // test validation logic requires branching
 			if tt.content == "" {
 				if input.HasSelection() {
 					t.Error("HasSelection() = true for empty content, want false")
@@ -464,7 +465,7 @@ func TestTextInput_WithSelection(t *testing.T) {
 		t.Errorf("Selection = (%d, %d), want (0, 5)", sel.Start(), sel.End())
 	}
 
-	// Cursor should be at end of selection
+	// Cursor should be at end of selection.
 	if input.CursorPosition() != 5 {
 		t.Errorf("CursorPosition() = %d, want 5", input.CursorPosition())
 	}
@@ -485,12 +486,12 @@ func TestTextInput_WithValidator(t *testing.T) {
 	validator := service.NotEmpty()
 	input := New(40).WithValidator(validator)
 
-	// Empty should be invalid
+	// Empty should be invalid.
 	if input.IsValid() {
 		t.Error("IsValid() = true, want false for empty content")
 	}
 
-	// Non-empty should be valid
+	// Non-empty should be valid.
 	input = input.WithContent("hello")
 	if !input.IsValid() {
 		t.Error("IsValid() = false, want true for non-empty content")
@@ -507,19 +508,19 @@ func TestTextInput_Validate(t *testing.T) {
 
 	input := New(40).WithValidator(validator)
 
-	// Invalid content
+	// Invalid content.
 	input = input.WithContent("invalid")
 	if err := input.Validate(); err == nil {
 		t.Error("Validate() = nil, want error")
 	}
 
-	// Valid content
+	// Valid content.
 	input = input.WithContent("valid")
 	if err := input.Validate(); err != nil {
 		t.Errorf("Validate() = %v, want nil", err)
 	}
 
-	// No validator
+	// No validator.
 	input = New(40).WithContent("anything")
 	if err := input.Validate(); err != nil {
 		t.Errorf("Validate() with no validator = %v, want nil", err)
@@ -560,7 +561,7 @@ func TestTextInput_WithWidth(t *testing.T) {
 		t.Errorf("Width() = %d, want 80", input.Width())
 	}
 
-	// Zero/negative should be clamped
+	// Zero/negative should be clamped.
 	input = input.WithWidth(0)
 	if input.Width() != 1 {
 		t.Errorf("Width() = %d, want 1 (clamped)", input.Width())
@@ -573,7 +574,7 @@ func TestTextInput_Immutability(t *testing.T) {
 		WithPlaceholder("test").
 		WithFocus(true)
 
-	// Perform various operations
+	// Perform various operations.
 	_ = original.WithContent("world")
 	_ = original.MoveLeft()
 	_ = original.InsertRune('x')
@@ -581,7 +582,7 @@ func TestTextInput_Immutability(t *testing.T) {
 	_ = original.Clear()
 	_ = original.SelectAll()
 
-	// Original should be unchanged
+	// Original should be unchanged.
 	if original.Content() != "hello" {
 		t.Error("original content modified")
 	}
@@ -614,7 +615,7 @@ func TestTextInput_DeleteSelection(t *testing.T) {
 }
 
 func TestTextInput_ComplexUnicode(t *testing.T) {
-	// Test with various Unicode complexities
+	// Test with various Unicode complexities.
 	tests := []struct {
 		name    string
 		content string
@@ -634,7 +635,7 @@ func TestTextInput_ComplexUnicode(t *testing.T) {
 			svc := service.NewCursorMovementService()
 			maxPos := svc.GraphemeCount(tt.content)
 
-			// Should be able to navigate through content
+			// Should be able to navigate through content.
 			count := 0
 			for input.CursorPosition() < maxPos {
 				input = input.MoveRight()
@@ -644,7 +645,7 @@ func TestTextInput_ComplexUnicode(t *testing.T) {
 				}
 			}
 
-			// Should be at end
+			// Should be at end.
 			if input.CursorPosition() != maxPos {
 				t.Errorf("final cursor = %d, want %d", input.CursorPosition(), maxPos)
 			}

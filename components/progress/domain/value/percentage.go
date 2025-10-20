@@ -1,3 +1,4 @@
+// Package value contains value objects for progress domain.
 package value
 
 // Percentage represents progress percentage (0-100).
@@ -36,13 +37,13 @@ func (p *Percentage) IsComplete() bool {
 	return p.value == 100
 }
 
-// clamp restricts a value to the range [min, max].
-func clamp(value, min, max int) int {
-	if value < min {
-		return min
+// clamp restricts a value to the range [minVal, maxVal].
+func clamp(value, minVal, maxVal int) int {
+	if value < minVal {
+		return minVal
 	}
-	if value > max {
-		return max
+	if value > maxVal {
+		return maxVal
 	}
 	return value
 }

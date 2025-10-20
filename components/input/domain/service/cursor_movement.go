@@ -1,3 +1,4 @@
+// Package service provides domain services for cursor movement logic.
 package service
 
 import (
@@ -5,7 +6,7 @@ import (
 )
 
 // CursorMovementService handles grapheme-aware cursor movement.
-// It uses uniseg for proper Unicode grapheme cluster segmentation,
+// It uses uniseg for proper Unicode grapheme cluster segmentation,.
 // ensuring correct handling of emoji, combining characters, and CJK text.
 type CursorMovementService struct{}
 
@@ -21,7 +22,7 @@ func (s *CursorMovementService) MoveLeft(content string, currentPos int) int {
 		return 0
 	}
 
-	// Count grapheme clusters from start until we reach currentPos-1
+	// Count grapheme clusters from start until we reach currentPos-1.
 	targetPos := currentPos - 1
 	var byteOffset int
 	graphemeCount := 0
@@ -35,8 +36,8 @@ func (s *CursorMovementService) MoveLeft(content string, currentPos int) int {
 		graphemeCount++
 	}
 
-	// If we've processed all graphemes and haven't reached target,
-	// return the count of graphemes we found
+	// If we've processed all graphemes and haven't reached target,.
+	// return the count of graphemes we found.
 	if graphemeCount < targetPos {
 		return graphemeCount
 	}
@@ -47,7 +48,7 @@ func (s *CursorMovementService) MoveLeft(content string, currentPos int) int {
 // MoveRight moves the cursor right by one grapheme cluster.
 // Returns the new cursor position (clamped to content length in graphemes).
 func (s *CursorMovementService) MoveRight(content string, currentPos int) int {
-	// Count total graphemes in content
+	// Count total graphemes in content.
 	maxPos := s.GraphemeCount(content)
 	if currentPos >= maxPos {
 		return maxPos
@@ -67,9 +68,9 @@ func (s *CursorMovementService) GraphemeCount(content string) int {
 }
 
 // SplitAtCursor splits content at the cursor position into three parts:
-// - before: text before cursor
+// - before: text before cursor.
 // - at: grapheme cluster at cursor (empty if at end)
-// - after: text after cursor
+// - after: text after cursor.
 func (s *CursorMovementService) SplitAtCursor(content string, pos int) (before, at, after string) {
 	if pos < 0 {
 		pos = 0
@@ -79,10 +80,10 @@ func (s *CursorMovementService) SplitAtCursor(content string, pos int) (before, 
 	var byteOffset int
 	graphemeCount := 0
 
-	// Find byte offset for the grapheme cluster at position 'pos'
+	// Find byte offset for the grapheme cluster at position 'pos'.
 	for gr.Next() {
 		if graphemeCount == pos {
-			// Found the position
+			// Found the position.
 			before = content[:byteOffset]
 			atBytes := gr.Bytes()
 			at = string(atBytes)
@@ -93,7 +94,7 @@ func (s *CursorMovementService) SplitAtCursor(content string, pos int) (before, 
 		graphemeCount++
 	}
 
-	// Cursor is at or beyond end
+	// Cursor is at or beyond end.
 	before = content
 	at = ""
 	after = ""
@@ -117,7 +118,7 @@ func (s *CursorMovementService) ByteOffsetToGraphemeOffset(content string, byteO
 	for gr.Next() {
 		nextByteOffset := currentByteOffset + len(gr.Bytes())
 		if nextByteOffset > byteOffset {
-			// The byte offset falls within this grapheme cluster
+			// The byte offset falls within this grapheme cluster.
 			return graphemeCount
 		}
 		currentByteOffset = nextByteOffset
@@ -146,6 +147,6 @@ func (s *CursorMovementService) GraphemeOffsetToByteOffset(content string, graph
 		graphemeCount++
 	}
 
-	// Offset is at or beyond end
+	// Offset is at or beyond end.
 	return len(content)
 }

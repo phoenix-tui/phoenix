@@ -10,15 +10,15 @@ import (
 	"github.com/phoenix-tui/phoenix/clipboard/domain/model"
 )
 
-// Provider implements clipboard operations using macOS pbcopy/pbpaste
+// Provider implements clipboard operations using macOS pbcopy/pbpaste.
 type Provider struct{}
 
-// NewProvider creates a new macOS native clipboard provider
+// NewProvider creates a new macOS native clipboard provider.
 func NewProvider() *Provider {
 	return &Provider{}
 }
 
-// Read reads content from the macOS clipboard using pbpaste
+// Read reads content from the macOS clipboard using pbpaste.
 func (p *Provider) Read() (*model.ClipboardContent, error) {
 	// Use pbpaste to read from clipboard
 	cmd := exec.Command("pbpaste")
@@ -38,7 +38,7 @@ func (p *Provider) Read() (*model.ClipboardContent, error) {
 	return model.NewTextContent(text)
 }
 
-// Write writes content to the macOS clipboard using pbcopy
+// Write writes content to the macOS clipboard using pbcopy.
 func (p *Provider) Write(content *model.ClipboardContent) error {
 	if content == nil {
 		return fmt.Errorf("content cannot be nil")
@@ -62,7 +62,7 @@ func (p *Provider) Write(content *model.ClipboardContent) error {
 	return nil
 }
 
-// IsAvailable returns true if pbcopy/pbpaste are available
+// IsAvailable returns true if pbcopy/pbpaste are available.
 func (p *Provider) IsAvailable() bool {
 	// Check if pbcopy and pbpaste are available
 	_, err := exec.LookPath("pbcopy")
@@ -78,7 +78,7 @@ func (p *Provider) IsAvailable() bool {
 	return true
 }
 
-// Name returns the provider name
+// Name returns the provider name.
 func (p *Provider) Name() string {
 	return "macOS Native (pbcopy/pbpaste)"
 }

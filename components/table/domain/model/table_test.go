@@ -65,12 +65,12 @@ func TestTable_WithRows(t *testing.T) {
 	rows := createTestRows()
 	table2 := table.WithRows(rows)
 
-	// Original unchanged
+	// Original unchanged.
 	if len(table.Rows()) != 0 {
 		t.Errorf("Original table should have 0 rows")
 	}
 
-	// New table has rows
+	// New table has rows.
 	if len(table2.Rows()) != 5 {
 		t.Errorf("New table rows = %v, want 5", len(table2.Rows()))
 	}
@@ -80,12 +80,12 @@ func TestTable_WithHeight(t *testing.T) {
 	table := NewTableWithRows(createTestColumns(), createTestRows())
 	table2 := table.WithHeight(20)
 
-	// Original unchanged
+	// Original unchanged.
 	if table.Height() != 10 {
 		t.Errorf("Original height should be 10")
 	}
 
-	// New table has new height
+	// New table has new height.
 	if table2.Height() != 20 {
 		t.Errorf("New height = %v, want 20", table2.Height())
 	}
@@ -95,12 +95,12 @@ func TestTable_WithShowHeader(t *testing.T) {
 	table := NewTableWithRows(createTestColumns(), createTestRows())
 	table2 := table.WithShowHeader(false)
 
-	// Original unchanged
+	// Original unchanged.
 	if !table.ShowHeader() {
 		t.Errorf("Original should show header")
 	}
 
-	// New table hides header
+	// New table hides header.
 	if table2.ShowHeader() {
 		t.Errorf("New table should hide header")
 	}
@@ -109,19 +109,19 @@ func TestTable_WithShowHeader(t *testing.T) {
 func TestTable_MoveDown(t *testing.T) {
 	table := NewTableWithRows(createTestColumns(), createTestRows())
 
-	// Move down once
+	// Move down once.
 	table2 := table.MoveDown()
 	if table2.SelectedIndex() != 1 {
 		t.Errorf("SelectedIndex = %v, want 1", table2.SelectedIndex())
 	}
 
-	// Move down to end
+	// Move down to end.
 	table3 := table2.MoveDown().MoveDown().MoveDown().MoveDown()
 	if table3.SelectedIndex() != 4 {
 		t.Errorf("SelectedIndex = %v, want 4", table3.SelectedIndex())
 	}
 
-	// Try to move past end
+	// Try to move past end.
 	table4 := table3.MoveDown()
 	if table4.SelectedIndex() != 4 {
 		t.Errorf("Should not move past end, got %v", table4.SelectedIndex())
@@ -132,19 +132,19 @@ func TestTable_MoveUp(t *testing.T) {
 	table := NewTableWithRows(createTestColumns(), createTestRows())
 	table = table.MoveToEnd()
 
-	// Move up once
+	// Move up once.
 	table2 := table.MoveUp()
 	if table2.SelectedIndex() != 3 {
 		t.Errorf("SelectedIndex = %v, want 3", table2.SelectedIndex())
 	}
 
-	// Move up to start
+	// Move up to start.
 	table3 := table2.MoveUp().MoveUp().MoveUp()
 	if table3.SelectedIndex() != 0 {
 		t.Errorf("SelectedIndex = %v, want 0", table3.SelectedIndex())
 	}
 
-	// Try to move before start
+	// Try to move before start.
 	table4 := table3.MoveUp()
 	if table4.SelectedIndex() != 0 {
 		t.Errorf("Should not move before start, got %v", table4.SelectedIndex())
@@ -177,7 +177,7 @@ func TestTable_SelectedRow(t *testing.T) {
 	rows := createTestRows()
 	table := NewTableWithRows(createTestColumns(), rows)
 
-	// First row selected by default
+	// First row selected by default.
 	row := table.SelectedRow()
 	if row == nil {
 		t.Fatal("SelectedRow should not be nil")
@@ -186,7 +186,7 @@ func TestTable_SelectedRow(t *testing.T) {
 		t.Errorf("Selected row name = %v, want Alice", row["name"])
 	}
 
-	// Select second row
+	// Select second row.
 	table2 := table.MoveDown()
 	row2 := table2.SelectedRow()
 	if row2["name"] != "Bob" {
@@ -247,7 +247,7 @@ func TestTable_ClearSort(t *testing.T) {
 }
 
 func TestTable_VisibleRows(t *testing.T) {
-	// Create table with 10 rows
+	// Create table with 10 rows.
 	rows := []Row{}
 	for i := 1; i <= 10; i++ {
 		rows = append(rows, Row{"id": i, "name": "User", "age": 20 + i})
@@ -264,13 +264,13 @@ func TestTable_VisibleRows(t *testing.T) {
 		t.Errorf("First visible row id = %v, want 1", visible[0]["id"])
 	}
 
-	// Scroll down
+	// Scroll down.
 	table2 := table.MoveDown().MoveDown().MoveDown().MoveDown().MoveDown()
 	visible2 := table2.VisibleRows()
 	if len(visible2) != 4 {
 		t.Errorf("VisibleRows count = %v, want 4", len(visible2))
 	}
-	// Should show rows starting from scrollOffset
+	// Should show rows starting from scrollOffset.
 	if visible2[0]["id"].(int) < 1 {
 		t.Errorf("Visible rows should have scrolled")
 	}
@@ -294,7 +294,7 @@ func TestTable_VisibleRows_NoHeader(t *testing.T) {
 }
 
 func TestTable_Scrolling(t *testing.T) {
-	// Create table with many rows
+	// Create table with many rows.
 	rows := []Row{}
 	for i := 1; i <= 20; i++ {
 		rows = append(rows, Row{"id": i})
@@ -302,18 +302,18 @@ func TestTable_Scrolling(t *testing.T) {
 
 	table := NewTableWithRows(createTestColumns(), rows).WithHeight(5)
 
-	// Move down several times
+	// Move down several times.
 	table2 := table
 	for i := 0; i < 10; i++ {
 		table2 = table2.MoveDown()
 	}
 
-	// Should have scrolled
+	// Should have scrolled.
 	if table2.ScrollOffset() <= 0 {
 		t.Errorf("ScrollOffset should be > 0 after moving down")
 	}
 
-	// Selected index should be visible
+	// Selected index should be visible.
 	if table2.SelectedIndex() < table2.ScrollOffset() {
 		t.Errorf("Selected index should be >= scroll offset")
 	}
@@ -322,14 +322,14 @@ func TestTable_Scrolling(t *testing.T) {
 func TestTable_Immutability(t *testing.T) {
 	table1 := NewTableWithRows(createTestColumns(), createTestRows())
 
-	// Chain multiple operations
+	// Chain multiple operations.
 	table2 := table1.
 		WithHeight(20).
 		WithShowHeader(false).
 		MoveDown().
 		MoveDown()
 
-	// Original unchanged
+	// Original unchanged.
 	if table1.Height() != 10 {
 		t.Errorf("Original height should be 10")
 	}
@@ -340,7 +340,7 @@ func TestTable_Immutability(t *testing.T) {
 		t.Errorf("Original selection should be 0")
 	}
 
-	// New table has all changes
+	// New table has all changes.
 	if table2.Height() != 20 {
 		t.Errorf("New height = %v, want 20", table2.Height())
 	}

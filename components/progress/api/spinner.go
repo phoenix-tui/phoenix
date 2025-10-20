@@ -29,7 +29,8 @@ func NewSpinner(style string) *Spinner {
 
 // NewSpinnerCustom creates a new spinner with custom frames and FPS.
 // Returns pointer for initialization, but store as value in Model.
-func NewSpinnerCustom(frames []string, fps int) *Spinner {
+//nolint:revive // frames parameter will be used when custom spinner support is added
+func NewSpinnerCustom(_ []string, fps int) *Spinner {
 	return &Spinner{
 		domain: *model.NewSpinner(infrastructure.GetSpinnerStyle("dots")), // Dereference!
 	}
@@ -37,7 +38,7 @@ func NewSpinnerCustom(frames []string, fps int) *Spinner {
 
 // Label sets the label text displayed with the spinner.
 // Returns new Spinner for method chaining (value semantics).
-// IMPORTANT: Must reassign: spinner = spinner.Label("text")
+// IMPORTANT: Must reassign: spinner = spinner.Label("text").
 func (s Spinner) Label(label string) Spinner {
 	s.domain = s.domain.WithLabel(label)
 	return s
@@ -51,11 +52,12 @@ func (s Spinner) Init() tea.Cmd {
 
 // Update handles messages (implements tea model contract).
 // Advances the animation frame on tea.TickMsg.
-// IMPORTANT: Must reassign: spinner = spinner.Update(msg)
+// IMPORTANT: Must reassign: spinner = spinner.Update(msg).
 func (s Spinner) Update(msg tea.Msg) (Spinner, tea.Cmd) {
+	//nolint:gocritic // single case for now, will expand with pause/resume
 	switch msg.(type) {
 	case tea.TickMsg:
-		// Advance to next frame
+		// Advance to next frame.
 		s.domain = s.domain.NextFrame()
 		return s, s.tick()
 	}
@@ -63,8 +65,8 @@ func (s Spinner) Update(msg tea.Msg) (Spinner, tea.Cmd) {
 }
 
 // View renders the spinner to a string (tea.Model interface).
-// Format: [frame] [label]
-// Example: "⠋ Loading..."
+// Format: [frame] [label].
+// Example: "⠋ Loading...".
 func (s Spinner) View() string {
 	frame := s.domain.CurrentFrame()
 	label := s.domain.Label()

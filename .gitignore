@@ -64,3 +64,5 @@ test_*.txt
 **/test_results.txt
 setup-*.sh
 setup-*.bat
+
+logo/

@@ -9,7 +9,7 @@ import (
 	"github.com/phoenix-tui/phoenix/clipboard/infrastructure/platform"
 )
 
-// MockProvider for testing
+// MockProvider for testing.
 type MockProvider struct {
 	name      string
 	available bool

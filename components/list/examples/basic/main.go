@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	// Create a simple file picker
+	// Create a simple file picker.
 	files := []interface{}{"file1.txt", "file2.go", "file3.md", "README.md", "main.go"}
 	labels := []string{"file1.txt", "file2.go", "file3.md", "README.md", "main.go"}
 
@@ -23,7 +23,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// After program exits, show selected file
+	// After program exits, show selected file.
 	selected := l.SelectedItems()
 	if len(selected) > 0 {
 		fmt.Printf("\nYou selected: %v\n", selected[0])

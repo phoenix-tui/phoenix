@@ -40,14 +40,14 @@ func TestNewKillRing(t *testing.T) {
 				t.Error("NewKillRing() should be empty")
 			}
 
-			// Test that ring accepts items up to maxSize
+			// Test that ring accepts items up to maxSize.
 			testKr := kr
 			for i := 0; i < tt.wantMaxSize; i++ {
 				testKr = testKr.Kill("item")
 			}
 
-			// Ring should now be at max capacity
-			// Adding one more should remove oldest
+			// Ring should now be at max capacity.
+			// Adding one more should remove oldest.
 			testKr = testKr.Kill("newest")
 			yanked := testKr.Yank()
 			if yanked != "newest" {
@@ -111,7 +111,7 @@ func TestKillRing_Kill(t *testing.T) {
 				}
 			}
 
-			// Verify immutability
+			// Verify immutability.
 			originalYank := kr.Yank()
 			if len(tt.initial) > 0 && originalYank != tt.initial[len(tt.initial)-1] {
 				t.Errorf("Original kill ring was modified")
@@ -123,12 +123,12 @@ func TestKillRing_Kill(t *testing.T) {
 func TestKillRing_Kill_MaxSize(t *testing.T) {
 	kr := NewKillRing(3)
 
-	// Fill ring to capacity
+	// Fill ring to capacity.
 	kr = kr.Kill("first")
 	kr = kr.Kill("second")
 	kr = kr.Kill("third")
 
-	// Verify we have 3 items
+	// Verify we have 3 items.
 	if kr.IsEmpty() {
 		t.Error("Ring should not be empty")
 	}
@@ -136,12 +136,12 @@ func TestKillRing_Kill_MaxSize(t *testing.T) {
 	// Add fourth item (should evict first)
 	kr = kr.Kill("fourth")
 
-	// Current item should be fourth
+	// Current item should be fourth.
 	if kr.Yank() != "fourth" {
 		t.Errorf("Yank() = %q, want %q", kr.Yank(), "fourth")
 	}
 
-	// Rotate back through ring
+	// Rotate back through ring.
 	kr = kr.YankPop() // third
 	if kr.Yank() != "third" {
 		t.Errorf("After YankPop(), Yank() = %q, want %q", kr.Yank(), "third")
@@ -253,7 +253,7 @@ func TestKillRing_YankPop(t *testing.T) {
 				kr = kr.Kill(item)
 			}
 
-			// Pop numPops times
+			// Pop numPops times.
 			for i := 0; i < tt.numPops; i++ {
 				kr = kr.YankPop()
 			}
@@ -310,32 +310,32 @@ func TestKillRing_Copy(t *testing.T) {
 	kr = kr.Kill("second")
 	kr = kr.Kill("third")
 
-	copy := kr.Copy()
+	updated := kr.Copy()
 
-	// Verify copy has same content
-	if copy.Yank() != kr.Yank() {
-		t.Errorf("Copy() Yank() = %q, want %q", copy.Yank(), kr.Yank())
+	// Verify updated has same content.
+	if updated.Yank() != kr.Yank() {
+		t.Errorf("Copy() Yank() = %q, want %q", updated.Yank(), kr.Yank())
 	}
-	if copy.IsEmpty() != kr.IsEmpty() {
-		t.Errorf("Copy() IsEmpty() = %v, want %v", copy.IsEmpty(), kr.IsEmpty())
+	if updated.IsEmpty() != kr.IsEmpty() {
+		t.Errorf("Copy() IsEmpty() = %v, want %v", updated.IsEmpty(), kr.IsEmpty())
 	}
 
-	// Verify it's a new instance
-	if copy == kr {
+	// Verify it's a new instance.
+	if updated == kr {
 		t.Error("Copy() returned same instance, want new instance")
 	}
 
-	// Verify modifying copy doesn't affect original
-	copy = copy.Kill("fourth")
+	// Verify modifying updated doesn't affect original.
+	updated = updated.Kill("fourth")
 	if kr.Yank() != "third" {
 		t.Errorf("Original ring was modified: Yank() = %q, want %q", kr.Yank(), "third")
 	}
-	if copy.Yank() != "fourth" {
-		t.Errorf("Copy Yank() = %q, want %q", copy.Yank(), "fourth")
+	if updated.Yank() != "fourth" {
+		t.Errorf("Copy Yank() = %q, want %q", updated.Yank(), "fourth")
 	}
 
-	// Verify modifying index in copy doesn't affect original
-	copy = copy.YankPop()
+	// Verify modifying index in updated doesn't affect original.
+	_ = updated.YankPop()
 	if kr.Yank() != "third" {
 		t.Error("Original ring index was modified")
 	}
@@ -345,17 +345,17 @@ func TestKillRing_Immutability(t *testing.T) {
 	original := NewKillRing(10)
 	original = original.Kill("first")
 
-	// Test all mutation operations preserve original
+	// Test all mutation operations preserve original.
 	killed := original.Kill("second")
 	popped := original.YankPop()
 	copied := original.Copy()
 
-	// Original should remain unchanged
+	// Original should remain unchanged.
 	if original.Yank() != "first" {
 		t.Errorf("Original ring changed after operations: %q, want %q", original.Yank(), "first")
 	}
 
-	// Results should have correct values
+	// Results should have correct values.
 	if killed.Yank() != "second" {
 		t.Error("Kill() produced incorrect ring")
 	}
@@ -370,17 +370,17 @@ func TestKillRing_Immutability(t *testing.T) {
 func TestKillRing_EmptyStringHandling(t *testing.T) {
 	kr := NewKillRing(10)
 
-	// Kill empty string should not add to ring
+	// Kill empty string should not add to ring.
 	kr = kr.Kill("")
 	if !kr.IsEmpty() {
 		t.Error("Kill(\"\") should not add to ring")
 	}
 
-	// Kill non-empty, then try empty
+	// Kill non-empty, then try empty.
 	kr = kr.Kill("valid")
 	kr = kr.Kill("")
 
-	// Should still have only "valid"
+	// Should still have only "valid".
 	if kr.Yank() != "valid" {
 		t.Errorf("After Kill(\"\"), Yank() = %q, want %q", kr.Yank(), "valid")
 	}

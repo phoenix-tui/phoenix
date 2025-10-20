@@ -19,6 +19,7 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
+	//nolint:gocritic // switch preferred for extensibility in examples
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		if msg.Type == tea.KeyCtrlC || (msg.Ctrl && msg.Rune == 'c') {

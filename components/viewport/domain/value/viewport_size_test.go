@@ -62,11 +62,11 @@ func TestViewportSize_WithWidth(t *testing.T) {
 			if got := result.Width(); got != tt.want {
 				t.Errorf("WithWidth(%d).Width() = %d, want %d", tt.newWidth, got, tt.want)
 			}
-			// Height should remain unchanged
+			// Height should remain unchanged.
 			if got := result.Height(); got != tt.initial.Height() {
 				t.Errorf("WithWidth() changed height: got %d, want %d", got, tt.initial.Height())
 			}
-			// Verify immutability
+			// Verify immutability.
 			if tt.initial.Width() != 80 {
 				t.Errorf("WithWidth() modified original width: got %d, want 80", tt.initial.Width())
 			}
@@ -92,11 +92,11 @@ func TestViewportSize_WithHeight(t *testing.T) {
 			if got := result.Height(); got != tt.want {
 				t.Errorf("WithHeight(%d).Height() = %d, want %d", tt.newHeight, got, tt.want)
 			}
-			// Width should remain unchanged
+			// Width should remain unchanged.
 			if got := result.Width(); got != tt.initial.Width() {
 				t.Errorf("WithHeight() changed width: got %d, want %d", got, tt.initial.Width())
 			}
-			// Verify immutability
+			// Verify immutability.
 			if tt.initial.Height() != 24 {
 				t.Errorf("WithHeight() modified original height: got %d, want 24", tt.initial.Height())
 			}
@@ -107,11 +107,11 @@ func TestViewportSize_WithHeight(t *testing.T) {
 func TestViewportSize_Immutability(t *testing.T) {
 	original := NewViewportSize(80, 24)
 
-	// Perform various operations
+	// Perform various operations.
 	_ = original.WithWidth(100)
 	_ = original.WithHeight(30)
 
-	// Original should remain unchanged
+	// Original should remain unchanged.
 	if got := original.Width(); got != 80 {
 		t.Errorf("ViewportSize width was mutated: got %d, want 80", got)
 	}
@@ -130,7 +130,7 @@ func TestViewportSize_ChainedOperations(t *testing.T) {
 	if got := result.Height(); got != 30 {
 		t.Errorf("Chained operations: Height() = %d, want 30", got)
 	}
-	// Original should remain unchanged
+	// Original should remain unchanged.
 	if original.Width() != 80 || original.Height() != 24 {
 		t.Errorf("Chained operations modified original: got (%d, %d), want (80, 24)", original.Width(), original.Height())
 	}

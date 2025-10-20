@@ -24,7 +24,7 @@ func TestSizeWithWidth(t *testing.T) {
 		t.Errorf("Original width should be 80, got %d", original.Width())
 	}
 
-	// New size has updated width
+	// New size has updated width.
 	if modified.Width() != 100 {
 		t.Errorf("Expected width 100, got %d", modified.Width())
 	}
@@ -42,7 +42,7 @@ func TestSizeWithHeight(t *testing.T) {
 		t.Errorf("Original height should be 24, got %d", original.Height())
 	}
 
-	// New size has updated height
+	// New size has updated height.
 	if modified.Width() != 80 {
 		t.Errorf("Expected width 80, got %d", modified.Width())
 	}

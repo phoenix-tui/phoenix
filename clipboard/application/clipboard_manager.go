@@ -1,3 +1,4 @@
+// Package application implements clipboard use cases and coordinates between domain services and providers.
 package application
 
 import (
@@ -9,14 +10,14 @@ import (
 	"github.com/phoenix-tui/phoenix/clipboard/infrastructure/platform"
 )
 
-// ClipboardManager is the application service that manages clipboard operations
-// It coordinates between domain services and infrastructure providers
+// ClipboardManager is the application service that manages clipboard operations.
+// It coordinates between domain services and infrastructure providers.
 type ClipboardManager struct {
 	service  *service.ClipboardService
 	detector *platform.Detector
 }
 
-// NewClipboardManager creates a new clipboard manager with auto-detected providers
+// NewClipboardManager creates a new clipboard manager with auto-detected providers.
 func NewClipboardManager() (*ClipboardManager, error) {
 	detector := platform.NewDetector()
 
@@ -35,7 +36,7 @@ func NewClipboardManager() (*ClipboardManager, error) {
 	}, nil
 }
 
-// NewClipboardManagerWithProviders creates a clipboard manager with custom providers
+// NewClipboardManagerWithProviders creates a clipboard manager with custom providers.
 func NewClipboardManagerWithProviders(providers []service.Provider) (*ClipboardManager, error) {
 	clipboardService, err := service.NewClipboardService(providers)
 	if err != nil {
@@ -48,32 +49,32 @@ func NewClipboardManagerWithProviders(providers []service.Provider) (*ClipboardM
 	}, nil
 }
 
-// Read reads text from the clipboard
+// Read reads text from the clipboard.
 func (m *ClipboardManager) Read() (string, error) {
 	return m.service.ReadText()
 }
 
-// Write writes text to the clipboard
+// Write writes text to the clipboard.
 func (m *ClipboardManager) Write(text string) error {
 	return m.service.WriteText(text)
 }
 
-// IsAvailable returns true if clipboard is available
+// IsAvailable returns true if clipboard is available.
 func (m *ClipboardManager) IsAvailable() bool {
 	return m.service.IsAvailable()
 }
 
-// GetProviderName returns the name of the active provider
+// GetProviderName returns the name of the active provider.
 func (m *ClipboardManager) GetProviderName() string {
 	return m.service.GetAvailableProviderName()
 }
 
-// IsSSH returns true if running in an SSH session
+// IsSSH returns true if running in an SSH session.
 func (m *ClipboardManager) IsSSH() bool {
 	return m.detector.IsSSH()
 }
 
-// buildProviderChain builds a prioritized list of clipboard providers
+// buildProviderChain builds a prioritized list of clipboard providers.
 func buildProviderChain(detector *platform.Detector) []service.Provider {
 	var providers []service.Provider
 
