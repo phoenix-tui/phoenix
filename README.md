@@ -8,7 +8,7 @@
 [![License](https://img.shields.io/github/license/phoenix-tui/phoenix)](https://github.com/phoenix-tui/phoenix/blob/main/LICENSE)
 [![GoDoc](https://pkg.go.dev/badge/github.com/phoenix-tui/phoenix.svg)](https://pkg.go.dev/github.com/phoenix-tui/phoenix)
 
-> **Note**: Phoenix uses a [multi-module monorepo](https://github.com/golang/go/wiki/Modules#is-it-possible-to-add-a-module-to-a-multi-module-repository) structure. Go Report Card analyzes only the root umbrella module. For complete code quality metrics across all 10 libraries, see our [CI pipeline](https://github.com/phoenix-tui/phoenix/actions).
+> **Multi-module monorepo** - 10 independent libraries. Full metrics in [CI](https://github.com/phoenix-tui/phoenix/actions).
 
 > Next-generation Terminal User Interface framework for Go
 
