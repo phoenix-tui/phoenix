@@ -28,18 +28,18 @@ func (k *KillRing) Kill(text string) *KillRing {
 		return k
 	}
 
-	copy := k.Copy()
+	updated := k.Copy()
 
 	// Add to ring (circular buffer)
-	if len(copy.items) >= copy.maxSize {
-		// Ring is full, remove oldest
-		copy.items = copy.items[1:]
+	if len(updated.items) >= updated.maxSize {
+		// Ring is full, remove oldest.
+		updated.items = updated.items[1:]
 	}
 
-	copy.items = append(copy.items, text)
-	copy.index = len(copy.items) - 1 // Point to latest
+	updated.items = append(updated.items, text)
+	updated.index = len(updated.items) - 1 // Point to latest
 
-	return copy
+	return updated
 }
 
 // Yank returns current kill ring item.
@@ -56,18 +56,18 @@ func (k *KillRing) Yank() string {
 // YankPop rotates kill ring backward (for Emacs M-y).
 // Returns new ring with index decremented.
 func (k *KillRing) YankPop() *KillRing {
-	copy := k.Copy()
+	updated := k.Copy()
 
-	if len(copy.items) == 0 {
-		return copy
+	if len(updated.items) == 0 {
+		return updated
 	}
 
-	copy.index--
-	if copy.index < 0 {
-		copy.index = len(copy.items) - 1
+	updated.index--
+	if updated.index < 0 {
+		updated.index = len(updated.items) - 1
 	}
 
-	return copy
+	return updated
 }
 
 // IsEmpty returns true if kill ring has no items.

@@ -1,3 +1,5 @@
+// Package main demonstrates multiple progress bars.
+// This example shows concurrent progress tracking with multiple bars.
 package main
 
 import (
@@ -10,8 +12,8 @@ import (
 	tea "github.com/phoenix-tui/phoenix/tea/api"
 )
 
-// Multi-progress example
-// Demonstrates multiple progress bars and a spinner
+// Multi-progress example.
+// Demonstrates multiple progress bars and a spinner.
 type model struct {
 	spinner progress.Spinner
 	bars    []progress.Bar
@@ -47,13 +49,13 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 		}
 
 	case tea.TickMsg:
-		// Update spinner
+		// Update spinner.
 		updated, cmd := m.spinner.Update(msg)
 		m.spinner = updated // Already *progress.Spinner type
 		return m, cmd
 
 	case tickProgressMsg:
-		// Update progress bars
+		// Update progress bars.
 		allComplete := true
 		for i := range m.bars {
 			if !m.bars[i].IsComplete() {
@@ -64,7 +66,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 
 		m.count++
 
-		// Quit if all bars complete or after 100 ticks
+		// Quit if all bars complete or after 100 ticks.
 		if allComplete || m.count >= 100 {
 			return m, tea.Quit()
 		}
@@ -81,12 +83,12 @@ func (m model) View() string {
 	b.WriteString("\n  Multi-Progress Example\n")
 	b.WriteString("  ======================\n\n")
 
-	// Render spinner
+	// Render spinner.
 	b.WriteString("  ")
 	b.WriteString(m.spinner.View())
 	b.WriteString("\n\n")
 
-	// Render all progress bars
+	// Render all progress bars.
 	for _, bar := range m.bars {
 		b.WriteString("  ")
 		b.WriteString(bar.View())
@@ -98,7 +100,7 @@ func (m model) View() string {
 	return b.String()
 }
 
-// tickProgressMsg is sent to update progress bars
+// tickProgressMsg is sent to update progress bars.
 type tickProgressMsg struct{}
 
 func tickCmd() tea.Cmd {

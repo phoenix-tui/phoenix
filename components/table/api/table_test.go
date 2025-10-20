@@ -207,7 +207,7 @@ func TestTable_SelectedRow(t *testing.T) {
 func TestTable_SortByColumn(t *testing.T) {
 	table := createTestTable()
 
-	// Sort by age ascending
+	// Sort by age ascending.
 	table = table.SortByColumn("age")
 
 	// First row should be Bob (age 25)
@@ -216,7 +216,7 @@ func TestTable_SortByColumn(t *testing.T) {
 		t.Errorf("After sort asc, first row = %v, want Bob", visibleRows[0]["name"])
 	}
 
-	// Toggle to descending
+	// Toggle to descending.
 	table = table.SortByColumn("age")
 
 	visibleRows = table.domain.VisibleRows()
@@ -264,7 +264,7 @@ func TestTable_View_Header(t *testing.T) {
 	table := createTestTable()
 	view := table.View()
 
-	// Should contain header titles
+	// Should contain header titles.
 	if !strings.Contains(view, "ID") {
 		t.Errorf("View should contain 'ID' header")
 	}
@@ -275,7 +275,7 @@ func TestTable_View_Header(t *testing.T) {
 		t.Errorf("View should contain 'Age' header")
 	}
 
-	// Should contain separator
+	// Should contain separator.
 	if !strings.Contains(view, "─") {
 		t.Errorf("View should contain header separator")
 	}
@@ -285,7 +285,7 @@ func TestTable_View_NoHeader(t *testing.T) {
 	table := createTestTable().ShowHeader(false)
 	view := table.View()
 
-	// Should not contain separator
+	// Should not contain separator.
 	if strings.Contains(view, "─") {
 		t.Errorf("View should not contain header separator when header hidden")
 	}
@@ -295,7 +295,7 @@ func TestTable_View_Data(t *testing.T) {
 	table := createTestTable()
 	view := table.View()
 
-	// Should contain data
+	// Should contain data.
 	if !strings.Contains(view, "Alice") {
 		t.Errorf("View should contain 'Alice'")
 	}
@@ -311,7 +311,7 @@ func TestTable_View_Selection(t *testing.T) {
 	table := createTestTable()
 	view := table.View()
 
-	// First row should have selection indicator
+	// First row should have selection indicator.
 	lines := strings.Split(view, "\n")
 	var dataLines []string
 	for _, line := range lines {
@@ -334,16 +334,16 @@ func TestTable_View_SortIndicator(t *testing.T) {
 
 	view := table.View()
 
-	// Should contain ascending indicator
+	// Should contain ascending indicator.
 	if !strings.Contains(view, "▲") {
 		t.Errorf("View should contain ascending sort indicator '▲'")
 	}
 
-	// Toggle to descending
+	// Toggle to descending.
 	table = table.SortByColumn("name")
 	view = table.View()
 
-	// Should contain descending indicator
+	// Should contain descending indicator.
 	if !strings.Contains(view, "▼") {
 		t.Errorf("View should contain descending sort indicator '▼'")
 	}
@@ -394,15 +394,15 @@ func TestTable_View_Alignment(t *testing.T) {
 	table := NewWithRows(columns, rows)
 	view := table.View()
 
-	// Just check that view renders without error
-	// Detailed alignment testing would require parsing the output
+	// Just check that view renders without error.
+	// Detailed alignment testing would require parsing the output.
 	if view == "" {
 		t.Errorf("View should not be empty")
 	}
 }
 
 func TestTable_PageDown(t *testing.T) {
-	// Create table with many rows
+	// Create table with many rows.
 	columns := []Column{
 		{Key: "id", Title: "ID", Width: 5},
 	}
@@ -414,7 +414,7 @@ func TestTable_PageDown(t *testing.T) {
 
 	table := NewWithRows(columns, rows).Height(5)
 
-	// Page down
+	// Page down.
 	msg := tea.KeyMsg{Type: tea.KeyPgDown}
 	updated, _ := table.Update(msg)
 	table = updated
@@ -426,7 +426,7 @@ func TestTable_PageDown(t *testing.T) {
 }
 
 func TestTable_PageUp(t *testing.T) {
-	// Create table with many rows
+	// Create table with many rows.
 	columns := []Column{
 		{Key: "id", Title: "ID", Width: 5},
 	}
@@ -438,15 +438,15 @@ func TestTable_PageUp(t *testing.T) {
 
 	table := NewWithRows(columns, rows).Height(5)
 
-	// Move to end first
+	// Move to end first.
 	table.domain = table.domain.MoveToEnd()
 
-	// Page up
+	// Page up.
 	msg := tea.KeyMsg{Type: tea.KeyPgUp}
 	updated, _ := table.Update(msg)
 	table = updated
 
-	// Should have moved up
+	// Should have moved up.
 	if table.SelectedIndex() >= 19 {
 		t.Errorf("After PageUp from end, SelectedIndex = %v, should be < 19", table.SelectedIndex())
 	}
@@ -455,10 +455,10 @@ func TestTable_PageUp(t *testing.T) {
 func TestTable_Immutability(t *testing.T) {
 	table1 := createTestTable()
 
-	// Perform operations
+	// Perform operations.
 	table2 := table1.Height(20).ShowHeader(false)
 
-	// table1 should be unchanged
+	// table1 should be unchanged.
 	if table1.domain.Height() != 10 {
 		t.Errorf("Original table height should be 10")
 	}
@@ -466,7 +466,7 @@ func TestTable_Immutability(t *testing.T) {
 		t.Errorf("Original table should show header")
 	}
 
-	// table2 should have changes
+	// table2 should have changes.
 	if table2.domain.Height() != 20 {
 		t.Errorf("New table height should be 20")
 	}

@@ -18,7 +18,7 @@ func NewSpinnerStyle(frames []string, fps int) *SpinnerStyle {
 		fps = 10 // Default FPS
 	}
 
-	// Copy frames to ensure immutability
+	// Copy frames to ensure immutability.
 	framesCopy := make([]string, len(frames))
 	copy(framesCopy, frames)
 
@@ -52,12 +52,12 @@ func (s *SpinnerStyle) GetFrame(index int) string {
 		return ""
 	}
 
-	// Normalize negative indices
+	// Normalize negative indices.
 	if index < 0 {
 		index = len(s.frames) + (index % len(s.frames))
 	}
 
-	// Wrap around
-	index = index % len(s.frames)
+	// Wrap around.
+	index %= len(s.frames)
 	return s.frames[index]
 }

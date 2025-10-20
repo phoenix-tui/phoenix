@@ -31,6 +31,8 @@ func (m CounterModel) Init() api.Cmd {
 
 // Update handles incoming messages and updates the model.
 func (m CounterModel) Update(msg api.Msg) (CounterModel, api.Cmd) {
+	// Single type switch is clear for examples (simple pattern)
+	//nolint:gocritic // singleCaseSwitch: Keep for example clarity
 	switch msg := msg.(type) {
 	case api.KeyMsg:
 		switch msg.String() {

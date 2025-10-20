@@ -118,9 +118,9 @@ func (b *Box) WithContent(content string) *Box {
 	if content == "" {
 		panic("box: content cannot be empty")
 	}
-	copy := *b
-	copy.content = content
-	return &copy
+	result := *b
+	result.content = content
+	return &result
 }
 
 // WithPadding returns a new Box with the given padding.
@@ -130,9 +130,9 @@ func (b *Box) WithContent(content string) *Box {
 //
 //	box := NewBox("Text").WithPadding(value.NewSpacingAll(1))
 func (b *Box) WithPadding(p value.Spacing) *Box {
-	copy := *b
-	copy.padding = p
-	return &copy
+	result := *b
+	result.padding = p
+	return &result
 }
 
 // WithMargin returns a new Box with the given margin.
@@ -142,9 +142,9 @@ func (b *Box) WithPadding(p value.Spacing) *Box {
 //
 //	box := NewBox("Text").WithMargin(value.NewSpacingVH(1, 2))
 func (b *Box) WithMargin(m value.Spacing) *Box {
-	copy := *b
-	copy.margin = m
-	return &copy
+	result := *b
+	result.margin = m
+	return &result
 }
 
 // WithBorder returns a new Box with border enabled or disabled.
@@ -154,9 +154,9 @@ func (b *Box) WithMargin(m value.Spacing) *Box {
 //
 //	box := NewBox("Text").WithBorder(true)
 func (b *Box) WithBorder(hasBorder bool) *Box {
-	copy := *b
-	copy.hasBorder = hasBorder
-	return &copy
+	result := *b
+	result.hasBorder = hasBorder
+	return &result
 }
 
 // WithSize returns a new Box with the given size constraints.
@@ -166,9 +166,9 @@ func (b *Box) WithBorder(hasBorder bool) *Box {
 //
 //	box := NewBox("Text").WithSize(value.NewSizeExact(80, 24))
 func (b *Box) WithSize(s value.Size) *Box {
-	copy := *b
-	copy.size = s
-	return &copy
+	result := *b
+	result.size = s
+	return &result
 }
 
 // WithAlignment returns a new Box with the given alignment.
@@ -178,9 +178,9 @@ func (b *Box) WithSize(s value.Size) *Box {
 //
 //	box := NewBox("Text").WithAlignment(value.NewAlignmentCenter())
 func (b *Box) WithAlignment(a value.Alignment) *Box {
-	copy := *b
-	copy.alignment = a
-	return &copy
+	result := *b
+	result.alignment = a
+	return &result
 }
 
 // ContentSize calculates the size of the content area.

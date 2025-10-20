@@ -1,3 +1,4 @@
+// Package input provides keyboard input reading and parsing.
 package input
 
 import (
@@ -8,15 +9,15 @@ import (
 	"github.com/phoenix-tui/phoenix/tea/infrastructure/ansi"
 )
 
-// InputReader reads input from stdin and parses it into messages.
-type InputReader struct {
+// Reader reads input from stdin and parses it into messages.
+type Reader struct {
 	reader *bufio.Reader
 	parser *ansi.Parser
 }
 
-// NewInputReader creates a new input reader.
-func NewInputReader(r io.Reader) *InputReader {
-	return &InputReader{
+// NewReader creates a new input reader.
+func NewReader(r io.Reader) *Reader {
+	return &Reader{
 		reader: bufio.NewReader(r),
 		parser: ansi.NewParser(),
 	}
@@ -26,11 +27,13 @@ func NewInputReader(r io.Reader) *InputReader {
 // Blocks until input is available.
 //
 // Returns:
-// - KeyMsg if keyboard input
-// - error if read fails
+// - KeyMsg if keyboard input.
+// - error if read fails.
 //
-// Properly handles UTF-8 multi-byte sequences (Russian, Chinese, emoji, etc.)
-func (ir *InputReader) Read() (model.Msg, error) {
+// Properly handles UTF-8 multi-byte sequences (Russian, Chinese, emoji, etc.).
+//
+//nolint:gocognit,gocyclo,cyclop,nestif // Input parsing requires sequential byte analysis
+func (ir *Reader) Read() (model.Msg, error) {
 	// Read one byte to detect input type
 	b, err := ir.reader.ReadByte()
 	if err != nil {
@@ -97,6 +100,7 @@ func (ir *InputReader) Read() (model.Msg, error) {
 	}
 
 	// Non-printable unknown byte - ignore and try to read next
-	// Return nil to indicate no message
+	// Return nil to indicate no message (sentinel pattern for skipped input)
+	//nolint:nilnil // Intentional: nil msg + nil error = skip this byte, continue reading
 	return nil, nil
 }

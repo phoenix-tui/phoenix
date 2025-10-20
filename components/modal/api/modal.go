@@ -8,8 +8,8 @@
 //   - Button support (optional action buttons)
 //   - Background dimming (improves UX)
 //
-// This is a UNIVERSAL component - it works for any application (confirmation dialogs,
-// help screens, settings panels, alerts, etc.). It does NOT include application-specific
+// This is a UNIVERSAL component - it works for any application (confirmation dialogs,.
+// help screens, settings panels, alerts, etc.). It does NOT include application-specific.
 // features.
 package modal
 
@@ -164,14 +164,14 @@ func (m *Modal) Init() tea.Cmd {
 
 // Update implements tea.Model.
 func (m *Modal) Update(msg tea.Msg) (*Modal, tea.Cmd) {
-	// If modal is not visible, don't process any input
+	// If modal is not visible, don't process any input.
 	if !m.domain.IsVisible() {
 		return m, nil
 	}
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		// Update terminal size for rendering
+		// Update terminal size for rendering.
 		return &Modal{
 			domain:         m.domain,
 			layoutService:  m.layoutService,
@@ -221,7 +221,7 @@ func (m *Modal) handleKeyPress(msg tea.KeyMsg) (*Modal, tea.Cmd) {
 	if kb.IsActivateButton(msg) {
 		focusedBtn := m.domain.FocusedButton()
 		if focusedBtn != nil {
-			// Send ButtonPressedMsg
+			// Send ButtonPressedMsg.
 			return m, func() tea.Msg {
 				return ButtonPressedMsg{Action: focusedBtn.Action()}
 			}
@@ -243,14 +243,14 @@ func (m *Modal) handleKeyPress(msg tea.KeyMsg) (*Modal, tea.Cmd) {
 
 // View implements tea.Model.
 func (m *Modal) View() string {
-	// If not visible, return empty string
+	// If not visible, return empty string.
 	if !m.domain.IsVisible() {
 		return ""
 	}
 
 	var b strings.Builder
 
-	// Calculate modal position
+	// Calculate modal position.
 	modalWidth := m.domain.Size().Width()
 	modalHeight := m.domain.Size().Height()
 	x, y := m.layoutService.CalculatePosition(
@@ -266,7 +266,7 @@ func (m *Modal) View() string {
 		b.WriteString(m.renderDimmedBackground(x, y, modalWidth, modalHeight))
 	}
 
-	// Render modal box
+	// Render modal box.
 	b.WriteString(m.renderModalBox(x, y, modalWidth, modalHeight))
 
 	return b.String()
@@ -278,7 +278,7 @@ func (m *Modal) renderDimmedBackground(modalX, modalY, modalWidth, modalHeight i
 
 	for row := 0; row < m.terminalHeight; row++ {
 		for col := 0; col < m.terminalWidth; col++ {
-			// Check if this cell is inside the modal area
+			// Check if this cell is inside the modal area.
 			isInsideModal := col >= modalX && col < modalX+modalWidth &&
 				row >= modalY && row < modalY+modalHeight
 
@@ -298,10 +298,10 @@ func (m *Modal) renderDimmedBackground(modalX, modalY, modalWidth, modalHeight i
 func (m *Modal) renderModalBox(x, y, width, height int) string {
 	var b strings.Builder
 
-	// Position cursor at modal location
+	// Position cursor at modal location.
 	b.WriteString(fmt.Sprintf("\x1b[%d;%dH", y+1, x+1)) // ANSI cursor positioning (1-indexed)
 
-	// Top border
+	// Top border.
 	b.WriteString("┌" + strings.Repeat("─", width-2) + "┐\n")
 
 	// Title row (if title exists)
@@ -309,12 +309,12 @@ func (m *Modal) renderModalBox(x, y, width, height int) string {
 		b.WriteString(fmt.Sprintf("\x1b[%d;%dH", y+2, x+1))
 		b.WriteString("│ " + m.padOrTruncate(m.domain.Title(), width-4) + " │\n")
 
-		// Title separator
+		// Title separator.
 		b.WriteString(fmt.Sprintf("\x1b[%d;%dH", y+3, x+1))
 		b.WriteString("├" + strings.Repeat("─", width-2) + "┤\n")
 	}
 
-	// Content area
+	// Content area.
 	contentStartY := y + 2
 	if m.domain.Title() != "" {
 		contentStartY = y + 4
@@ -342,7 +342,7 @@ func (m *Modal) renderModalBox(x, y, width, height int) string {
 		b.WriteString("│ " + m.renderButtons(width-4) + " │\n")
 	}
 
-	// Bottom border
+	// Bottom border.
 	b.WriteString(fmt.Sprintf("\x1b[%d;%dH", y+height-1, x+1))
 	b.WriteString("└" + strings.Repeat("─", width-2) + "┘\n")
 
@@ -367,10 +367,10 @@ func (m *Modal) renderButtons(availableWidth int) string {
 		parts = append(parts, btnText)
 	}
 
-	// Join buttons with spacing
+	// Join buttons with spacing.
 	result := strings.Join(parts, "  ")
 
-	// Pad or truncate to fit available width
+	// Pad or truncate to fit available width.
 	return m.padOrTruncate(result, availableWidth)
 }
 

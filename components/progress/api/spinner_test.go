@@ -53,7 +53,7 @@ func TestSpinnerInit(t *testing.T) {
 		t.Fatal("Init() returned nil cmd")
 	}
 
-	// Execute cmd to get tea.TickMsg
+	// Execute cmd to get tea.TickMsg.
 	msg := cmd()
 	if _, ok := msg.(tea.TickMsg); !ok {
 		t.Errorf("Init() cmd didn't return tea.TickMsg, got %T", msg)
@@ -63,21 +63,21 @@ func TestSpinnerInit(t *testing.T) {
 func TestSpinnerUpdate(t *testing.T) {
 	spinner := NewSpinner("line") // 4 frames: | / - \
 
-	// Initial frame
+	// Initial frame.
 	view1 := spinner.View()
 
-	// Send tea.TickMsg
+	// Send tea.TickMsg.
 	updated, cmd := spinner.Update(tea.TickMsg{Time: time.Now()})
 
-	// Should return spinner and tick cmd
+	// Should return spinner and tick cmd.
 	if cmd == nil {
 		t.Error("Update() returned nil cmd")
 	}
 
-	// View should change (different frame) - updated is already *Spinner type
+	// View should change (different frame) - updated is already *Spinner type.
 	view2 := updated.View()
 	if view1 == view2 {
-		// Note: might be same if single frame, but "line" has 4 frames
+		// Note: might be same if single frame, but "line" has 4 frames.
 		t.Logf("Warning: views are same: %s", view1)
 	}
 }
@@ -85,7 +85,7 @@ func TestSpinnerUpdate(t *testing.T) {
 func TestSpinnerUpdateOtherMsg(t *testing.T) {
 	spinner := *NewSpinner("dots") // Dereference to get value
 
-	// Send non-TickMsg
+	// Send non-TickMsg.
 	updated, cmd := spinner.Update(tea.KeyMsg{})
 
 	if cmd != nil {
@@ -113,7 +113,7 @@ func TestSpinnerView(t *testing.T) {
 				if view == "" {
 					t.Error("View() is empty")
 				}
-				// Should contain Unicode spinner char
+				// Should contain Unicode spinner char.
 				if len(view) < 1 {
 					t.Errorf("View() too short: %q", view)
 				}
@@ -129,7 +129,7 @@ func TestSpinnerView(t *testing.T) {
 				if !strings.Contains(view, "Loading...") {
 					t.Errorf("View() missing label: %s", view)
 				}
-				// Should have format: "⠋ Loading..."
+				// Should have format: "⠋ Loading...".
 				parts := strings.Split(view, " ")
 				if len(parts) < 2 {
 					t.Errorf("View() format incorrect: %s", view)
@@ -186,7 +186,7 @@ func TestSpinnerAnimation(t *testing.T) {
 			frames[0], frames[4])
 	}
 
-	// All frames in between should be different
+	// All frames in between should be different.
 	// (for "line" spinner with 4 distinct frames)
 	seen := make(map[string]bool)
 	for i := 0; i < 4; i++ {
@@ -196,7 +196,7 @@ func TestSpinnerAnimation(t *testing.T) {
 		seen[frames[i]] = true
 	}
 
-	// Should have seen all 4 frames
+	// Should have seen all 4 frames.
 	if len(seen) < 4 {
 		t.Errorf("Only saw %d unique frames, expected 4: %v", len(seen), frames[:4])
 	}
@@ -212,11 +212,11 @@ func TestSpinnerMethodChaining(t *testing.T) {
 	}
 }
 
-func TestSpinnerTeaModelContract(t *testing.T) {
+func TestSpinnerTeaModelContract(_ *testing.T) {
 	// Verify Spinner implements tea model contract (Init, Update, View)
 	spinner := NewSpinner("dots")
 
-	// Init returns Cmd
+	// Init returns Cmd.
 	cmd := spinner.Init()
 	_ = cmd
 
@@ -225,7 +225,7 @@ func TestSpinnerTeaModelContract(t *testing.T) {
 	_ = updated
 	_ = cmd2
 
-	// View returns string
+	// View returns string.
 	view := spinner.View()
 	_ = view
 }
@@ -238,14 +238,14 @@ func TestSpinnerTickTiming(t *testing.T) {
 		t.Fatal("Init() returned nil")
 	}
 
-	// Verify tick message
+	// Verify tick message.
 	msg := cmd()
 	tickMsg, ok := msg.(tea.TickMsg)
 	if !ok {
 		t.Fatalf("Expected tea.TickMsg, got %T", msg)
 	}
 
-	// TickMsg should have time
+	// TickMsg should have time.
 	if tickMsg.Time.IsZero() {
 		t.Error("TickMsg has zero time")
 	}
@@ -256,14 +256,14 @@ func TestSpinnerEmptyLabel(t *testing.T) {
 
 	view := spinner.View()
 
-	// Should not have trailing space
+	// Should not have trailing space.
 	if strings.HasSuffix(view, " ") {
 		t.Errorf("View() has trailing space: %q", view)
 	}
 }
 
 func TestSpinnerAllStyles(t *testing.T) {
-	// Test all pre-defined styles
+	// Test all pre-defined styles.
 	styles := []string{
 		"dots", "line", "arrow", "circle", "bounce",
 		"dot-pulse", "grow-vertical", "grow-horizontal",
@@ -275,13 +275,13 @@ func TestSpinnerAllStyles(t *testing.T) {
 		t.Run(style, func(t *testing.T) {
 			spinner := NewSpinner(style)
 
-			// Should initialize
+			// Should initialize.
 			cmd := spinner.Init()
 			if cmd == nil {
 				t.Errorf("Init() returned nil for %s", style)
 			}
 
-			// Should render
+			// Should render.
 			view := spinner.View()
 			if view == "" {
 				t.Errorf("View() empty for %s", style)
@@ -295,17 +295,17 @@ func TestSpinnerAllStyles(t *testing.T) {
 }
 
 func TestSpinnerViewFormat(t *testing.T) {
-	// Without label
+	// Without label.
 	spinner1 := NewSpinner("dots")
 	view1 := spinner1.View()
 
-	// Should not have leading/trailing spaces
+	// Should not have leading/trailing spaces.
 	trimmed1 := strings.TrimSpace(view1)
 	if trimmed1 != view1 {
 		t.Errorf("View() without label has extra spaces: %q", view1)
 	}
 
-	// With label
+	// With label.
 	spinner2 := NewSpinner("dots").Label("Test")
 	view2 := spinner2.View()
 

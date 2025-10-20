@@ -12,7 +12,7 @@ func TestInputReader_Read_SingleKey(t *testing.T) {
 	// Simulate stdin with single key
 	stdin := strings.NewReader("a")
 
-	reader := input.NewInputReader(stdin)
+	reader := input.NewReader(stdin)
 
 	msg, err := reader.Read()
 	if err != nil {
@@ -36,7 +36,7 @@ func TestInputReader_Read_SingleKey(t *testing.T) {
 func TestInputReader_Read_MultipleKeys(t *testing.T) {
 	stdin := strings.NewReader("abc")
 
-	reader := input.NewInputReader(stdin)
+	reader := input.NewReader(stdin)
 
 	// Read 'a'
 	msg, err := reader.Read()
@@ -70,7 +70,7 @@ func TestInputReader_Read_ArrowKey(t *testing.T) {
 	// ESC [ A (up arrow)
 	stdin := strings.NewReader("\x1B[A")
 
-	reader := input.NewInputReader(stdin)
+	reader := input.NewReader(stdin)
 
 	msg, err := reader.Read()
 	if err != nil {
@@ -90,7 +90,7 @@ func TestInputReader_Read_ArrowKey(t *testing.T) {
 func TestInputReader_Read_Enter(t *testing.T) {
 	stdin := strings.NewReader("\r")
 
-	reader := input.NewInputReader(stdin)
+	reader := input.NewReader(stdin)
 
 	msg, err := reader.Read()
 	if err != nil {
@@ -110,7 +110,7 @@ func TestInputReader_Read_Enter(t *testing.T) {
 func TestInputReader_Read_Space(t *testing.T) {
 	stdin := strings.NewReader(" ")
 
-	reader := input.NewInputReader(stdin)
+	reader := input.NewReader(stdin)
 
 	msg, err := reader.Read()
 	if err != nil {
@@ -134,7 +134,7 @@ func TestInputReader_Read_FunctionKey(t *testing.T) {
 	// multi-byte sequences. For this test, we just verify no error occurs.
 	stdin := strings.NewReader("\x1BOP")
 
-	reader := input.NewInputReader(stdin)
+	reader := input.NewReader(stdin)
 
 	msg, err := reader.Read()
 	if err != nil {
@@ -162,7 +162,7 @@ func TestInputReader_Read_FunctionKey(t *testing.T) {
 func TestInputReader_Read_EOFError(t *testing.T) {
 	stdin := strings.NewReader("")
 
-	reader := input.NewInputReader(stdin)
+	reader := input.NewReader(stdin)
 
 	_, err := reader.Read()
 	if err == nil {
@@ -175,7 +175,7 @@ func TestInputReader_Read_UTF8_Russian(t *testing.T) {
 	// Russian letter 'а' (U+0430) = 0xD0 0xB0 (2 bytes in UTF-8)
 	stdin := strings.NewReader("а")
 
-	reader := input.NewInputReader(stdin)
+	reader := input.NewReader(stdin)
 
 	msg, err := reader.Read()
 	if err != nil {
@@ -200,7 +200,7 @@ func TestInputReader_Read_UTF8_Chinese(t *testing.T) {
 	// Chinese character '中' (U+4E2D) = 0xE4 0xB8 0xAD (3 bytes in UTF-8)
 	stdin := strings.NewReader("中")
 
-	reader := input.NewInputReader(stdin)
+	reader := input.NewReader(stdin)
 
 	msg, err := reader.Read()
 	if err != nil {
@@ -225,7 +225,7 @@ func TestInputReader_Read_UTF8_Emoji(t *testing.T) {
 	// Emoji '🚀' (U+1F680) = 0xF0 0x9F 0x9A 0x80 (4 bytes in UTF-8)
 	stdin := strings.NewReader("🚀")
 
-	reader := input.NewInputReader(stdin)
+	reader := input.NewReader(stdin)
 
 	msg, err := reader.Read()
 	if err != nil {
@@ -250,7 +250,7 @@ func TestInputReader_Read_UTF8_MultipleRussian(t *testing.T) {
 	// Russian word "привет" (hello)
 	stdin := strings.NewReader("привет")
 
-	reader := input.NewInputReader(stdin)
+	reader := input.NewReader(stdin)
 
 	expected := []rune{'п', 'р', 'и', 'в', 'е', 'т'}
 
@@ -279,7 +279,7 @@ func TestInputReader_Read_UTF8_Mixed(t *testing.T) {
 	// Mixed ASCII + UTF-8: "Hello мир 世界 🚀"
 	stdin := strings.NewReader("Hello мир 世界 🚀")
 
-	reader := input.NewInputReader(stdin)
+	reader := input.NewReader(stdin)
 
 	expected := []rune{'H', 'e', 'l', 'l', 'o', ' ', 'м', 'и', 'р', ' ', '世', '界', ' ', '🚀'}
 
@@ -295,6 +295,7 @@ func TestInputReader_Read_UTF8_Mixed(t *testing.T) {
 		}
 
 		// Space is parsed as KeySpace, not KeyRune
+		//nolint:nestif // Test validation logic
 		if expectedRune == ' ' {
 			if keyMsg.Type != model.KeySpace {
 				t.Errorf("message %d: Type = %v, want KeySpace", i, keyMsg.Type)

@@ -1,3 +1,4 @@
+// Package model contains domain models for viewport component.
 package model
 
 import (
@@ -46,12 +47,12 @@ func (v *Viewport) WithContent(content []string) *Viewport {
 	newV.content = make([]string, len(content))
 	copy(newV.content, content)
 
-	// If follow mode is enabled, scroll to bottom
+	// If follow mode is enabled, scroll to bottom.
 	if newV.followMode {
 		offset := newV.scrollSvc.FollowModeOffset(len(newV.content), newV.size.Height())
 		newV.scrollOffset = value.NewScrollOffset(offset)
 	} else {
-		// Clamp existing offset to new content bounds
+		// Clamp existing offset to new content bounds.
 		maxOffset := newV.scrollSvc.MaxScrollOffset(len(newV.content), newV.size.Height())
 		newV.scrollOffset = newV.scrollOffset.Clamp(maxOffset)
 	}
@@ -64,7 +65,7 @@ func (v *Viewport) WithSize(width, height int) *Viewport {
 	newV := v.clone()
 	newV.size = value.NewViewportSize(width, height)
 
-	// Clamp scroll offset to new size bounds
+	// Clamp scroll offset to new size bounds.
 	maxOffset := newV.scrollSvc.MaxScrollOffset(len(newV.content), height)
 	newV.scrollOffset = newV.scrollOffset.Clamp(maxOffset)
 
@@ -77,7 +78,7 @@ func (v *Viewport) WithFollowMode(enabled bool) *Viewport {
 	newV := v.clone()
 	newV.followMode = enabled
 
-	// If enabling follow mode, scroll to bottom immediately
+	// If enabling follow mode, scroll to bottom immediately.
 	if enabled {
 		offset := newV.scrollSvc.FollowModeOffset(len(newV.content), newV.size.Height())
 		newV.scrollOffset = value.NewScrollOffset(offset)
@@ -110,7 +111,7 @@ func (v *Viewport) ScrollDown(lines int) *Viewport {
 	newOffset := v.scrollSvc.ScrollDown(v.scrollOffset.Offset(), lines, maxOffset)
 	newV.scrollOffset = value.NewScrollOffset(newOffset)
 
-	// Re-enable follow mode if we've scrolled to the bottom
+	// Re-enable follow mode if we've scrolled to the bottom.
 	if newV.scrollSvc.IsAtBottom(newOffset, len(v.content), v.size.Height()) {
 		newV.followMode = true
 	}
@@ -144,7 +145,7 @@ func (v *Viewport) ScrollToBottom() *Viewport {
 func (v *Viewport) WithScrollOffset(offset int) *Viewport {
 	newV := v.clone()
 	maxOffset := v.scrollSvc.MaxScrollOffset(len(v.content), v.size.Height())
-	// Clamp to valid range
+	// Clamp to valid range.
 	if offset < 0 {
 		offset = 0
 	}
@@ -320,7 +321,7 @@ func (v *Viewport) wrapLine(line string, width int) []string {
 		gWidth := uniseg.StringWidth(g)
 
 		if currentWidth+gWidth > width && currentWidth > 0 {
-			// Start a new line
+			// Start a new line.
 			result = append(result, currentLine.String())
 			currentLine.Reset()
 			currentWidth = 0
@@ -330,7 +331,7 @@ func (v *Viewport) wrapLine(line string, width int) []string {
 		currentWidth += gWidth
 	}
 
-	// Add the last line
+	// Add the last line.
 	if currentLine.Len() > 0 {
 		result = append(result, currentLine.String())
 	}

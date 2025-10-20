@@ -5,7 +5,7 @@ import (
 	"github.com/phoenix-tui/phoenix/components/list/domain/value"
 )
 
-// List is the aggregate root for the list component
+// List is the aggregate root for the list component.
 type List struct {
 	items           []*value.Item       // All items
 	filteredItems   []*value.Item       // Filtered items (if filter active)
@@ -18,12 +18,12 @@ type List struct {
 	height          int    // Visible height (for scrolling)
 	scrollOffset    int    // Scroll offset
 
-	// Services
+	// Services.
 	navService    *service.NavigationService
 	filterService *service.FilterService
 }
 
-// NewList creates a new list with the given selection mode
+// NewList creates a new list with the given selection mode.
 func NewList(selectionMode value.SelectionMode) *List {
 	return &List{
 		items:           []*value.Item{},
@@ -41,13 +41,13 @@ func NewList(selectionMode value.SelectionMode) *List {
 	}
 }
 
-// NewListWithItems creates a new list with the given items and selection mode
+// NewListWithItems creates a new list with the given items and selection mode.
 func NewListWithItems(items []*value.Item, mode value.SelectionMode) *List {
 	l := NewList(mode)
 	return l.WithItems(items)
 }
 
-// defaultItemRenderer provides a simple default rendering for items
+// defaultItemRenderer provides a simple default rendering for items.
 func defaultItemRenderer(item *value.Item, index int, selected, focused bool) string {
 	prefix := "  "
 	if selected {
@@ -59,7 +59,7 @@ func defaultItemRenderer(item *value.Item, index int, selected, focused bool) st
 	return prefix + item.Label()
 }
 
-// WithItems returns a new List with the given items
+// WithItems returns a new List with the given items.
 func (l *List) WithItems(items []*value.Item) *List {
 	newList := l.clone()
 	newList.items = make([]*value.Item, len(items))
@@ -69,14 +69,14 @@ func (l *List) WithItems(items []*value.Item) *List {
 	return newList
 }
 
-// WithItemRenderer returns a new List with a custom item renderer
+// WithItemRenderer returns a new List with a custom item renderer.
 func (l *List) WithItemRenderer(renderer func(*value.Item, int, bool, bool) string) *List {
 	newList := l.clone()
 	newList.itemRenderer = renderer
 	return newList
 }
 
-// WithFilter returns a new List with a custom filter function
+// WithFilter returns a new List with a custom filter function.
 func (l *List) WithFilter(filterFunc func(*value.Item, string) bool) *List {
 	newList := l.clone()
 	newList.filterFunc = filterFunc
@@ -84,7 +84,7 @@ func (l *List) WithFilter(filterFunc func(*value.Item, string) bool) *List {
 	return newList
 }
 
-// WithHeight returns a new List with the specified visible height
+// WithHeight returns a new List with the specified visible height.
 func (l *List) WithHeight(height int) *List {
 	newList := l.clone()
 	newList.height = height
@@ -92,7 +92,7 @@ func (l *List) WithHeight(height int) *List {
 	return newList
 }
 
-// MoveUp moves the focus up by one item
+// MoveUp moves the focus up by one item.
 func (l *List) MoveUp() *List {
 	if len(l.filteredItems) == 0 {
 		return l
@@ -103,7 +103,7 @@ func (l *List) MoveUp() *List {
 	return newList
 }
 
-// MoveDown moves the focus down by one item
+// MoveDown moves the focus down by one item.
 func (l *List) MoveDown() *List {
 	if len(l.filteredItems) == 0 {
 		return l
@@ -114,7 +114,7 @@ func (l *List) MoveDown() *List {
 	return newList
 }
 
-// MovePageUp moves the focus up by one page
+// MovePageUp moves the focus up by one page.
 func (l *List) MovePageUp() *List {
 	if len(l.filteredItems) == 0 {
 		return l
@@ -125,7 +125,7 @@ func (l *List) MovePageUp() *List {
 	return newList
 }
 
-// MovePageDown moves the focus down by one page
+// MovePageDown moves the focus down by one page.
 func (l *List) MovePageDown() *List {
 	if len(l.filteredItems) == 0 {
 		return l
@@ -136,7 +136,7 @@ func (l *List) MovePageDown() *List {
 	return newList
 }
 
-// MoveToStart moves the focus to the first item
+// MoveToStart moves the focus to the first item.
 func (l *List) MoveToStart() *List {
 	if len(l.filteredItems) == 0 {
 		return l
@@ -147,7 +147,7 @@ func (l *List) MoveToStart() *List {
 	return newList
 }
 
-// MoveToEnd moves the focus to the last item
+// MoveToEnd moves the focus to the last item.
 func (l *List) MoveToEnd() *List {
 	if len(l.filteredItems) == 0 {
 		return l
@@ -158,7 +158,7 @@ func (l *List) MoveToEnd() *List {
 	return newList
 }
 
-// ToggleSelection toggles the selection of the currently focused item
+// ToggleSelection toggles the selection of the currently focused item.
 func (l *List) ToggleSelection() *List {
 	if len(l.filteredItems) == 0 {
 		return l
@@ -167,11 +167,11 @@ func (l *List) ToggleSelection() *List {
 	newList := l.clone()
 
 	if newList.selectionMode.IsSingle() {
-		// Single selection: clear all and select focused
+		// Single selection: clear all and select focused.
 		newList.selectedIndices = make(map[int]bool)
 		newList.selectedIndices[newList.focusedIndex] = true
 	} else {
-		// Multi selection: toggle focused item
+		// Multi selection: toggle focused item.
 		if newList.selectedIndices[newList.focusedIndex] {
 			delete(newList.selectedIndices, newList.focusedIndex)
 		} else {
@@ -197,14 +197,14 @@ func (l *List) SelectAll() *List {
 	return newList
 }
 
-// ClearSelection clears all selections
+// ClearSelection clears all selections.
 func (l *List) ClearSelection() *List {
 	newList := l.clone()
 	newList.selectedIndices = make(map[int]bool)
 	return newList
 }
 
-// SelectedItems returns the selected items
+// SelectedItems returns the selected items.
 func (l *List) SelectedItems() []*value.Item {
 	result := make([]*value.Item, 0, len(l.selectedIndices))
 	for idx := range l.selectedIndices {
@@ -215,7 +215,7 @@ func (l *List) SelectedItems() []*value.Item {
 	return result
 }
 
-// FocusedItem returns the currently focused item, or nil if no items
+// FocusedItem returns the currently focused item, or nil if no items.
 func (l *List) FocusedItem() *value.Item {
 	if len(l.filteredItems) == 0 || l.focusedIndex >= len(l.filteredItems) {
 		return nil
@@ -223,7 +223,7 @@ func (l *List) FocusedItem() *value.Item {
 	return l.filteredItems[l.focusedIndex]
 }
 
-// SetFilterQuery updates the filter query and reapplies filtering
+// SetFilterQuery updates the filter query and reapplies filtering.
 func (l *List) SetFilterQuery(query string) *List {
 	newList := l.clone()
 	newList.filterQuery = query
@@ -232,7 +232,7 @@ func (l *List) SetFilterQuery(query string) *List {
 	return newList
 }
 
-// ClearFilter clears the filter query
+// ClearFilter clears the filter query.
 func (l *List) ClearFilter() *List {
 	return l.SetFilterQuery("")
 }
@@ -244,14 +244,14 @@ func (l *List) Items() []*value.Item {
 	return result
 }
 
-// FilteredItems returns the currently filtered items
+// FilteredItems returns the currently filtered items.
 func (l *List) FilteredItems() []*value.Item {
 	result := make([]*value.Item, len(l.filteredItems))
 	copy(result, l.filteredItems)
 	return result
 }
 
-// IsFiltered returns true if a filter is currently active
+// IsFiltered returns true if a filter is currently active.
 func (l *List) IsFiltered() bool {
 	return l.filterQuery != ""
 }
@@ -270,22 +270,22 @@ func (l *List) SelectedIndices() []int {
 	return result
 }
 
-// Height returns the visible height
+// Height returns the visible height.
 func (l *List) Height() int {
 	return l.height
 }
 
-// ScrollOffset returns the current scroll offset
+// ScrollOffset returns the current scroll offset.
 func (l *List) ScrollOffset() int {
 	return l.scrollOffset
 }
 
-// SelectionMode returns the selection mode
+// SelectionMode returns the selection mode.
 func (l *List) SelectionMode() value.SelectionMode {
 	return l.selectionMode
 }
 
-// RenderItem renders a specific item using the item renderer
+// RenderItem renders a specific item using the item renderer.
 func (l *List) RenderItem(index int) string {
 	if index < 0 || index >= len(l.filteredItems) {
 		return ""
@@ -298,7 +298,7 @@ func (l *List) RenderItem(index int) string {
 	return l.itemRenderer(item, index, selected, focused)
 }
 
-// RenderVisibleItems renders all visible items based on scroll offset
+// RenderVisibleItems renders all visible items based on scroll offset.
 func (l *List) RenderVisibleItems() []string {
 	if len(l.filteredItems) == 0 {
 		return []string{}
@@ -321,7 +321,7 @@ func (l *List) RenderVisibleItems() []string {
 	return result
 }
 
-// clone creates a shallow copy of the list for immutability
+// clone creates a shallow copy of the list for immutability.
 func (l *List) clone() *List {
 	newSelectedIndices := make(map[int]bool, len(l.selectedIndices))
 	for k, v := range l.selectedIndices {
@@ -344,13 +344,13 @@ func (l *List) clone() *List {
 	}
 }
 
-// applyFilter applies the current filter to items
+// applyFilter applies the current filter to items.
 func (l *List) applyFilter() {
 	l.filteredItems = l.filterService.Filter(l.items, l.filterQuery, l.filterFunc)
 	l.selectedIndices = make(map[int]bool) // Clear selections after filter
 }
 
-// resetFocus resets the focus to the first item if current focus is out of bounds
+// resetFocus resets the focus to the first item if current focus is out of bounds.
 func (l *List) resetFocus() {
 	if l.focusedIndex >= len(l.filteredItems) {
 		l.focusedIndex = 0
@@ -358,7 +358,7 @@ func (l *List) resetFocus() {
 	l.updateScrollOffset()
 }
 
-// updateScrollOffset updates the scroll offset based on the focused item
+// updateScrollOffset updates the scroll offset based on the focused item.
 func (l *List) updateScrollOffset() {
 	l.scrollOffset = l.navService.CalculateScrollOffset(
 		l.focusedIndex,

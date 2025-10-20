@@ -1,3 +1,4 @@
+// Package input provides a single-line text input component with cursor control and validation.
 package input
 
 import (
@@ -32,7 +33,7 @@ func New(width int) *Input {
 
 // Placeholder sets the placeholder text shown when input is empty and unfocused.
 // Returns new Input for method chaining (value semantics).
-// IMPORTANT: Must reassign: input = input.Placeholder("text")
+// IMPORTANT: Must reassign: input = input.Placeholder("text").
 func (i Input) Placeholder(text string) Input {
 	i.domain = i.domain.WithPlaceholder(text)
 	return i
@@ -40,7 +41,7 @@ func (i Input) Placeholder(text string) Input {
 
 // Validator sets the validation function for input content.
 // Returns new Input for method chaining (value semantics).
-// IMPORTANT: Must reassign: input = input.Validator(fn)
+// IMPORTANT: Must reassign: input = input.Validator(fn).
 func (i Input) Validator(fn func(string) error) Input {
 	i.domain = i.domain.WithValidator(fn)
 	return i
@@ -48,7 +49,7 @@ func (i Input) Validator(fn func(string) error) Input {
 
 // Content sets the initial content.
 // Returns new Input for method chaining (value semantics).
-// IMPORTANT: Must reassign: input = input.Content("text")
+// IMPORTANT: Must reassign: input = input.Content("text").
 func (i Input) Content(text string) Input {
 	i.domain = i.domain.WithContent(text)
 	return i
@@ -56,7 +57,7 @@ func (i Input) Content(text string) Input {
 
 // Focused sets the focus state.
 // Returns new Input for method chaining (value semantics).
-// IMPORTANT: Must reassign: input = input.Focused(true)
+// IMPORTANT: Must reassign: input = input.Focused(true).
 func (i Input) Focused(focused bool) Input {
 	i.domain = i.domain.WithFocus(focused)
 	return i
@@ -66,7 +67,7 @@ func (i Input) Focused(focused bool) Input {
 // When false, applications can use the terminal's native cursor instead.
 // This is useful for shells that prefer the terminal's native blinking cursor.
 // Returns new Input for method chaining (value semantics).
-// IMPORTANT: Must reassign: input = input.ShowCursor(false)
+// IMPORTANT: Must reassign: input = input.ShowCursor(false).
 func (i Input) ShowCursor(show bool) Input {
 	i.domain = i.domain.WithShowCursor(show)
 	return i
@@ -74,7 +75,7 @@ func (i Input) ShowCursor(show bool) Input {
 
 // Width sets the visible width.
 // Returns new Input for method chaining (value semantics).
-// IMPORTANT: Must reassign: input = input.Width(80)
+// IMPORTANT: Must reassign: input = input.Width(80).
 func (i Input) Width(width int) Input {
 	i.domain = i.domain.WithWidth(width)
 	return i
@@ -82,7 +83,7 @@ func (i Input) Width(width int) Input {
 
 // KeyBindings sets a custom key binding handler.
 // Returns new Input for method chaining (value semantics).
-// IMPORTANT: Must reassign: input = input.KeyBindings(handler)
+// IMPORTANT: Must reassign: input = input.KeyBindings(handler).
 func (i Input) KeyBindings(handler KeyBindingHandler) Input {
 	i.keyBindings = handler
 	return i
@@ -103,7 +104,7 @@ func (i Input) ContentParts() (before, at, after string) {
 // SetContent sets both content and cursor position atomically.
 // This is a KEY DIFFERENTIATOR - prevents race conditions.
 // Returns new Input for method chaining (value semantics).
-// IMPORTANT: Must reassign: input = input.SetContent("text", 0)
+// IMPORTANT: Must reassign: input = input.SetContent("text", 0).
 func (i Input) SetContent(content string, cursorPos int) Input {
 	i.domain = i.domain.SetContent(content, cursorPos)
 	return i
@@ -130,16 +131,16 @@ func (i Input) Init() tea.Cmd {
 }
 
 // Update implements the Update method of Elm Architecture.
-// IMPORTANT: Must reassign: input = input.Update(msg)
+// IMPORTANT: Must reassign: input = input.Update(msg).
 func (i Input) Update(msg tea.Msg) (Input, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		// Only process keys if focused
+		// Only process keys if focused.
 		if !i.domain.Focused() {
 			return i, nil
 		}
 
-		// Handle key via bindings
+		// Handle key via bindings.
 		result := i.keyBindings.Handle(i.domain, msg)
 		i.domain = result
 		return i, nil
@@ -151,7 +152,7 @@ func (i Input) Update(msg tea.Msg) (Input, tea.Cmd) {
 
 // View implements tea.Model.
 func (i Input) View() string {
-	// If empty and not focused, show placeholder
+	// If empty and not focused, show placeholder.
 	if i.domain.Content() == "" && !i.domain.Focused() {
 		if i.domain.Placeholder() != "" {
 			return i.renderPlaceholder()
@@ -159,43 +160,45 @@ func (i Input) View() string {
 		return ""
 	}
 
-	// Render content with cursor
+	// Render content with cursor.
 	return i.renderContent()
 }
 
 // renderPlaceholder renders the placeholder text.
 func (i Input) renderPlaceholder() string {
 	// Simple gray placeholder (apps can customize via styling)
-	// For now, just return the placeholder text
-	// TODO: Apply styling when style system is integrated
+	// For now, just return the placeholder text.
+	// TODO: Apply styling when style system is integrated.
 	return i.domain.Placeholder()
 }
 
 // renderContent renders the input content with cursor.
+//
+//nolint:gocognit // rendering logic requires multiple conditions
 func (i Input) renderContent() string {
 	before, at, after := i.domain.ContentParts()
 
-	// Calculate visible portion based on width
+	// Calculate visible portion based on width.
 	// For now, simple truncation (TODO: proper scrolling)
 	content := before + at + after
 
 	if len(content) <= i.domain.Width() {
-		// Content fits, render cursor
+		// Content fits, render cursor.
 		if i.domain.Focused() {
 			return before + i.renderCursor(at) + after
 		}
 		return content
 	}
 
-	// Content too long, needs scrolling
-	// Simple approach: keep cursor in view
+	// Content too long, needs scrolling.
+	// Simple approach: keep cursor in view.
 	cursorPos := i.domain.CursorPosition()
 	width := i.domain.Width()
 
-	// Calculate scroll offset to keep cursor visible
+	// Calculate scroll offset to keep cursor visible.
 	scrollOffset := i.domain.ScrollOffset()
 
-	// Adjust scroll if cursor is out of view
+	// Adjust scroll if cursor is out of view.
 	if cursorPos < scrollOffset {
 		scrollOffset = cursorPos
 	}
@@ -212,7 +215,8 @@ func (i Input) renderContent() string {
 
 	visibleContent := content[visibleStart:visibleEnd]
 
-	// Render cursor if in visible range
+	// Render cursor if in visible range.
+	//nolint:nestif // rendering logic requires nested conditions for cursor positioning
 	if i.domain.Focused() && cursorPos >= scrollOffset && cursorPos < scrollOffset+width {
 		cursorInVisible := cursorPos - scrollOffset
 		if cursorInVisible <= len(visibleContent) {
@@ -235,13 +239,13 @@ func (i Input) renderContent() string {
 // renderCursor renders the cursor at the current position.
 // Returns empty string if cursor rendering is disabled (terminal cursor used instead).
 func (i Input) renderCursor(at string) string {
-	// If cursor rendering is disabled, return the character without highlighting
-	// This allows the terminal's native cursor to be visible instead
+	// If cursor rendering is disabled, return the character without highlighting.
+	// This allows the terminal's native cursor to be visible instead.
 	if !i.domain.ShowCursor() {
 		return at
 	}
 
-	// Render Phoenix's cursor using reverse video
+	// Render Phoenix's cursor using reverse video.
 	if at == "" {
 		return "█" // Block cursor at end
 	}
@@ -252,7 +256,7 @@ func (i Input) renderCursor(at string) string {
 // Re-exported for convenience.
 type ValidationFunc = service.ValidationFunc
 
-// Common validators (re-exported for convenience)
+// Common validators (re-exported for convenience).
 var (
 	NotEmpty  = service.NotEmpty
 	MinLength = service.MinLength
@@ -261,7 +265,7 @@ var (
 	Chain     = service.Chain
 )
 
-// Validation errors (re-exported for convenience)
+// Validation errors (re-exported for convenience).
 var (
 	ErrEmpty         = service.ErrEmpty
 	ErrTooShort      = service.ErrTooShort
@@ -269,7 +273,7 @@ var (
 	ErrInvalidFormat = service.ErrInvalidFormat
 )
 
-// Helper to create custom key bindings
+// CustomKeyBindings creates custom key bindings for input handling.
 func CustomKeyBindings(handlers ...infrastructure.KeyHandler) KeyBindingHandler {
 	return infrastructure.NewCustomKeyBindings(handlers...)
 }

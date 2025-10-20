@@ -8,6 +8,24 @@ import (
 	"github.com/phoenix-tui/phoenix/tea/api"
 )
 
+// CursorPos represents a cursor position in the text buffer.
+// This is used for cursor movement validation and observation.
+type CursorPos struct {
+	Row int // Line number (0-based)
+	Col int // Column number (0-based, rune offset)
+}
+
+// MovementValidator validates cursor movements.
+// Return true to allow movement, false to block it.
+type MovementValidator func(from, to CursorPos) bool
+
+// CursorMovedHandler is called after successful cursor movement.
+// This is an observer pattern - cannot block movement.
+type CursorMovedHandler func(from, to CursorPos)
+
+// BoundaryHitHandler provides feedback when movement is blocked.
+type BoundaryHitHandler func(attemptedPos CursorPos, reason string)
+
 // TextArea is the public API for multiline text editing.
 // This implements the Elm Architecture (Model-View-Update) pattern.
 type TextArea struct {
@@ -58,14 +76,14 @@ func (t TextArea) Size(width, height int) TextArea {
 }
 
 // MaxLines sets maximum line limit (0 = unlimited).
-func (t TextArea) MaxLines(max int) TextArea {
-	t.model = t.model.WithMaxLines(max)
+func (t TextArea) MaxLines(maxVal int) TextArea {
+	t.model = t.model.WithMaxLines(maxVal)
 	return t
 }
 
 // MaxChars sets maximum character limit (0 = unlimited).
-func (t TextArea) MaxChars(max int) TextArea {
-	t.model = t.model.WithMaxChars(max)
+func (t TextArea) MaxChars(maxVal int) TextArea {
+	t.model = t.model.WithMaxChars(maxVal)
 	return t
 }
 
@@ -95,7 +113,7 @@ func (t TextArea) ShowLineNumbers(show bool) TextArea {
 
 // ShowCursor enables/disables Phoenix cursor rendering.
 // true: Phoenix renders █ cursor (default)
-// false: Use terminal cursor (ANSI positioning) - for shell applications
+// false: Use terminal cursor (ANSI positioning) - for shell applications.
 func (t TextArea) ShowCursor(show bool) TextArea {
 	t.model = t.model.WithShowCursor(show)
 	return t
@@ -134,6 +152,125 @@ func (t TextArea) Lines() []string {
 // CursorPosition returns current cursor position (row, col).
 func (t TextArea) CursorPosition() (row, col int) {
 	return t.model.CursorPosition()
+}
+
+// SetCursorPosition sets cursor to specific position with bounds checking.
+// Position is clamped to valid range (0 to buffer bounds).
+// Returns new instance (immutable).
+//
+// Example - Jump to specific line/column:
+//
+//	ta := textarea.New().SetValue("line1\nline2\nline3")
+//	ta = ta.SetCursorPosition(1, 2) // Row 1, Col 2.
+//	row, col := ta.CursorPosition()
+//	// row = 1, col = 2
+//
+// Example - Clamps to valid bounds:
+//
+//	ta := textarea.New().SetValue("short")
+//	ta = ta.SetCursorPosition(10, 100) // Out of bounds.
+//	row, col := ta.CursorPosition()
+//	// row = 0, col = 5 (clamped to end of line)
+func (t TextArea) SetCursorPosition(row, col int) TextArea {
+	t.model = t.model.SetCursorPosition(row, col)
+	return t
+}
+
+// OnMovement sets a validator that is called BEFORE cursor movements.
+// Return false to block the movement.
+// This is useful for implementing boundary protection (e.g., shell prompts).
+//
+// Example - Shell boundary protection:
+//
+//	ta := textarea.New().
+//	    SetValue("> ").
+//	    SetCursorPosition(0, 2).
+//	    OnMovement(func(from, to textarea.CursorPos) bool {.
+//	        // Don't allow cursor before the prompt ("> ")
+//	        if to.Row == 0 && to.Col < 2 {.
+//	            return false // Block movement.
+//	        }
+//	        return true // Allow movement.
+//	    })
+func (t TextArea) OnMovement(validator MovementValidator) TextArea {
+	// Convert API CursorPos to domain model CursorPos.
+	if validator != nil {
+		domainValidator := func(from, to model.CursorPos) bool {
+			apiFrom := CursorPos{Row: from.Row, Col: from.Col}
+			apiTo := CursorPos{Row: to.Row, Col: to.Col}
+			return validator(apiFrom, apiTo)
+		}
+		// Use reflection to access package-private method.
+		// We need to call withMovementValidator which is package-private.
+		// For now, we'll directly set it since we're in the same module.
+		t.model = setMovementValidator(t.model, domainValidator)
+	}
+	return t
+}
+
+// OnCursorMoved sets an observer that is called AFTER successful cursor movement.
+// This cannot block movement - use OnMovement() for validation.
+// This is useful for updating UI (e.g., syntax highlighting) when cursor moves.
+//
+// Example - Refresh syntax highlighting on row change:
+//
+//	ta := textarea.New().
+//	    OnCursorMoved(func(from, to textarea.CursorPos) {.
+//	        if from.Row != to.Row {.
+//	            // Cursor moved to different line.
+//	            refreshSyntaxHighlight(to.Row)
+//	        }
+//	    })
+func (t TextArea) OnCursorMoved(handler CursorMovedHandler) TextArea {
+	// Convert API CursorPos to domain model CursorPos.
+	if handler != nil {
+		domainHandler := func(from, to model.CursorPos) {
+			apiFrom := CursorPos{Row: from.Row, Col: from.Col}
+			apiTo := CursorPos{Row: to.Row, Col: to.Col}
+			handler(apiFrom, apiTo)
+		}
+		t.model = setCursorMovedHandler(t.model, domainHandler)
+	}
+	return t
+}
+
+// OnBoundaryHit sets a handler that is called when cursor movement is blocked.
+// This provides feedback to the user when they try to move beyond allowed boundaries.
+// Useful for accessibility and user experience.
+//
+// Example - Visual feedback for blocked movement:
+//
+//	ta := textarea.New().
+//	    OnMovement(func(from, to textarea.CursorPos) bool {.
+//	        return to.Row >= 0 && to.Col >= 0 // Block negative positions.
+//	    }).
+//	    OnBoundaryHit(func(attemptedPos textarea.CursorPos, reason string) {.
+//	        // Flash screen, beep, or show message.
+//	        fmt.Println("Cannot move to", attemptedPos, ":", reason)
+//	    })
+func (t TextArea) OnBoundaryHit(handler BoundaryHitHandler) TextArea {
+	// Convert API CursorPos to domain model CursorPos.
+	if handler != nil {
+		domainHandler := func(attemptedPos model.CursorPos, reason string) {
+			apiPos := CursorPos{Row: attemptedPos.Row, Col: attemptedPos.Col}
+			handler(apiPos, reason)
+		}
+		t.model = setBoundaryHitHandler(t.model, domainHandler)
+	}
+	return t
+}
+
+// Helper functions to access package-private setters from domain model.
+func setMovementValidator(ta *model.TextArea, validator func(from, to model.CursorPos) bool) *model.TextArea {
+	return ta.WithMovementValidator(validator)
+}
+
+func setCursorMovedHandler(ta *model.TextArea, handler func(from, to model.CursorPos)) *model.TextArea {
+	return ta.WithCursorMovedHandler(handler)
+}
+
+func setBoundaryHitHandler(ta *model.TextArea, handler func(attemptedPos model.CursorPos, reason string)) *model.TextArea {
+	return ta.WithBoundaryHitHandler(handler)
 }
 
 // ContentParts returns text before/at/after cursor (for syntax highlighting).
@@ -177,7 +314,7 @@ func (t TextArea) Init() api.Cmd {
 func (t TextArea) Update(msg api.Msg) (TextArea, api.Cmd) {
 	switch msg := msg.(type) {
 	case api.KeyMsg:
-		// Delegate to keybindings handler
+		// Delegate to keybindings handler.
 		switch t.keybindings {
 		case KeybindingsEmacs, KeybindingsDefault:
 			handler := keybindings.NewEmacsKeybindings()
@@ -186,7 +323,7 @@ func (t TextArea) Update(msg api.Msg) (TextArea, api.Cmd) {
 			return t, cmd
 
 		case KeybindingsVi:
-			// Future: Vi keybindings
+			// Future: Vi keybindings.
 			return t, nil
 
 		default:
@@ -194,9 +331,9 @@ func (t TextArea) Update(msg api.Msg) (TextArea, api.Cmd) {
 		}
 
 	case api.WindowSizeMsg:
-		// Handle window resize
-		// For now, we don't auto-resize the textarea
-		// User should explicitly set size if needed
+		// Handle window resize.
+		// For now, we don't auto-resize the textarea.
+		// User should explicitly set size if needed.
 		return t, nil
 	}
 

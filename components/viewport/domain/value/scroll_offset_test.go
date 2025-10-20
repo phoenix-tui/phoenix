@@ -54,7 +54,7 @@ func TestScrollOffset_Add(t *testing.T) {
 			if got := result.Offset(); got != tt.want {
 				t.Errorf("Add(%d, %d) = %d, want %d", tt.delta, tt.maxOffset, got, tt.want)
 			}
-			// Verify immutability
+			// Verify immutability.
 			if s.Offset() != tt.offset {
 				t.Errorf("Add() modified original offset: got %d, want %d", s.Offset(), tt.offset)
 			}
@@ -85,7 +85,7 @@ func TestScrollOffset_Set(t *testing.T) {
 			if got := result.Offset(); got != tt.want {
 				t.Errorf("Set(%d, %d) = %d, want %d", tt.newOffset, tt.maxOffset, got, tt.want)
 			}
-			// Verify immutability
+			// Verify immutability.
 			if s.Offset() != tt.initial {
 				t.Errorf("Set() modified original offset: got %d, want %d", s.Offset(), tt.initial)
 			}
@@ -117,7 +117,7 @@ func TestScrollOffset_Clamp(t *testing.T) {
 			if got := result.Offset(); got != tt.want {
 				t.Errorf("Clamp(%d) = %d, want %d", tt.maxOffset, got, tt.want)
 			}
-			// Verify immutability
+			// Verify immutability.
 			if s.Offset() != originalOffset {
 				t.Errorf("Clamp() modified original offset: got %d, want %d", s.Offset(), originalOffset)
 			}
@@ -128,12 +128,12 @@ func TestScrollOffset_Clamp(t *testing.T) {
 func TestScrollOffset_Immutability(t *testing.T) {
 	original := NewScrollOffset(10)
 
-	// Perform various operations
+	// Perform various operations.
 	_ = original.Add(5, 20)
 	_ = original.Set(15, 20)
 	_ = original.Clamp(20)
 
-	// Original should remain unchanged
+	// Original should remain unchanged.
 	if got := original.Offset(); got != 10 {
 		t.Errorf("ScrollOffset was mutated: got %d, want 10", got)
 	}

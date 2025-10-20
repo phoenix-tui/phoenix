@@ -116,9 +116,9 @@ func (f *FlexContainer) WithDirection(direction value.FlexDirection) *FlexContai
 		panic(fmt.Sprintf("flexbox: invalid direction %d", direction))
 	}
 
-	copy := *f
-	copy.direction = direction
-	return &copy
+	result := *f
+	result.direction = direction
+	return &result
 }
 
 // WithJustifyContent returns a new FlexContainer with the given justify content.
@@ -128,9 +128,9 @@ func (f *FlexContainer) WithJustifyContent(justify value.JustifyContent) *FlexCo
 		panic(fmt.Sprintf("flexbox: invalid justify content %d", justify))
 	}
 
-	copy := *f
-	copy.justifyContent = justify
-	return &copy
+	result := *f
+	result.justifyContent = justify
+	return &result
 }
 
 // WithAlignItems returns a new FlexContainer with the given align items.
@@ -140,9 +140,9 @@ func (f *FlexContainer) WithAlignItems(align value.AlignItems) *FlexContainer {
 		panic(fmt.Sprintf("flexbox: invalid align items %d", align))
 	}
 
-	copy := *f
-	copy.alignItems = align
-	return &copy
+	result := *f
+	result.alignItems = align
+	return &result
 }
 
 // WithGap returns a new FlexContainer with the given gap.
@@ -152,16 +152,16 @@ func (f *FlexContainer) WithGap(gap int) *FlexContainer {
 		panic(fmt.Sprintf("flexbox: gap must be non-negative, got %d", gap))
 	}
 
-	copy := *f
-	copy.gap = gap
-	return &copy
+	result := *f
+	result.gap = gap
+	return &result
 }
 
 // WithSize returns a new FlexContainer with the given size constraints.
 func (f *FlexContainer) WithSize(size value.Size) *FlexContainer {
-	copy := *f
-	copy.size = size
-	return &copy
+	result := *f
+	result.size = size
+	return &result
 }
 
 // AddItem returns a new FlexContainer with the given item appended.
@@ -175,14 +175,12 @@ func (f *FlexContainer) AddItem(item *Node) *FlexContainer {
 		panic("flexbox: item cannot be nil")
 	}
 
-	copy := *f
-	copy.items = make([]*Node, len(f.items)+1)
-	for i, existingItem := range f.items {
-		copy.items[i] = existingItem
-	}
-	copy.items[len(copy.items)-1] = item
+	result := *f
+	result.items = make([]*Node, len(f.items)+1)
+	copy(result.items, f.items)
+	result.items[len(result.items)-1] = item
 
-	return &copy
+	return &result
 }
 
 // AddItems returns a new FlexContainer with multiple items appended.
@@ -210,20 +208,20 @@ func (f *FlexContainer) RemoveItem(index int) *FlexContainer {
 		panic(fmt.Sprintf("flexbox: index %d out of bounds (0-%d)", index, len(f.items)-1))
 	}
 
-	copy := *f
-	copy.items = make([]*Node, len(f.items)-1)
+	result := *f
+	result.items = make([]*Node, len(f.items)-1)
 
 	// Copy items before removed index
 	for i := 0; i < index; i++ {
-		copy.items[i] = f.items[i]
+		result.items[i] = f.items[i]
 	}
 
 	// Copy items after removed index
 	for i := index + 1; i < len(f.items); i++ {
-		copy.items[i-1] = f.items[i]
+		result.items[i-1] = f.items[i]
 	}
 
-	return &copy
+	return &result
 }
 
 // ClearItems returns a new FlexContainer with all items removed.
@@ -232,9 +230,9 @@ func (f *FlexContainer) ClearItems() *FlexContainer {
 		return f // Already empty, return self
 	}
 
-	copy := *f
-	copy.items = []*Node{}
-	return &copy
+	result := *f
+	result.items = []*Node{}
+	return &result
 }
 
 // TotalGap calculates the total gap space between items.

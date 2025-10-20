@@ -158,7 +158,7 @@ func (a Alignment) String() string {
 	return fmt.Sprintf("Alignment{%s, %s}", a.horizontal, a.vertical)
 }
 
-// CalculateOffset calculates the offset needed to align content within a container.
+// CalculateHorizontalOffset calculates the offset needed to align content within a container.
 // This is a utility function used by layout engine.
 //
 // Parameters:

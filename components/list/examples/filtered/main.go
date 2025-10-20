@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	// Create a file list with custom filter
+	// Create a file list with custom filter.
 	files := []interface{}{
 		"main.go",
 		"main_test.go",
@@ -34,12 +34,12 @@ func main() {
 		"api_test.go",
 	}
 
-	// Custom filter: show only Go files containing query
+	// Custom filter: show only Go files containing query.
 	l := list.New(files, labels, value.SelectionModeSingle).
 		Height(10).
 		Filter(func(item interface{}, query string) bool {
 			filename := item.(string)
-			// Show files matching query
+			// Show files matching query.
 			return strings.Contains(filename, query)
 		})
 
@@ -52,7 +52,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Show selected file
+	// Show selected file.
 	selected := l.SelectedItems()
 	if len(selected) > 0 {
 		fmt.Printf("\nYou selected: %v\n", selected[0])

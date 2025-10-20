@@ -1,5 +1,5 @@
-//go:build windows
-// +build windows
+//go:build windows.
+// +build windows.
 
 package windows
 
@@ -13,7 +13,7 @@ import (
 func TestNewConsole(t *testing.T) {
 	console, err := NewConsole()
 	if err != nil {
-		// This is expected in Git Bash or redirected I/O
+		// This is expected in Git Bash or redirected I/O.
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
@@ -21,7 +21,7 @@ func TestNewConsole(t *testing.T) {
 		t.Fatal("NewConsole() returned nil console")
 	}
 
-	// Verify handles are valid
+	// Verify handles are valid.
 	if console.stdout == 0 {
 		t.Error("stdout handle is invalid (0)")
 	}
@@ -55,7 +55,7 @@ func TestConsole_Size(t *testing.T) {
 		t.Fatalf("Size() error: %v", err)
 	}
 
-	// Reasonable terminal size bounds
+	// Reasonable terminal size bounds.
 	if width < 20 || width > 1000 {
 		t.Errorf("Width = %d, expected 20-1000", width)
 	}
@@ -71,13 +71,13 @@ func TestConsole_SetCursorPosition(t *testing.T) {
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Set cursor to position (10, 5)
+	// Set cursor to position (10, 5).
 	err = console.SetCursorPosition(10, 5)
 	if err != nil {
 		t.Fatalf("SetCursorPosition(10, 5) error: %v", err)
 	}
 
-	// Verify position was set correctly
+	// Verify position was set correctly.
 	x, y, err := console.GetCursorPosition()
 	if err != nil {
 		t.Fatalf("GetCursorPosition() error: %v", err)
@@ -100,7 +100,7 @@ func TestConsole_GetCursorPosition(t *testing.T) {
 		t.Fatalf("GetCursorPosition() error: %v", err)
 	}
 
-	// Cursor position should be within screen bounds
+	// Cursor position should be within screen bounds.
 	width, height, _ := console.Size()
 	if x < 0 || x >= width {
 		t.Errorf("Cursor X = %d, expected 0-%d", x, width-1)
@@ -117,13 +117,13 @@ func TestConsole_MoveCursor(t *testing.T) {
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Set known position
+	// Set known position.
 	err = console.SetCursorPosition(20, 10)
 	if err != nil {
 		t.Fatalf("SetCursorPosition() error: %v", err)
 	}
 
-	// Move right 5
+	// Move right 5.
 	err = console.MoveCursorRight(5)
 	if err != nil {
 		t.Fatalf("MoveCursorRight(5) error: %v", err)
@@ -137,7 +137,7 @@ func TestConsole_MoveCursor(t *testing.T) {
 		t.Errorf("After MoveCursorRight(5), Y = %d, want 10", y)
 	}
 
-	// Move down 3
+	// Move down 3.
 	err = console.MoveCursorDown(3)
 	if err != nil {
 		t.Fatalf("MoveCursorDown(3) error: %v", err)
@@ -151,7 +151,7 @@ func TestConsole_MoveCursor(t *testing.T) {
 		t.Errorf("After MoveCursorDown(3), Y = %d, want 13", y)
 	}
 
-	// Move left 10
+	// Move left 10.
 	err = console.MoveCursorLeft(10)
 	if err != nil {
 		t.Fatalf("MoveCursorLeft(10) error: %v", err)
@@ -162,7 +162,7 @@ func TestConsole_MoveCursor(t *testing.T) {
 		t.Errorf("After MoveCursorLeft(10), X = %d, want 15", x)
 	}
 
-	// Move up 5
+	// Move up 5.
 	err = console.MoveCursorUp(5)
 	if err != nil {
 		t.Fatalf("MoveCursorUp(5) error: %v", err)
@@ -181,31 +181,31 @@ func TestConsole_SaveRestoreCursorPosition(t *testing.T) {
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Set known position
+	// Set known position.
 	err = console.SetCursorPosition(30, 15)
 	if err != nil {
 		t.Fatalf("SetCursorPosition() error: %v", err)
 	}
 
-	// Save position
+	// Save position.
 	err = console.SaveCursorPosition()
 	if err != nil {
 		t.Fatalf("SaveCursorPosition() error: %v", err)
 	}
 
-	// Move to different position
+	// Move to different position.
 	err = console.SetCursorPosition(5, 5)
 	if err != nil {
 		t.Fatalf("SetCursorPosition(5, 5) error: %v", err)
 	}
 
-	// Restore position
+	// Restore position.
 	err = console.RestoreCursorPosition()
 	if err != nil {
 		t.Fatalf("RestoreCursorPosition() error: %v", err)
 	}
 
-	// Verify we're back at saved position
+	// Verify we're back at saved position.
 	x, y, _ := console.GetCursorPosition()
 	if x != 30 || y != 15 {
 		t.Errorf("After restore, position = (%d, %d), want (30, 15)", x, y)
@@ -219,13 +219,13 @@ func TestConsole_HideShowCursor(t *testing.T) {
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Hide cursor
+	// Hide cursor.
 	err = console.HideCursor()
 	if err != nil {
 		t.Fatalf("HideCursor() error: %v", err)
 	}
 
-	// Show cursor (restore visibility)
+	// Show cursor (restore visibility).
 	err = console.ShowCursor()
 	if err != nil {
 		t.Fatalf("ShowCursor() error: %v", err)
@@ -255,7 +255,7 @@ func TestConsole_SetCursorStyle(t *testing.T) {
 		}
 	}
 
-	// Restore to block (default)
+	// Restore to block (default).
 	err = console.SetCursorStyle(api.CursorBlock)
 	if err != nil {
 		t.Fatalf("SetCursorStyle(Block) error: %v", err)
@@ -269,19 +269,19 @@ func TestConsole_Write(t *testing.T) {
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Save cursor position
+	// Save cursor position.
 	err = console.SaveCursorPosition()
 	if err != nil {
 		t.Fatalf("SaveCursorPosition() error: %v", err)
 	}
 
-	// Write some text
+	// Write some text.
 	err = console.Write("Phoenix Terminal Test")
 	if err != nil {
 		t.Fatalf("Write() error: %v", err)
 	}
 
-	// Restore position (cleanup)
+	// Restore position (cleanup).
 	err = console.RestoreCursorPosition()
 	if err != nil {
 		t.Fatalf("RestoreCursorPosition() error: %v", err)
@@ -295,18 +295,18 @@ func TestConsole_WriteAt(t *testing.T) {
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Write at specific position
+	// Write at specific position.
 	err = console.WriteAt(10, 5, "Test")
 	if err != nil {
 		t.Fatalf("WriteAt(10, 5, \"Test\") error: %v", err)
 	}
 
-	// Verify cursor moved to that position (after text)
+	// Verify cursor moved to that position (after text).
 	x, y, _ := console.GetCursorPosition()
 	if y != 5 {
 		t.Errorf("After WriteAt, Y = %d, want 5", y)
 	}
-	// X will be 10 + len("Test") = 14
+	// X will be 10 + len("Test") = 14.
 	if x != 14 {
 		t.Errorf("After WriteAt, X = %d, want 14", x)
 	}
@@ -319,13 +319,13 @@ func TestConsole_ClearLine(t *testing.T) {
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Write some text
+	// Write some text.
 	err = console.Write("This line will be cleared")
 	if err != nil {
 		t.Fatalf("Write() error: %v", err)
 	}
 
-	// Clear the line
+	// Clear the line.
 	err = console.ClearLine()
 	if err != nil {
 		t.Fatalf("ClearLine() error: %v", err)
@@ -339,13 +339,13 @@ func TestConsole_ClearFromCursor(t *testing.T) {
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Set cursor position
+	// Set cursor position.
 	err = console.SetCursorPosition(0, 10)
 	if err != nil {
 		t.Fatalf("SetCursorPosition() error: %v", err)
 	}
 
-	// Clear from cursor to end of screen
+	// Clear from cursor to end of screen.
 	err = console.ClearFromCursor()
 	if err != nil {
 		t.Fatalf("ClearFromCursor() error: %v", err)
@@ -359,19 +359,19 @@ func TestConsole_ClearLines(t *testing.T) {
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Set cursor to known position
+	// Set cursor to known position.
 	err = console.SetCursorPosition(0, 15)
 	if err != nil {
 		t.Fatalf("SetCursorPosition() error: %v", err)
 	}
 
-	// Clear 5 lines (should move cursor up and clear)
+	// Clear 5 lines (should move cursor up and clear).
 	err = console.ClearLines(5)
 	if err != nil {
 		t.Fatalf("ClearLines(5) error: %v", err)
 	}
 
-	// Verify cursor is at start of cleared region
+	// Verify cursor is at start of cleared region.
 	x, y, _ := console.GetCursorPosition()
 	if x != 0 {
 		t.Errorf("After ClearLines, X = %d, want 0", x)
@@ -388,13 +388,13 @@ func TestConsole_Clear(t *testing.T) {
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Clear entire screen
+	// Clear entire screen.
 	err = console.Clear()
 	if err != nil {
 		t.Fatalf("Clear() error: %v", err)
 	}
 
-	// Verify cursor is at top-left
+	// Verify cursor is at top-left.
 	x, y, _ := console.GetCursorPosition()
 	if x != 0 || y != 0 {
 		t.Errorf("After Clear(), position = (%d, %d), want (0, 0)", x, y)
@@ -408,13 +408,13 @@ func TestConsole_ReadScreenBuffer(t *testing.T) {
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Read screen buffer
+	// Read screen buffer.
 	buffer, err := console.ReadScreenBuffer()
 	if err != nil {
 		t.Fatalf("ReadScreenBuffer() error: %v", err)
 	}
 
-	// Verify buffer dimensions match terminal size
+	// Verify buffer dimensions match terminal size.
 	width, height, _ := console.Size()
 	if len(buffer) != height {
 		t.Errorf("Buffer height = %d, want %d", len(buffer), height)
@@ -433,7 +433,7 @@ func TestConsole_ColorDepth(t *testing.T) {
 	}
 
 	depth := console.ColorDepth()
-	// Windows 10+ should support TrueColor
+	// Windows 10+ should support TrueColor.
 	if depth != 16777216 {
 		t.Errorf("ColorDepth() = %d, want 16777216 (TrueColor)", depth)
 	}
@@ -446,7 +446,7 @@ func TestConsole_Capabilities(t *testing.T) {
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Windows Console should support all capabilities
+	// Windows Console should support all capabilities.
 	if !console.SupportsDirectPositioning() {
 		t.Error("SupportsDirectPositioning() = false, want true")
 	}
@@ -467,7 +467,7 @@ func TestConsole_EdgeCases(t *testing.T) {
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Test zero movements (should be no-ops)
+	// Test zero movements (should be no-ops).
 	tests := []struct {
 		name string
 		fn   func() error
@@ -496,13 +496,13 @@ func TestConsole_BoundaryConditions(t *testing.T) {
 		t.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Try to move cursor beyond boundaries
+	// Try to move cursor beyond boundaries.
 	width, height, _ := console.Size()
 
-	// Set to top-left
+	// Set to top-left.
 	console.SetCursorPosition(0, 0)
 
-	// Try to move up from top (should stay at 0)
+	// Try to move up from top (should stay at 0).
 	err = console.MoveCursorUp(10)
 	if err != nil {
 		t.Fatalf("MoveCursorUp(10) error: %v", err)
@@ -512,10 +512,10 @@ func TestConsole_BoundaryConditions(t *testing.T) {
 		t.Errorf("After MoveCursorUp from top, Y = %d, want 0", y)
 	}
 
-	// Set to bottom-right
+	// Set to bottom-right.
 	console.SetCursorPosition(width-1, height-1)
 
-	// Try to move down from bottom (should stay at max)
+	// Try to move down from bottom (should stay at max).
 	err = console.MoveCursorDown(10)
 	if err != nil {
 		t.Fatalf("MoveCursorDown(10) error: %v", err)

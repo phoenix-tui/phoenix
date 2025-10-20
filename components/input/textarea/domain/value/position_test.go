@@ -253,7 +253,7 @@ func TestPosition_Equals(t *testing.T) {
 }
 
 func TestPosition_Comparisons(t *testing.T) {
-	// Test that IsBefore and IsAfter are inverses when positions are different
+	// Test that IsBefore and IsAfter are inverses when positions are different.
 	tests := []struct {
 		name string
 		pos1 Position
@@ -278,21 +278,21 @@ func TestPosition_Comparisons(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// If pos1 is before pos2, then pos2 should be after pos1
+			// If pos1 is before pos2, then pos2 should be after pos1.
 			if tt.pos1.IsBefore(tt.pos2) {
 				if !tt.pos2.IsAfter(tt.pos1) {
 					t.Error("IsBefore and IsAfter are not inverses")
 				}
 			}
 
-			// If pos1 is after pos2, then pos2 should be before pos1
+			// If pos1 is after pos2, then pos2 should be before pos1.
 			if tt.pos1.IsAfter(tt.pos2) {
 				if !tt.pos2.IsBefore(tt.pos1) {
 					t.Error("IsAfter and IsBefore are not inverses")
 				}
 			}
 
-			// If positions are equal, neither should be before or after
+			// If positions are equal, neither should be before or after.
 			if tt.pos1.Equals(tt.pos2) {
 				if tt.pos1.IsBefore(tt.pos2) || tt.pos1.IsAfter(tt.pos2) {
 					t.Error("Equal positions should not be before or after each other")
@@ -303,25 +303,24 @@ func TestPosition_Comparisons(t *testing.T) {
 }
 
 func TestPosition_ValueObject(t *testing.T) {
-	// Test that Position behaves as a value object
+	// Test that Position behaves as a value object.
 	pos1 := NewPosition(5, 10)
 	pos2 := NewPosition(5, 10)
 	pos3 := NewPosition(5, 11)
 
-	// Equal positions should be equal by value
+	// Equal positions should be equal by value.
 	if !pos1.Equals(pos2) {
 		t.Error("Equal positions should compare equal")
 	}
 
-	// Different positions should not be equal
+	// Different positions should not be equal.
 	if pos1.Equals(pos3) {
 		t.Error("Different positions should not compare equal")
 	}
 
-	// Position should be comparable by value (not by reference)
-	if pos1 == pos2 {
-		// This is fine - value types can be compared with ==
-	}
+	// Position should be comparable by value (not by reference).
+	// Value types can be compared with ==.
+	_ = pos1 == pos2
 }
 
 func TestPosition_EdgeCases(t *testing.T) {
@@ -386,7 +385,7 @@ func TestPosition_EdgeCases(t *testing.T) {
 }
 
 func TestPosition_String(t *testing.T) {
-	// Test String() method exists and returns something
+	// Test String() method exists and returns something.
 	pos := NewPosition(3, 5)
 	str := pos.String()
 
@@ -394,6 +393,6 @@ func TestPosition_String(t *testing.T) {
 		t.Error("String() should return non-empty string")
 	}
 
-	// Just verify it doesn't panic and returns a string
-	// The exact format is not critical for value objects
+	// Just verify it doesn't panic and returns a string.
+	// The exact format is not critical for value objects.
 }

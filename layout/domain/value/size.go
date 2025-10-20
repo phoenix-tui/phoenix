@@ -44,6 +44,8 @@ type Size struct {
 //   - Same rules apply for height
 //   - If width is set, min/max are ignored
 //   - If height is set, min/max are ignored
+//
+//nolint:gocyclo,cyclop // Size validation requires checking multiple constraints
 func NewSize(width, height, minWidth, maxWidth, minHeight, maxHeight int) Size {
 	// Normalize -1 for "not set"
 	if width < 0 {
@@ -208,6 +210,8 @@ func (s Size) WithMaxHeight(maxHeight int) Size {
 //
 //	size := NewSize(-1, -1, 40, 120, 10, 30)
 //	w, h := size.Constrain(150, 5)  // Returns (120, 10) - clamped to max/min
+//
+//nolint:nestif // Size constraint logic requires nested checks for min/max
 func (s Size) Constrain(width, height int) (int, int) {
 	// Apply width constraints
 	if s.HasWidth() {
@@ -237,11 +241,13 @@ func (s Size) Constrain(width, height int) (int, int) {
 }
 
 // String returns a human-readable representation of the Size.
+//
+//nolint:gocognit,gocyclo,cyclop,nestif // Size formatting requires checking multiple states
 func (s Size) String() string {
 	if s.IsUnconstrained() {
 		return "Size{unconstrained}"
 	}
-
+	//nolint:goconst // Size formatting uses inline strings for clarity
 	result := "Size{"
 	if s.HasWidth() {
 		result += fmt.Sprintf("width=%d", s.width)

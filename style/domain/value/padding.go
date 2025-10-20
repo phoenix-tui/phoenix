@@ -1,3 +1,4 @@
+//nolint:dupl // Padding and Margin are separate domain concepts - duplication is intentional
 package value
 
 import "fmt"
@@ -95,12 +96,5 @@ func (p Padding) String() string {
 	return fmt.Sprintf("Padding(top=%d, right=%d, bottom=%d, left=%d)", p.top, p.right, p.bottom, p.left)
 }
 
-// --- Private helpers ---
-
-// max returns the maximum of two integers.
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
+// --- Private helpers ---.
+// Note: Using Go 1.21+ builtin max() function.

@@ -144,7 +144,7 @@ func TestCursor_MoveTo(t *testing.T) {
 				t.Errorf("MoveTo() col = %d, want %d", result.Col(), tt.wantCol)
 			}
 
-			// Verify immutability
+			// Verify immutability.
 			if tt.initial.Row() != tt.origRow {
 				t.Errorf("Original cursor row was modified: %d, want %d", tt.initial.Row(), tt.origRow)
 			}
@@ -219,7 +219,7 @@ func TestCursor_MoveBy(t *testing.T) {
 				t.Errorf("MoveBy() col = %d, want %d", result.Col(), tt.wantCol)
 			}
 
-			// Verify immutability
+			// Verify immutability.
 			if tt.initial.Row() != tt.origRow {
 				t.Errorf("Original cursor row was modified: %d, want %d", tt.initial.Row(), tt.origRow)
 			}
@@ -256,22 +256,22 @@ func TestCursor_Copy(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			original := NewCursor(tt.row, tt.col)
-			copy := original.Copy()
+			updated := original.Copy()
 
-			if copy.Row() != original.Row() {
-				t.Errorf("Copy() row = %d, want %d", copy.Row(), original.Row())
+			if updated.Row() != original.Row() {
+				t.Errorf("Copy() row = %d, want %d", updated.Row(), original.Row())
 			}
-			if copy.Col() != original.Col() {
-				t.Errorf("Copy() col = %d, want %d", copy.Col(), original.Col())
+			if updated.Col() != original.Col() {
+				t.Errorf("Copy() col = %d, want %d", updated.Col(), original.Col())
 			}
 
 			// Verify it's a new instance (not same pointer)
-			if copy == original {
+			if updated == original {
 				t.Error("Copy() returned same instance, want new instance")
 			}
 
-			// Verify modifying copy doesn't affect original
-			newCopy := copy.MoveTo(999, 888)
+			// Verify modifying updated doesn't affect original.
+			newCopy := updated.MoveTo(999, 888)
 			if original.Row() != tt.row {
 				t.Errorf("Original cursor row was modified: %d, want %d", original.Row(), tt.row)
 			}
@@ -279,7 +279,7 @@ func TestCursor_Copy(t *testing.T) {
 				t.Errorf("Original cursor col was modified: %d, want %d", original.Col(), tt.col)
 			}
 			if newCopy.Row() != 999 || newCopy.Col() != 888 {
-				t.Error("Modified copy has incorrect values")
+				t.Error("Modified updated has incorrect values")
 			}
 		})
 	}
@@ -288,12 +288,12 @@ func TestCursor_Copy(t *testing.T) {
 func TestCursor_Immutability(t *testing.T) {
 	original := NewCursor(5, 10)
 
-	// Test all mutation operations preserve original
+	// Test all mutation operations preserve original.
 	moved := original.MoveTo(20, 30)
 	movedBy := original.MoveBy(3, 5)
 	copied := original.Copy()
 
-	// Original should remain unchanged
+	// Original should remain unchanged.
 	if original.Row() != 5 {
 		t.Errorf("Original row changed after operations: %d, want 5", original.Row())
 	}
@@ -301,7 +301,7 @@ func TestCursor_Immutability(t *testing.T) {
 		t.Errorf("Original col changed after operations: %d, want 10", original.Col())
 	}
 
-	// Results should have correct values
+	// Results should have correct values.
 	if moved.Row() != 20 || moved.Col() != 30 {
 		t.Error("MoveTo() produced incorrect values")
 	}

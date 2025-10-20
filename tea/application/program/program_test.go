@@ -297,7 +297,7 @@ func TestProgram_Quit(t *testing.T) {
 }
 
 // TestProgram_Stop_NotRunning verifies edge case of stopping non-running program.
-func TestProgram_Stop_NotRunning(t *testing.T) {
+func TestProgram_Stop_NotRunning(_ *testing.T) {
 	p := New(TestModel{})
 
 	// Stop() on non-running program doesn't panic

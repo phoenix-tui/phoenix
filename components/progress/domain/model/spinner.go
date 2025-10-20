@@ -13,7 +13,7 @@ type Spinner struct {
 // NewSpinner creates a new Spinner with the given style.
 func NewSpinner(style *value.SpinnerStyle) *Spinner {
 	if style == nil {
-		// Default to single dot
+		// Default to single dot.
 		style = value.NewSpinnerStyle([]string{"•"}, 10)
 	}
 

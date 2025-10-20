@@ -18,10 +18,13 @@ func (t testCounterMsg) String() string {
 }
 
 // testDelayMsg is sent after a delay (for testing timing).
+//
+//nolint:unused // Used in deferred test scenarios
 type testDelayMsg struct {
 	duration time.Duration
 }
 
+//nolint:unused // Used in deferred test scenarios
 func (t testDelayMsg) String() string {
 	return fmt.Sprintf("delay(%v)", t.duration)
 }

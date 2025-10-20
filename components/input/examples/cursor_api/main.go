@@ -1,3 +1,5 @@
+// Package main demonstrates the cursor control API.
+// This example shows Phoenix TextInput's public cursor API - a key differentiator.
 package main
 
 import (
@@ -31,13 +33,13 @@ func (m cursorAPIModel) Update(msg tea.Msg) (cursorAPIModel, tea.Cmd) {
 			return m, tea.Quit()
 
 		case "ctrl+s":
-			// Demonstrate SetContent with cursor position
+			// Demonstrate SetContent with cursor position.
 			m.input = m.input.SetContent("Saved content!", 6)
 			m.info = "Content set atomically with cursor at position 6"
 			return m, nil
 
 		case "ctrl+i":
-			// Show cursor info
+			// Show cursor info.
 			pos := m.input.CursorPosition()
 			before, at, after := m.input.ContentParts()
 			m.info = fmt.Sprintf(
@@ -47,7 +49,7 @@ func (m cursorAPIModel) Update(msg tea.Msg) (cursorAPIModel, tea.Cmd) {
 			return m, nil
 
 		case "ctrl+j":
-			// Jump to middle
+			// Jump to middle.
 			content := m.input.Value()
 			middle := len(content) / 2
 			m.input = m.input.SetContent(content, middle)
@@ -55,9 +57,9 @@ func (m cursorAPIModel) Update(msg tea.Msg) (cursorAPIModel, tea.Cmd) {
 			return m, nil
 
 		case "ctrl+p":
-			// Programmatic manipulation using cursor API
+			// Programmatic manipulation using cursor API.
 			before, at, after := m.input.ContentParts()
-			// Insert "[CURSOR]" marker
+			// Insert "[CURSOR]" marker.
 			newContent := before + "[" + at + "]" + after
 			cursorPos := m.input.CursorPosition()
 			m.input = m.input.SetContent(newContent, cursorPos)
@@ -70,11 +72,11 @@ func (m cursorAPIModel) Update(msg tea.Msg) (cursorAPIModel, tea.Cmd) {
 		return m, nil
 	}
 
-	// Forward to input
+	// Forward to input.
 	updated, cmd := m.input.Update(msg)
 	m.input = updated
 
-	// Update info
+	// Update info.
 	if m.lastKey != "" && m.lastKey != "ctrl+i" {
 		pos := m.input.CursorPosition()
 		m.info = fmt.Sprintf("Cursor at position %d (press Ctrl-I for details)", pos)
@@ -120,7 +122,7 @@ func (m cursorAPIModel) View() string {
 }
 
 func main() {
-	// Create input with initial content
+	// Create input with initial content.
 	model := cursorAPIModel{
 		input: input.New(60).
 			Content("Try moving the cursor and pressing Ctrl-I").
@@ -128,12 +130,12 @@ func main() {
 		info: "Press Ctrl-I to see cursor information",
 	}
 
-	// Move cursor to middle initially
+	// Move cursor to middle initially.
 	content := model.input.Value()
 	middle := len(content) / 2
 	model.input = model.input.SetContent(content, middle)
 
-	// Run program
+	// Run program.
 	p := tea.New(model)
 	if err := p.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)

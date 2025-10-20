@@ -10,7 +10,7 @@ import (
 )
 
 // SortService handles table sorting logic.
-// This is a domain service because sorting behavior is part of the business logic
+// This is a domain service because sorting behavior is part of the business logic.
 // but doesn't belong to a single entity.
 type SortService struct{}
 
@@ -26,11 +26,11 @@ func (s *SortService) Sort(rows []model.Row, columnKey string, direction value.S
 		return rows
 	}
 
-	// Create a copy to avoid modifying original
+	// Create a copy to avoid modifying original.
 	sorted := make([]model.Row, len(rows))
 	copy(sorted, rows)
 
-	// Sort using stable sort
+	// Sort using stable sort.
 	sort.SliceStable(sorted, func(i, j int) bool {
 		valI := sorted[i][columnKey]
 		valJ := sorted[j][columnKey]
@@ -50,11 +50,11 @@ func (s *SortService) Sort(rows []model.Row, columnKey string, direction value.S
 // Supports string, int, int64, float64, and bool types.
 // Returns:
 //
-//	-1 if a < b
-//	 0 if a == b
-//	 1 if a > b
+//	-1 if a < b.
+//	 0 if a == b.
+//	 1 if a > b.
 func (s *SortService) Compare(a, b interface{}) int {
-	// Handle nil values
+	// Handle nil values.
 	if a == nil && b == nil {
 		return 0
 	}
@@ -65,7 +65,7 @@ func (s *SortService) Compare(a, b interface{}) int {
 		return 1
 	}
 
-	// Compare by type
+	// Compare by type.
 	switch aVal := a.(type) {
 	case string:
 		if bVal, ok := b.(string); ok {
@@ -93,7 +93,7 @@ func (s *SortService) Compare(a, b interface{}) int {
 		}
 	}
 
-	// Fallback: compare as strings
+	// Fallback: compare as strings.
 	return compareStrings(fmt.Sprintf("%v", a), fmt.Sprintf("%v", b))
 }
 

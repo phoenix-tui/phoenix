@@ -27,7 +27,7 @@ func TestNode_Creation(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			defer func() {
 				r := recover()
 				if tt.shouldPanic && r == nil {
@@ -107,7 +107,7 @@ func TestNode_AddChild_Panics(t *testing.T) {
 	parent := NewNode(NewBox("Parent"))
 
 	// Test nil child
-	t.Run("nil child panics", func(t *testing.T) {
+	t.Run("nil child panics", func(_ *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Error("Expected panic for nil child")
@@ -117,7 +117,7 @@ func TestNode_AddChild_Panics(t *testing.T) {
 	})
 
 	// Test self as child (cycle detection)
-	t.Run("self as child panics", func(t *testing.T) {
+	t.Run("self as child panics", func(_ *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Error("Expected panic for self as child")
@@ -210,7 +210,7 @@ func TestNode_RemoveChild_Panics(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			defer func() {
 				if r := recover(); r == nil {
 					t.Error("Expected panic for invalid index")
@@ -436,7 +436,7 @@ func TestNode_Depth(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			tree := tt.buildTree()
 			depth := tree.Depth()
 
@@ -487,7 +487,7 @@ func TestNode_NodeCount(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			tree := tt.buildTree()
 			count := tree.NodeCount()
 
@@ -599,7 +599,7 @@ func TestNode_ChildrenImmutability(t *testing.T) {
 
 	// Modify the slice
 	children[0] = NewNode(NewBox("Modified"))
-	children = append(children, NewNode(NewBox("Added")))
+	_ = append(children, NewNode(NewBox("Added")))
 
 	// Verify original node is unchanged
 	originalChildren := node.Children()

@@ -6,8 +6,8 @@
 //   - Keyboard navigation (arrows, vim keys, home/end)
 //   - Scrolling (for tables larger than viewport)
 //
-// This is a UNIVERSAL component - it works for any application (file managers,
-// data viewers, process lists, etc.). It does NOT include application-specific
+// This is a UNIVERSAL component - it works for any application (file managers,.
+// data viewers, process lists, etc.). It does NOT include application-specific.
 // features like file system operations.
 package table
 
@@ -71,7 +71,7 @@ func New(columns []Column) *Table {
 func NewWithRows(columns []Column, rows []Row) *Table {
 	t := New(columns)
 
-	// Convert to domain rows
+	// Convert to domain rows.
 	domainRows := make([]model.Row, len(rows))
 	for i, row := range rows {
 		domainRows[i] = model.Row(row)
@@ -209,18 +209,18 @@ func (t *Table) View() string {
 	columns := t.domain.Columns()
 	visibleRows := t.domain.VisibleRows()
 
-	// Calculate total width
+	// Calculate total width.
 	totalWidth := 0
 	for _, col := range columns {
 		totalWidth += col.Width() + 1 // +1 for separator
 	}
 
-	// Render header
+	// Render header.
 	if t.domain.ShowHeader() {
 		for i, col := range columns {
 			title := col.Title()
 
-			// Add sort indicator if this column is sorted
+			// Add sort indicator if this column is sorted.
 			if t.domain.IsSorted() && t.domain.SortColumn() == col.Key() {
 				if t.domain.SortDirection().IsAscending() {
 					title += " ▲"
@@ -238,7 +238,7 @@ func (t *Table) View() string {
 		}
 		b.WriteString("\n")
 
-		// Header separator
+		// Header separator.
 		for i, col := range columns {
 			b.WriteString(strings.Repeat("─", col.Width()))
 			if i < len(columns)-1 {
@@ -248,7 +248,7 @@ func (t *Table) View() string {
 		b.WriteString("\n")
 	}
 
-	// Render rows
+	// Render rows.
 	selectedIndex := t.domain.SelectedIndex()
 	scrollOffset := t.domain.ScrollOffset()
 
@@ -259,7 +259,7 @@ func (t *Table) View() string {
 		for colIdx, col := range columns {
 			value := row[col.Key()]
 
-			// Use custom renderer if available
+			// Use custom renderer if available.
 			var cellText string
 			if col.Renderer() != nil {
 				cellText = col.Renderer()(value)
@@ -269,7 +269,7 @@ func (t *Table) View() string {
 
 			cell := t.formatCell(cellText, col.Width(), col.Alignment())
 
-			// Add selection indicator
+			// Add selection indicator.
 			if isSelected && colIdx == 0 {
 				if len(cell) > 0 {
 					cell = ">" + cell[1:]
@@ -290,7 +290,7 @@ func (t *Table) View() string {
 
 // formatCell formats a cell with alignment and width.
 func (t *Table) formatCell(text string, width int, alignment value.Alignment) string {
-	// Truncate if too long
+	// Truncate if too long.
 	if len(text) > width {
 		if width > 3 {
 			text = text[:width-3] + "..."
@@ -299,7 +299,7 @@ func (t *Table) formatCell(text string, width int, alignment value.Alignment) st
 		}
 	}
 
-	// Pad based on alignment
+	// Pad based on alignment.
 	padding := width - len(text)
 	if padding <= 0 {
 		return text
@@ -342,7 +342,7 @@ func (t *Table) Rows() []Row {
 // SortByColumn returns a new table sorted by the specified column key.
 // If already sorted by this column, toggles the direction.
 func (t *Table) SortByColumn(columnKey string) *Table {
-	// Check if column is sortable
+	// Check if column is sortable.
 	var targetCol *model.Column
 	for _, col := range t.domain.Columns() {
 		if col.Key() == columnKey {
@@ -355,13 +355,13 @@ func (t *Table) SortByColumn(columnKey string) *Table {
 		return t // Column not found or not sortable
 	}
 
-	// Determine direction
+	// Determine direction.
 	direction := value.SortDirectionAsc
 	if t.domain.IsSorted() && t.domain.SortColumn() == columnKey {
 		direction = t.domain.SortDirection().Toggle()
 	}
 
-	// Perform sort
+	// Perform sort.
 	sortedRows := t.sortService.Sort(t.domain.Rows(), columnKey, direction)
 	newDomain := t.domain.SortBy(columnKey, direction, sortedRows)
 

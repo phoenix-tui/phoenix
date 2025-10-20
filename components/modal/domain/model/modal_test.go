@@ -47,16 +47,16 @@ func TestModalWithTitle(t *testing.T) {
 	original := NewModal("Content")
 	modified := original.WithTitle("New Title")
 
-	// Original unchanged
+	// Original unchanged.
 	if original.Title() != "" {
 		t.Errorf("Original title should be empty, got '%s'", original.Title())
 	}
 
-	// Modified has new title
+	// Modified has new title.
 	if modified.Title() != "New Title" {
 		t.Errorf("Expected title 'New Title', got '%s'", modified.Title())
 	}
-	// Other fields preserved
+	// Other fields preserved.
 	if modified.Content() != "Content" {
 		t.Error("Content should be preserved")
 	}
@@ -66,12 +66,12 @@ func TestModalWithContent(t *testing.T) {
 	original := NewModal("Original")
 	modified := original.WithContent("Modified")
 
-	// Original unchanged
+	// Original unchanged.
 	if original.Content() != "Original" {
 		t.Error("Original content should be unchanged")
 	}
 
-	// Modified has new content
+	// Modified has new content.
 	if modified.Content() != "Modified" {
 		t.Errorf("Expected content 'Modified', got '%s'", modified.Content())
 	}
@@ -81,12 +81,12 @@ func TestModalWithSize(t *testing.T) {
 	original := NewModal("Content")
 	modified := original.WithSize(80, 24)
 
-	// Original unchanged
+	// Original unchanged.
 	if original.Size().Width() != 40 || original.Size().Height() != 10 {
 		t.Error("Original size should be unchanged")
 	}
 
-	// Modified has new size
+	// Modified has new size.
 	if modified.Size().Width() != 80 || modified.Size().Height() != 24 {
 		t.Errorf("Expected size 80x24, got %dx%d", modified.Size().Width(), modified.Size().Height())
 	}
@@ -102,7 +102,7 @@ func TestModalWithPosition(t *testing.T) {
 		t.Error("Original position should be centered")
 	}
 
-	// Modified has custom position
+	// Modified has custom position.
 	if modified.Position().IsCenter() {
 		t.Error("Modified position should not be centered")
 	}
@@ -119,12 +119,12 @@ func TestModalWithButtons(t *testing.T) {
 	}
 	modified := original.WithButtons(buttons)
 
-	// Original unchanged
+	// Original unchanged.
 	if len(original.Buttons()) != 0 {
 		t.Error("Original should have no buttons")
 	}
 
-	// Modified has buttons
+	// Modified has buttons.
 	if len(modified.Buttons()) != 2 {
 		t.Errorf("Expected 2 buttons, got %d", len(modified.Buttons()))
 	}
@@ -135,7 +135,7 @@ func TestModalWithButtons(t *testing.T) {
 		t.Error("Second button should be No")
 	}
 
-	// Focused button reset to 0
+	// Focused button reset to 0.
 	if modified.FocusedButtonIndex() != 0 {
 		t.Errorf("Focused button should be 0, got %d", modified.FocusedButtonIndex())
 	}
@@ -145,12 +145,12 @@ func TestModalWithDimBackground(t *testing.T) {
 	original := NewModal("Content")
 	modified := original.WithDimBackground(true)
 
-	// Original unchanged
+	// Original unchanged.
 	if original.DimBackground() {
 		t.Error("Original should not have dimming")
 	}
 
-	// Modified has dimming
+	// Modified has dimming.
 	if !modified.DimBackground() {
 		t.Error("Modified should have dimming enabled")
 	}
@@ -160,12 +160,12 @@ func TestModalWithVisible(t *testing.T) {
 	original := NewModal("Content")
 	modified := original.WithVisible(true)
 
-	// Original unchanged
+	// Original unchanged.
 	if original.IsVisible() {
 		t.Error("Original should not be visible")
 	}
 
-	// Modified is visible
+	// Modified is visible.
 	if !modified.IsVisible() {
 		t.Error("Modified should be visible")
 	}
@@ -238,13 +238,13 @@ func TestModalFocusPreviousButton(t *testing.T) {
 func TestModalFocusButtonsNoButtons(t *testing.T) {
 	modal := NewModal("Content")
 
-	// FocusNextButton with no buttons should return unchanged modal
+	// FocusNextButton with no buttons should return unchanged modal.
 	next := modal.FocusNextButton()
 	if next.FocusedButtonIndex() != modal.FocusedButtonIndex() {
 		t.Error("Focus should not change when there are no buttons")
 	}
 
-	// FocusPreviousButton with no buttons should return unchanged modal
+	// FocusPreviousButton with no buttons should return unchanged modal.
 	prev := modal.FocusPreviousButton()
 	if prev.FocusedButtonIndex() != modal.FocusedButtonIndex() {
 		t.Error("Focus should not change when there are no buttons")
@@ -258,7 +258,7 @@ func TestModalFocusedButton(t *testing.T) {
 	}
 	modal := NewModal("Content").WithButtons(buttons)
 
-	// Initially focused on first button
+	// Initially focused on first button.
 	focused := modal.FocusedButton()
 	if focused == nil {
 		t.Fatal("Expected focused button, got nil")
@@ -267,7 +267,7 @@ func TestModalFocusedButton(t *testing.T) {
 		t.Errorf("Expected focused button 'Yes', got '%s'", focused.Label())
 	}
 
-	// Focus next button
+	// Focus next button.
 	modal = modal.FocusNextButton()
 	focused = modal.FocusedButton()
 	if focused == nil {
@@ -309,14 +309,14 @@ func TestModalSingleButton(t *testing.T) {
 func TestModalImmutability(t *testing.T) {
 	original := NewModal("Original Content")
 
-	// Apply multiple changes
+	// Apply multiple changes.
 	modified := original.
 		WithTitle("Title").
 		WithSize(80, 24).
 		WithVisible(true).
 		WithDimBackground(true)
 
-	// Original should be unchanged
+	// Original should be unchanged.
 	if original.Title() != "" {
 		t.Error("Original title should be unchanged")
 	}
@@ -330,7 +330,7 @@ func TestModalImmutability(t *testing.T) {
 		t.Error("Original size should be unchanged")
 	}
 
-	// Modified should have all changes
+	// Modified should have all changes.
 	if modified.Title() != "Title" {
 		t.Error("Modified title incorrect")
 	}

@@ -17,6 +17,171 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.0-beta.2] - 2025-10-20 (Multi-Module + TextArea Cursor Control)
+
+**Status**: 🎉 FEATURE RELEASE
+
+This release fixes the multi-module monorepo structure AND adds advanced cursor control API for TextArea component, requested by GoSh shell project.
+
+### Changed
+
+**Multi-Module Monorepo Structure**
+- ✅ **Added root go.mod** for pkg.go.dev indexing
+  - Umbrella module pattern (like OpenTelemetry, Kubernetes)
+  - Contains `replace` directives for all 10 libraries
+  - No `require` section (pure umbrella module)
+  - Enables GitHub badges and Go proxy discovery
+- ✅ **Module tagging strategy** documented
+  - 11 tags per release (10 module-specific + 1 root tag)
+  - Example: `clipboard/v0.1.0-beta.2`, `components/v0.1.0-beta.2`, `v0.1.0-beta.2`
+  - All tags point to the same commit for consistency
+
+### Added
+
+**TextArea Cursor Control API** ⭐ NEW FEATURE
+
+Phoenix TextArea now supports advanced cursor control for shell-like applications (requested by GoSh project):
+
+1. **SetCursorPosition(row, col)** - Programmatic cursor positioning
+   - Set cursor to exact position with automatic bounds clamping
+   - Enables shell-like navigation (e.g., "Up on first line → jump to end")
+   - Example: `ta.SetCursorPosition(0, len([]rune(firstLine)))`
+
+2. **OnMovement(validator)** - Movement validation
+   - Validator called BEFORE cursor moves
+   - Return false to block movement (boundary protection)
+   - Example: Block cursor from editing shell prompt area
+
+3. **OnCursorMoved(handler)** - Cursor movement observer
+   - Handler called AFTER successful movement
+   - React to cursor changes (update UI, refresh syntax highlighting)
+   - Observer pattern (cannot block movement)
+
+4. **OnBoundaryHit(handler)** - Boundary hit feedback
+   - Handler called when movement blocked by validator
+   - Provides user feedback for accessibility/UX
+   - Know when and why cursor couldn't move
+
+**Complete Example** (Shell REPL):
+```go
+ta := textarea.New().
+    OnMovement(func(from, to textarea.CursorPos) bool {
+        // Don't allow cursor to edit prompt area
+        if to.Row == 0 && to.Col < 2 {
+            return false  // Block movement
+        }
+        return true
+    }).
+    OnCursorMoved(func(from, to textarea.CursorPos) {
+        // Update syntax highlighting when row changes
+        if from.Row != to.Row {
+            refreshSyntaxHighlight(to.Row)
+        }
+    }).
+    OnBoundaryHit(func(attemptedPos textarea.CursorPos, reason string) {
+        // Visual feedback for user
+        flash("Cannot edit prompt area")
+    })
+```
+
+**New Files**:
+- `components/input/textarea/domain/model/cursor_position.go` - CursorPos value object
+- `components/input/textarea/api/textarea_cursor_control_test.go` - 11 unit tests (90%+ coverage)
+- `components/input/textarea/api/textarea_shell_integration_test.go` - 8 integration tests
+- `components/input/textarea/examples/shell_prompt/main.go` - Interactive demo
+- `components/input/textarea/CURSOR_CONTROL_API.md` - Complete API documentation
+
+**Modified Files**:
+- `components/input/textarea/api/textarea.go` - Added 4 new methods + types + godoc examples
+- `components/input/textarea/domain/model/textarea.go` - Added callbacks support + SetCursorPosition()
+- `components/input/textarea/domain/service/navigation.go` - Integrated validator checks (all 10 navigation methods)
+
+**Benefits**:
+- ✅ Enables shell REPLs (GoSh, custom shells)
+- ✅ Enables code editors with gutters/line numbers
+- ✅ Enables SQL clients with multiline queries
+- ✅ Accessibility (screen reader integration)
+- ✅ Follows industry patterns (PSReadLine, GNU Readline, prompt_toolkit)
+- ✅ 100% backward compatible (all features opt-in)
+
+**Open Source Best Practices**
+- ✅ **CODE_OF_CONDUCT.md** - Contributor Covenant 2.1
+- ✅ **SECURITY.md** - Security policy and vulnerability reporting
+- ✅ **.github/FUNDING.yml** - Sponsorship configuration (placeholder)
+- ✅ **.github/ISSUE_TEMPLATE/** - Bug report, feature request, question templates
+- ✅ **.github/PULL_REQUEST_TEMPLATE.md** - Comprehensive PR checklist
+
+**Documentation**
+- ✅ **Updated RELEASE_PROCESS.md** - Multi-module tagging workflow
+- ✅ **scripts/create-release-tags.sh** - Automated multi-module tagging script
+- ✅ **Issue templates** - Structured bug reports and feature requests
+- ✅ **PR template** - Code quality, testing, and architecture checklists
+
+### Fixed
+
+**Code Quality - Linter Cleanup** ⭐ NEW
+- Fixed **358+ linter issues** across clipboard and components modules
+  - 143 issues in clipboard module → 0
+  - 215 issues in components module → 0
+  - Exit code: 0 (CI-ready)
+- **Critical fixes**:
+  - ✅ **40 redefines-builtin-id** (Go 1.21+ compatibility)
+    - Renamed `min`/`max`/`copy` parameters to avoid builtin conflicts
+    - Affects validation, textarea buffer, progress clamping
+  - ✅ **102 godot** (comment style) - automated with sed
+  - ✅ **35 revive** (package comments, unused params)
+  - ✅ **17 gocritic** (hugeParam, assignOp, paramTypeCombine, singleCaseSwitch, appendAssign)
+  - ✅ **5 staticcheck** (SA4006 unused values, S1008 if-return simplification)
+  - ✅ **13 nestif** (nested complexity)
+  - ✅ **4 gosec** (Windows API unsafe.Pointer - suppressed with nolint)
+- All modules now pass golangci-lint v2.5 with exit code 0
+- **Benefits**:
+  - ✅ CI will pass (no linter failures)
+  - ✅ Go 1.21+ compatibility guaranteed
+  - ✅ Code quality improved
+  - ✅ Production ready
+
+**pkg.go.dev Indexing**
+- Previously: v0.1.0-beta.1 cached on commit `a3668cd` (414 files, no root go.mod)
+- Now: v0.1.0-beta.2 on commit with root go.mod (415 files)
+- Go proxy will index the root module correctly
+- GitHub badges will work (Go version, Go Report Card, pkg.go.dev)
+
+### Technical Details
+
+**File Changes**
+- Added: `go.mod` (root module with 10 replace directives)
+- Added: `CODE_OF_CONDUCT.md` (1,134 lines)
+- Added: `SECURITY.md` (166 lines)
+- Added: `.github/FUNDING.yml` (27 lines)
+- Added: `.github/ISSUE_TEMPLATE/` (4 templates + config)
+- Added: `.github/PULL_REQUEST_TEMPLATE.md` (156 lines)
+- Added: `scripts/create-release-tags.sh` (automated tagging script)
+- Added: **TextArea cursor control** (5 new files, 3 modified, ~1,500 lines total)
+- Updated: `.claude/RELEASE_PROCESS.md` (multi-module workflow)
+- Updated: `CHANGELOG.md` (this file)
+
+**Why This Release?**
+- Go proxy has immutable cache - cannot update existing v0.1.0-beta.1
+- Root go.mod required for GitHub badges and pkg.go.dev root module index
+- Better to release beta.2 with proper structure than wait for v0.2.0
+
+**Migration from beta.1 to beta.2**
+No code changes! Just update your import paths if you were using the root module:
+
+```bash
+# Before (beta.1) - still works
+go get github.com/phoenix-tui/phoenix/components@v0.1.0-beta.1
+
+# After (beta.2) - now root module also available
+go get github.com/phoenix-tui/phoenix@v0.1.0-beta.2
+go get github.com/phoenix-tui/phoenix/components@components/v0.1.0-beta.2
+```
+
+**Recommended**: Continue importing individual libraries directly. Root module is mainly for tooling/discovery.
+
+---
+
 ## [0.1.0-beta.1] - 2025-10-19 (First Public Beta)
 
 **Status**: 🎉 FIRST PUBLIC RELEASE

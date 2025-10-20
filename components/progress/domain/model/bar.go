@@ -1,3 +1,4 @@
+// Package model contains domain models for progress indicators.
 package model
 
 import "github.com/phoenix-tui/phoenix/components/progress/domain/value"
@@ -31,7 +32,7 @@ func NewBar(width int) *Bar {
 }
 
 // NewBarWithPercentage creates a new Bar with initial percentage.
-func NewBarWithPercentage(width int, percentage int) *Bar {
+func NewBarWithPercentage(width, percentage int) *Bar {
 	bar := NewBar(width)
 	bar.percentage = value.NewPercentage(percentage)
 	return bar

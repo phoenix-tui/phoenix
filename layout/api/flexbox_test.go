@@ -298,6 +298,7 @@ func TestFlex_Chaining(t *testing.T) {
 
 	if flex == nil {
 		t.Error("Chaining returned nil")
+		return // Prevent nil dereference
 	}
 
 	if flex.domain.ItemCount() != 2 {

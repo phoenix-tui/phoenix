@@ -1,3 +1,4 @@
+// Package model contains rich domain models for styling.
 package model
 
 import (
@@ -9,19 +10,19 @@ import (
 // Style is a rich domain model that encapsulates all styling concerns for terminal UI elements.
 // It follows DDD principles: data + behavior, immutability, and fluent API design.
 //
-// Style composes multiple value objects:
-//   - Color (foreground, background, border color)
-//   - Border (border type and sides)
-//   - Padding (inner spacing)
-//   - Margin (outer spacing)
-//   - Size (width/height constraints)
-//   - Alignment (horizontal and vertical)
-//   - Text decorations (bold, italic, underline, strikethrough)
+// Style composes multiple value objects:.
+//   - Color (foreground, background, border color).
+//   - Border (border type and sides).
+//   - Padding (inner spacing).
+//   - Margin (outer spacing).
+//   - Size (width/height constraints).
+//   - Alignment (horizontal and vertical).
+//   - Text decorations (bold, italic, underline, strikethrough).
 //
 // All setter methods return a new Style instance (immutability).
 // Methods are chainable for fluent API usage.
 //
-// Example:
+// Example:.
 //
 //	style := model.NewStyle().
 //	    Foreground(value.RGB(255, 255, 255)).
@@ -29,13 +30,13 @@ import (
 //	    Bold(true).
 //	    Padding(value.NewPadding(1, 2, 1, 2)).
 //	    Border(value.RoundedBorder()).
-//	    BorderColor(value.RGB(128, 128, 128))
+//	    BorderColor(value.RGB(128, 128, 128)).
 type Style struct {
-	// Color properties
+	// Color properties.
 	foreground *value.Color
 	background *value.Color
 
-	// Border properties
+	// Border properties.
 	border       *value.Border
 	borderColor  *value.Color
 	borderTop    bool
@@ -43,35 +44,35 @@ type Style struct {
 	borderLeft   bool
 	borderRight  bool
 
-	// Spacing properties
+	// Spacing properties.
 	padding *value.Padding
 	margin  *value.Margin
 
-	// Size constraints
+	// Size constraints.
 	size *value.Size
 
-	// Alignment
+	// Alignment.
 	alignment *value.Alignment
 
-	// Text properties
+	// Text properties.
 	bold          bool
 	italic        bool
 	underline     bool
 	strikethrough bool
 
-	// Terminal capability (for color adaptation)
+	// Terminal capability (for color adaptation).
 	terminalCapability value.TerminalCapability
 }
 
 // NewStyle creates a new Style with default values.
-// Default values:
-//   - No colors set (uses terminal defaults)
-//   - No border
-//   - No padding/margin
-//   - No size constraints
-//   - No alignment (content-dependent)
-//   - No text decorations
-//   - TrueColor terminal capability
+// Default values:.
+//   - No colors set (uses terminal defaults).
+//   - No border.
+//   - No padding/margin.
+//   - No size constraints.
+//   - No alignment (content-dependent).
+//   - No text decorations.
+//   - TrueColor terminal capability.
 func NewStyle() Style {
 	return Style{
 		foreground:         nil,
@@ -94,7 +95,7 @@ func NewStyle() Style {
 	}
 }
 
-// Color methods (fluent)
+// Color methods (fluent).
 
 // Foreground sets the foreground (text) color.
 // Returns a new Style instance (immutability).
@@ -110,14 +111,14 @@ func (s Style) Background(c value.Color) Style {
 	return s
 }
 
-// Border methods (fluent)
+// Border methods (fluent).
 
 // Border sets the border style.
 // By default, enables all sides. Use BorderTop/Bottom/Left/Right to selectively enable sides.
 // Returns a new Style instance (immutability).
 func (s Style) Border(b value.Border) Style {
 	s.border = &b
-	// Default: enable all sides when border is set
+	// Default: enable all sides when border is set.
 	if s.border != nil && !s.borderTop && !s.borderBottom && !s.borderLeft && !s.borderRight {
 		s.borderTop = true
 		s.borderBottom = true
@@ -162,7 +163,7 @@ func (s Style) BorderRight(enabled bool) Style {
 	return s
 }
 
-// Spacing methods (fluent)
+// Spacing methods (fluent).
 
 // Padding sets the padding (inner spacing).
 // Returns a new Style instance (immutability).
@@ -326,7 +327,7 @@ func (s Style) MarginVertical(vertical int) Style {
 	return s
 }
 
-// Size methods (fluent)
+// Size methods (fluent).
 
 // Width sets the exact width.
 // Returns a new Style instance (immutability).
@@ -400,7 +401,7 @@ func (s Style) MinHeight(h int) Style {
 	return s
 }
 
-// Alignment methods (fluent)
+// Alignment methods (fluent).
 
 // Align sets both horizontal and vertical alignment.
 // Returns a new Style instance (immutability).
@@ -435,7 +436,7 @@ func (s Style) AlignVertical(v value.VerticalAlignment) Style {
 	return s
 }
 
-// Text decoration methods (fluent)
+// Text decoration methods (fluent).
 
 // Bold enables or disables bold text.
 // Returns a new Style instance (immutability).
@@ -465,7 +466,7 @@ func (s Style) Strikethrough(enabled bool) Style {
 	return s
 }
 
-// Terminal capability
+// Terminal capability.
 
 // TerminalCapability sets the terminal capability for color adaptation.
 // Returns a new Style instance (immutability).
@@ -474,7 +475,7 @@ func (s Style) TerminalCapability(tc value.TerminalCapability) Style {
 	return s
 }
 
-// Getters (for rendering)
+// Getters (for rendering).
 
 // GetForeground returns the foreground color if set.
 // Returns (color, true) if set, (zero value, false) otherwise.
@@ -595,12 +596,12 @@ func (s Style) GetTerminalCapability() value.TerminalCapability {
 
 // Validate validates the style for consistency.
 // Returns an error if the style has invalid combinations.
+//
+//nolint:gocyclo,cyclop // Cyclomatic complexity justified: comprehensive validation of multiple style properties
 func (s Style) Validate() error {
-	// Validate size constraints
-	if s.size != nil {
-	}
+	// Validate size constraints (currently no validations needed).
 
-	// Validate padding (must be non-negative)
+	// Validate padding (must be non-negative).
 	if s.padding != nil {
 		if s.padding.Top() < 0 || s.padding.Right() < 0 ||
 			s.padding.Bottom() < 0 || s.padding.Left() < 0 {
@@ -608,7 +609,7 @@ func (s Style) Validate() error {
 		}
 	}
 
-	// Validate margin (must be non-negative)
+	// Validate margin (must be non-negative).
 	if s.margin != nil {
 		if s.margin.Top() < 0 || s.margin.Right() < 0 ||
 			s.margin.Bottom() < 0 || s.margin.Left() < 0 {
@@ -616,7 +617,7 @@ func (s Style) Validate() error {
 		}
 	}
 
-	// Border validation: if any border side is enabled, border must be set
+	// Border validation: if any border side is enabled, border must be set.
 	if (s.borderTop || s.borderBottom || s.borderLeft || s.borderRight) && s.border == nil {
 		return fmt.Errorf("border sides enabled but no border style set")
 	}

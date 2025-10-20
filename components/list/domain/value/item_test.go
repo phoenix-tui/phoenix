@@ -39,7 +39,7 @@ func TestNewItemWithMetadata(t *testing.T) {
 		t.Errorf("NewItemWithMetadata() label = %v, want %v", item.Label(), label)
 	}
 
-	// Check metadata
+	// Check metadata.
 	if color, ok := item.GetMetadata("color"); !ok || color != "blue" {
 		t.Errorf("NewItemWithMetadata() color = %v, want blue", color)
 	}
@@ -104,10 +104,10 @@ func TestItem_Metadata(t *testing.T) {
 	}
 	item := NewItemWithMetadata("value", "label", metadata)
 
-	// Get metadata
+	// Get metadata.
 	got := item.Metadata()
 
-	// Verify contents
+	// Verify contents.
 	if !reflect.DeepEqual(got, metadata) {
 		t.Errorf("Item.Metadata() = %v, want %v", got, metadata)
 	}
@@ -170,15 +170,15 @@ func TestItem_WithMetadata(t *testing.T) {
 		"key1": "value1",
 	})
 
-	// Add metadata
+	// Add metadata.
 	updated := original.WithMetadata("key2", "value2")
 
-	// Original should be unchanged
+	// Original should be unchanged.
 	if _, ok := original.GetMetadata("key2"); ok {
 		t.Error("Item.WithMetadata() should not modify original item")
 	}
 
-	// Updated should have both keys
+	// Updated should have both keys.
 	if val, ok := updated.GetMetadata("key1"); !ok || val != "value1" {
 		t.Error("Item.WithMetadata() should preserve original metadata")
 	}
@@ -186,7 +186,7 @@ func TestItem_WithMetadata(t *testing.T) {
 		t.Error("Item.WithMetadata() should add new metadata")
 	}
 
-	// Values and labels should be the same
+	// Values and labels should be the same.
 	if updated.Value() != original.Value() {
 		t.Error("Item.WithMetadata() should preserve value")
 	}
@@ -202,12 +202,12 @@ func TestItem_WithMetadata_Overwrite(t *testing.T) {
 
 	updated := original.WithMetadata("key", "new-value")
 
-	// Original should still have old value
+	// Original should still have old value.
 	if val, _ := original.GetMetadata("key"); val != "old-value" {
 		t.Error("Item.WithMetadata() should not modify original item")
 	}
 
-	// Updated should have new value
+	// Updated should have new value.
 	if val, _ := updated.GetMetadata("key"); val != "new-value" {
 		t.Error("Item.WithMetadata() should overwrite existing key")
 	}

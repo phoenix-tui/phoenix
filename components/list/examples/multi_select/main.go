@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	// Create a todo list with multi-selection
+	// Create a todo list with multi-selection.
 	todos := []interface{}{
 		"Buy milk",
 		"Write Phoenix documentation",
@@ -39,7 +39,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Show completed todos
+	// Show completed todos.
 	selected := l.SelectedItems()
 	if len(selected) > 0 {
 		fmt.Printf("\nCompleted tasks:\n")

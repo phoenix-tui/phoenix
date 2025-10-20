@@ -21,17 +21,18 @@ func (s *EditingService) InsertChar(ta *model.TextArea, ch rune) *model.TextArea
 	row, col := ta.CursorPosition()
 	buffer := ta.GetBuffer()
 
-	// Insert character in buffer
+	// Insert character in buffer.
 	newBuffer := buffer.InsertChar(row, col, ch)
 
-	// Move cursor right
+	// Move cursor right.
 	newCursor := model.NewCursor(row, col+1)
 
-	// Return updated TextArea
+	// Return updated TextArea.
 	return ta.WithBuffer(newBuffer).WithCursor(newCursor)
 }
 
 // DeleteCharBackward deletes character before cursor (Backspace).
+// Checks movement validator BEFORE deleting to prevent deletion if cursor can't move back.
 func (s *EditingService) DeleteCharBackward(ta *model.TextArea) *model.TextArea {
 	if ta.IsReadOnly() {
 		return ta
@@ -43,10 +44,36 @@ func (s *EditingService) DeleteCharBackward(ta *model.TextArea) *model.TextArea 
 		return ta // Nothing to delete
 	}
 
+	// Calculate where cursor would move after deletion.
+	var targetRow, targetCol int
+	if col > 0 {
+		// Would move left on same line.
+		targetRow, targetCol = row, col-1
+	} else {
+		// Would move to end of previous line (col == 0, row > 0)
+		targetRow = row - 1
+		targetCol = len([]rune(ta.Lines()[row-1]))
+	}
+
+	// Check validator BEFORE deleting.
+	//nolint:nestif // domain validation logic requires nested conditions
+	if validator := ta.GetMovementValidator(); validator != nil {
+		from := model.NewCursorPos(row, col)
+		to := model.NewCursorPos(targetRow, targetCol)
+		if !validator(from, to) {
+			// Movement blocked - can't delete because cursor can't move back.
+			if handler := ta.GetBoundaryHitHandler(); handler != nil {
+				handler(to, "backspace blocked by validator")
+			}
+			return ta
+		}
+	}
+
+	// Validator allows movement - proceed with deletion.
 	buffer := ta.GetBuffer()
 
 	if col > 0 {
-		// Delete character on current line
+		// Delete character on current line.
 		newBuffer := buffer.DeleteChar(row, col-1)
 		newCursor := model.NewCursor(row, col-1)
 		return ta.WithBuffer(newBuffer).WithCursor(newCursor)
@@ -55,16 +82,16 @@ func (s *EditingService) DeleteCharBackward(ta *model.TextArea) *model.TextArea 
 	// Join with previous line (col == 0, row > 0)
 	prevLineLen := len([]rune(ta.Lines()[row-1]))
 
-	// Get content of current line
+	// Get content of current line.
 	currentLineContent := ta.CurrentLine()
 
-	// Set previous line to previous + current
+	// Set previous line to previous + current.
 	newBuffer := buffer.SetLine(row-1, buffer.Line(row-1)+currentLineContent)
 
-	// Delete current line
+	// Delete current line.
 	newBuffer, _ = newBuffer.DeleteLine(row)
 
-	// Move cursor to end of previous line
+	// Move cursor to end of previous line.
 	newCursor := model.NewCursor(row-1, prevLineLen)
 
 	return ta.WithBuffer(newBuffer).WithCursor(newCursor)
@@ -81,12 +108,12 @@ func (s *EditingService) DeleteCharForward(ta *model.TextArea) *model.TextArea {
 	buffer := ta.GetBuffer()
 
 	if col >= len([]rune(currentLine)) {
-		// At end of line, join with next line
+		// At end of line, join with next line.
 		if row < ta.LineCount()-1 {
 			nextLineContent := ta.Lines()[row+1]
 			newBuffer := buffer.SetLine(row, currentLine+nextLineContent)
 			newBuffer, _ = newBuffer.DeleteLine(row + 1)
-			// Preserve cursor position when joining lines
+			// Preserve cursor position when joining lines.
 			return ta.WithBuffer(newBuffer).WithCursor(model.NewCursor(row, col))
 		}
 		return ta
@@ -106,17 +133,17 @@ func (s *EditingService) InsertNewline(ta *model.TextArea) *model.TextArea {
 	// Check max lines (if limit is set)
 	maxLines := ta.MaxLines()
 	if maxLines > 0 && ta.LineCount() >= maxLines {
-		// Max lines reached
+		// Max lines reached.
 		return ta
 	}
 
 	row, col := ta.CursorPosition()
 	buffer := ta.GetBuffer()
 
-	// Split current line at cursor
+	// Split current line at cursor.
 	newBuffer := buffer.InsertNewline(row, col)
 
-	// Move cursor to start of new line
+	// Move cursor to start of new line.
 	newCursor := model.NewCursor(row+1, 0)
 
 	return ta.WithBuffer(newBuffer).WithCursor(newCursor)
@@ -136,11 +163,11 @@ func (s *EditingService) KillLine(ta *model.TextArea) *model.TextArea {
 	if col >= len(runes) {
 		// At end of line, kill newline (join with next line)
 		if row < ta.LineCount()-1 {
-			// Kill the newline
+			// Kill the newline.
 			killed := "\n"
 			killRing := ta.GetKillRing().Kill(killed)
 
-			// Join with next line
+			// Join with next line.
 			nextLineContent := ta.Lines()[row+1]
 			newBuffer := buffer.SetLine(row, currentLine+nextLineContent)
 			newBuffer, _ = newBuffer.DeleteLine(row + 1)
@@ -150,11 +177,11 @@ func (s *EditingService) KillLine(ta *model.TextArea) *model.TextArea {
 		return ta
 	}
 
-	// Kill from cursor to end of line
+	// Kill from cursor to end of line.
 	killed := string(runes[col:])
 	killRing := ta.GetKillRing().Kill(killed)
 
-	// Delete from cursor to end
+	// Delete from cursor to end.
 	newBuffer, _ := buffer.DeleteToLineEnd(row, col)
 
 	return ta.WithBuffer(newBuffer).WithKillRing(killRing)
@@ -170,7 +197,7 @@ func (s *EditingService) KillWord(ta *model.TextArea) *model.TextArea {
 	line := []rune(ta.CurrentLine())
 	buffer := ta.GetBuffer()
 
-	// Find next word boundary
+	// Find next word boundary.
 	startCol := col
 	for col < len(line) && !isWordBoundary(line[col]) {
 		col++
@@ -180,11 +207,11 @@ func (s *EditingService) KillWord(ta *model.TextArea) *model.TextArea {
 		return ta // No word to kill
 	}
 
-	// Kill from startCol to col
+	// Kill from startCol to col.
 	killed := string(line[startCol:col])
 	killRing := ta.GetKillRing().Kill(killed)
 
-	// Delete from buffer
+	// Delete from buffer.
 	newBuffer := buffer
 	for i := startCol; i < col; i++ {
 		newBuffer = newBuffer.DeleteChar(row, startCol)
@@ -206,19 +233,19 @@ func (s *EditingService) Yank(ta *model.TextArea) *model.TextArea {
 		return ta
 	}
 
-	// Insert text at cursor
+	// Insert text at cursor.
 	row, col := ta.CursorPosition()
 	buffer := ta.GetBuffer()
 
-	// Insert each character
+	// Insert each character.
 	for _, ch := range text {
 		if ch == '\n' {
-			// Insert newline
+			// Insert newline.
 			buffer = buffer.InsertNewline(row, col)
 			row++
 			col = 0
 		} else {
-			// Insert character
+			// Insert character.
 			buffer = buffer.InsertChar(row, col, ch)
 			col++
 		}

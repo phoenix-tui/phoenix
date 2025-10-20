@@ -12,24 +12,24 @@ import (
 )
 
 // RenderCommand applies a Style to content and generates ANSI-styled output.
-// This is the main application service that orchestrates all domain services
+// This is the main application service that orchestrates all domain services.
 // to execute the complete styling pipeline.
 //
-// Pipeline:
-//  1. Style validation
-//  2. Size validation (if size constraints set)
-//  3. Text alignment (if alignment set)
-//  4. Apply padding (if padding set)
-//  5. Apply border (if border set)
-//  6. Apply margin (if margin set)
-//  7. Color adaptation & ANSI generation
-//  8. Text decorations (bold, italic, etc.)
+// Pipeline:.
+//  1. Style validation.
+//  2. Size validation (if size constraints set).
+//  3. Text alignment (if alignment set).
+//  4. Apply padding (if padding set).
+//  5. Apply border (if border set).
+//  6. Apply margin (if margin set).
+//  7. Color adaptation & ANSI generation.
+//  8. Text decorations (bold, italic, etc.).
 //
-// Example:
+// Example:.
 //
-//	cmd := NewRenderCommand(colorAdapter, spacingCalc, textAligner, unicodeService, ansiGen)
-//	style := model.NewStyle().Foreground(value.RGB(255, 0, 0)).Bold(true)
-//	output, err := cmd.Execute(style, "Hello, World!")
+//	cmd := NewRenderCommand(colorAdapter, spacingCalc, textAligner, unicodeService, ansiGen).
+//	style := model.NewStyle().Foreground(value.RGB(255, 0, 0)).Bold(true).
+//	output, err := cmd.Execute(style, "Hello, World!").
 type RenderCommand struct {
 	colorAdapter      service.ColorAdapter
 	spacingCalculator service.SpacingCalculator
@@ -58,27 +58,30 @@ func NewRenderCommand(
 }
 
 // Execute applies the style to content and returns ANSI-styled string.
+//
+//nolint:gocognit,gocyclo,cyclop // Complexity justified: comprehensive style application with multiple optional properties
 func (rc *RenderCommand) Execute(style model.Style, content string) (string, error) {
-	// 1. Validate style
+	// 1. Validate style.
 	if err := style.Validate(); err != nil {
 		return "", fmt.Errorf("style validation failed: %w", err)
 	}
 
-	// 2. Size validation & content preparation
+	// 2. Size validation & content preparation.
 	targetWidth := 0
 	targetHeight := 0
 
+	//nolint:nestif // Nested checks required for optional style properties with interdependencies
 	if size, ok := style.GetSize(); ok {
-		// Calculate effective dimensions accounting for spacing
+		// Calculate effective dimensions accounting for spacing.
 		contentWidth, contentHeight := rc.calculateContentDimensions(content)
 
-		// Add padding dimensions
+		// Add padding dimensions.
 		if padding, hasPadding := style.GetPadding(); hasPadding {
 			contentWidth += padding.Left() + padding.Right()
 			contentHeight += padding.Top() + padding.Bottom()
 		}
 
-		// Add border dimensions
+		// Add border dimensions.
 		if style.GetBorderLeft() || style.GetBorderRight() {
 			contentWidth += 2 // Left + right border
 		}
@@ -86,18 +89,18 @@ func (rc *RenderCommand) Execute(style model.Style, content string) (string, err
 			contentHeight += 2 // Top + bottom border
 		}
 
-		// Add margin dimensions
+		// Add margin dimensions.
 		if margin, hasMargin := style.GetMargin(); hasMargin {
 			contentWidth += margin.Left() + margin.Right()
 			contentHeight += margin.Top() + margin.Bottom()
 		}
 
-		// Validate against constraints
+		// Validate against constraints.
 		if err := rc.validateSizeConstraints(size, contentWidth, contentHeight); err != nil {
 			return "", err
 		}
 
-		// Use size constraints as target dimensions
+		// Use size constraints as target dimensions.
 		if width, hasWidth := size.Width(); hasWidth {
 			targetWidth = width
 		}
@@ -106,7 +109,8 @@ func (rc *RenderCommand) Execute(style model.Style, content string) (string, err
 		}
 	}
 
-	// 3. Text alignment (before padding/border)
+	// 3. Text alignment (before padding/border).
+	//nolint:gocritic,nestif // ifElseChain: Sequential checks are clearer; nestif: Optional properties require nested checks
 	if alignment, ok := style.GetAlignment(); ok {
 		if targetWidth > 0 && targetHeight > 0 {
 			content = rc.textAligner.AlignBoth(content, targetWidth, targetHeight, alignment)
@@ -117,25 +121,25 @@ func (rc *RenderCommand) Execute(style model.Style, content string) (string, err
 		}
 	}
 
-	// 4. Apply padding
+	// 4. Apply padding.
 	if padding, ok := style.GetPadding(); ok {
 		content = rc.spacingCalculator.ApplyPadding(content, padding)
 	}
 
-	// 5. Apply border
+	// 5. Apply border.
 	if _, hasBorder := style.GetBorder(); hasBorder {
 		content = rc.borderRenderer.Render(content, style)
 	}
 
-	// 6. Apply margin
+	// 6. Apply margin.
 	if margin, ok := style.GetMargin(); ok {
 		content = rc.spacingCalculator.ApplyMargin(content, margin)
 	}
 
-	// 7. Color adaptation & ANSI generation
+	// 7. Color adaptation & ANSI generation.
 	content = rc.applyColors(content, style)
 
-	// 8. Text decorations
+	// 8. Text decorations.
 	content = rc.applyDecorations(content, style)
 
 	return content, nil
@@ -160,28 +164,28 @@ func (rc *RenderCommand) calculateContentDimensions(content string) (int, int) {
 // validateSizeConstraints validates content dimensions against min/max constraints only.
 // Width/Height are TARGET dimensions, not constraints - they're used for alignment.
 func (rc *RenderCommand) validateSizeConstraints(size value.Size, width, height int) error {
-	// Check minimum width
+	// Check minimum width.
 	if minWidth, hasMin := size.MinWidth(); hasMin {
 		if width < minWidth {
 			return fmt.Errorf("content width %d is less than minimum width %d", width, minWidth)
 		}
 	}
 
-	// Check maximum width
+	// Check maximum width.
 	if maxWidth, hasMax := size.MaxWidth(); hasMax {
 		if width > maxWidth {
 			return fmt.Errorf("content width %d exceeds maximum width %d", width, maxWidth)
 		}
 	}
 
-	// Check minimum height
+	// Check minimum height.
 	if minHeight, hasMin := size.MinHeight(); hasMin {
 		if height < minHeight {
 			return fmt.Errorf("content height %d is less than minimum height %d", height, minHeight)
 		}
 	}
 
-	// Check maximum height
+	// Check maximum height.
 	if maxHeight, hasMax := size.MaxHeight(); hasMax {
 		if height > maxHeight {
 			return fmt.Errorf("content height %d exceeds maximum height %d", height, maxHeight)
@@ -196,7 +200,7 @@ func (rc *RenderCommand) applyColors(content string, style model.Style) string {
 	termCap := style.GetTerminalCapability()
 	var codes []string
 
-	// Foreground color
+	// Foreground color.
 	if fg, hasFg := style.GetForeground(); hasFg {
 		ansiCode := rc.colorAdapter.ToANSIForeground(fg, termCap)
 		if ansiCode != "" {
@@ -204,7 +208,7 @@ func (rc *RenderCommand) applyColors(content string, style model.Style) string {
 		}
 	}
 
-	// Background color
+	// Background color.
 	if bg, hasBg := style.GetBackground(); hasBg {
 		ansiCode := rc.colorAdapter.ToANSIBackground(bg, termCap)
 		if ansiCode != "" {
@@ -212,12 +216,12 @@ func (rc *RenderCommand) applyColors(content string, style model.Style) string {
 		}
 	}
 
-	// No colors to apply
+	// No colors to apply.
 	if len(codes) == 0 {
 		return content
 	}
 
-	// Apply colors to entire content
+	// Apply colors to entire content.
 	prefix := strings.Join(codes, "")
 	suffix := rc.ansiGenerator.Reset()
 
@@ -241,12 +245,12 @@ func (rc *RenderCommand) applyDecorations(content string, style model.Style) str
 		codes = append(codes, rc.ansiGenerator.Strikethrough())
 	}
 
-	// No decorations to apply
+	// No decorations to apply.
 	if len(codes) == 0 {
 		return content
 	}
 
-	// Apply decorations to entire content
+	// Apply decorations to entire content.
 	prefix := strings.Join(codes, "")
 	suffix := rc.ansiGenerator.Reset()
 

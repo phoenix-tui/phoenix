@@ -26,34 +26,42 @@ func NewNullTerminal() api.Terminal {
 // │ Cursor Operations                                           │
 // └─────────────────────────────────────────────────────────────┘
 
-func (n *NullTerminal) SetCursorPosition(x, y int) error {
+// SetCursorPosition does nothing (null implementation).
+func (n *NullTerminal) SetCursorPosition(_, _ int) error {
 	return nil
 }
 
+// GetCursorPosition returns zero position (null implementation).
 func (n *NullTerminal) GetCursorPosition() (x, y int, err error) {
 	return 0, 0, nil
 }
 
-func (n *NullTerminal) MoveCursorUp(count int) error {
+// MoveCursorUp does nothing (null implementation).
+func (n *NullTerminal) MoveCursorUp(_ int) error {
 	return nil
 }
 
-func (n *NullTerminal) MoveCursorDown(count int) error {
+// MoveCursorDown does nothing (null implementation).
+func (n *NullTerminal) MoveCursorDown(_ int) error {
 	return nil
 }
 
-func (n *NullTerminal) MoveCursorLeft(count int) error {
+// MoveCursorLeft does nothing (null implementation).
+func (n *NullTerminal) MoveCursorLeft(_ int) error {
 	return nil
 }
 
-func (n *NullTerminal) MoveCursorRight(count int) error {
+// MoveCursorRight does nothing (null implementation).
+func (n *NullTerminal) MoveCursorRight(_ int) error {
 	return nil
 }
 
+// SaveCursorPosition does nothing (null implementation).
 func (n *NullTerminal) SaveCursorPosition() error {
 	return nil
 }
 
+// RestoreCursorPosition does nothing (null implementation).
 func (n *NullTerminal) RestoreCursorPosition() error {
 	return nil
 }
@@ -62,15 +70,18 @@ func (n *NullTerminal) RestoreCursorPosition() error {
 // │ Cursor Visibility & Style                                   │
 // └─────────────────────────────────────────────────────────────┘
 
+// HideCursor does nothing (null implementation).
 func (n *NullTerminal) HideCursor() error {
 	return nil
 }
 
+// ShowCursor does nothing (null implementation).
 func (n *NullTerminal) ShowCursor() error {
 	return nil
 }
 
-func (n *NullTerminal) SetCursorStyle(style api.CursorStyle) error {
+// SetCursorStyle does nothing (null implementation).
+func (n *NullTerminal) SetCursorStyle(_ api.CursorStyle) error {
 	return nil
 }
 
@@ -78,19 +89,23 @@ func (n *NullTerminal) SetCursorStyle(style api.CursorStyle) error {
 // │ Screen Operations                                           │
 // └─────────────────────────────────────────────────────────────┘
 
+// Clear does nothing (null implementation).
 func (n *NullTerminal) Clear() error {
 	return nil
 }
 
+// ClearLine does nothing (null implementation).
 func (n *NullTerminal) ClearLine() error {
 	return nil
 }
 
+// ClearFromCursor does nothing (null implementation).
 func (n *NullTerminal) ClearFromCursor() error {
 	return nil
 }
 
-func (n *NullTerminal) ClearLines(count int) error {
+// ClearLines does nothing (null implementation).
+func (n *NullTerminal) ClearLines(_ int) error {
 	return nil
 }
 
@@ -98,11 +113,12 @@ func (n *NullTerminal) ClearLines(count int) error {
 // │ Output                                                      │
 // └─────────────────────────────────────────────────────────────┘
 
-func (n *NullTerminal) Write(s string) error {
+func (n *NullTerminal) Write(_ string) error {
 	return nil
 }
 
-func (n *NullTerminal) WriteAt(x, y int, s string) error {
+// WriteAt does nothing (null implementation).
+func (n *NullTerminal) WriteAt(_, _ int, _ string) error {
 	return nil
 }
 
@@ -110,6 +126,7 @@ func (n *NullTerminal) WriteAt(x, y int, s string) error {
 // │ Screen Buffer (Windows Console API only)                    │
 // └─────────────────────────────────────────────────────────────┘
 
+// ReadScreenBuffer returns nil (null implementation).
 func (n *NullTerminal) ReadScreenBuffer() ([][]rune, error) {
 	return nil, nil
 }
@@ -118,10 +135,12 @@ func (n *NullTerminal) ReadScreenBuffer() ([][]rune, error) {
 // │ Terminal Info                                               │
 // └─────────────────────────────────────────────────────────────┘
 
+// Size returns zero size (null implementation).
 func (n *NullTerminal) Size() (width, height int, err error) {
 	return 80, 24, nil // Default terminal size
 }
 
+// ColorDepth returns zero (null implementation).
 func (n *NullTerminal) ColorDepth() int {
 	return 256 // Assume 256 colors
 }
@@ -130,18 +149,22 @@ func (n *NullTerminal) ColorDepth() int {
 // │ Capabilities Discovery                                      │
 // └─────────────────────────────────────────────────────────────┘
 
+// SupportsDirectPositioning returns false (null implementation).
 func (n *NullTerminal) SupportsDirectPositioning() bool {
 	return false // Conservative default
 }
 
+// SupportsReadback returns false (null implementation).
 func (n *NullTerminal) SupportsReadback() bool {
 	return false // Conservative default
 }
 
+// SupportsTrueColor returns false (null implementation).
 func (n *NullTerminal) SupportsTrueColor() bool {
 	return true // Optimistic default
 }
 
+// Platform returns null platform (null implementation).
 func (n *NullTerminal) Platform() api.Platform {
 	return api.PlatformUnknown
 }

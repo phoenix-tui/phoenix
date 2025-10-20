@@ -1,3 +1,4 @@
+// Package main demonstrates OSC 52 clipboard access for SSH sessions.
 package main
 
 import (
@@ -90,15 +91,15 @@ func main() {
 		log.Fatalf("Failed to create OSC 52-only clipboard: %v", err)
 	}
 
-	if osc52Only.IsAvailable() {
-		fmt.Printf("Provider: %s\n", osc52Only.GetProviderName())
-		err = osc52Only.Write("OSC 52 only mode test")
-		if err != nil {
-			fmt.Printf("✗ Write failed: %v\n", err)
-		} else {
-			fmt.Println("✓ Write successful")
-		}
-	} else {
+	if !osc52Only.IsAvailable() {
 		fmt.Println("✗ OSC 52 not available (terminal may not support it)")
+		return
+	}
+
+	fmt.Printf("Provider: %s\n", osc52Only.GetProviderName())
+	if err := osc52Only.Write("OSC 52 only mode test"); err != nil {
+		fmt.Printf("✗ Write failed: %v\n", err)
+	} else {
+		fmt.Println("✓ Write successful")
 	}
 }

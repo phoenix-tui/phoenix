@@ -1,11 +1,11 @@
 // Package main demonstrates Phoenix Terminal API usage.
 //
-// This example shows:
-//   - Auto-detection of terminal platform
-//   - Cursor positioning and visibility
-//   - ClearLines() operation (critical for multiline input)
-//   - Capability discovery
-//   - ANSI escape code generation
+// This example shows:.
+//   - Auto-detection of terminal platform.
+//   - Cursor positioning and visibility.
+//   - ClearLines() operation (critical for multiline input).
+//   - Capability discovery.
+//   - ANSI escape code generation.
 package main
 
 import (
@@ -16,12 +16,12 @@ import (
 )
 
 func main() {
-	// Create platform-optimized terminal with auto-detection
+	// Create platform-optimized terminal with auto-detection.
 	term := infrastructure.NewTerminal()
 
 	fmt.Println("=== Phoenix Terminal API Demo ===")
 
-	// Show platform detection
+	// Show platform detection.
 	fmt.Printf("Platform: %s\n", term.Platform())
 	fmt.Printf("Supports direct positioning: %v\n", term.SupportsDirectPositioning())
 	fmt.Printf("Supports readback: %v\n", term.SupportsReadback())
@@ -34,7 +34,7 @@ func main() {
 	fmt.Println("Press Enter to start demo...")
 	fmt.Scanln()
 
-	// Demo 1: Cursor positioning
+	// Demo 1: Cursor positioning.
 	fmt.Println("\n--- Demo 1: Cursor Positioning ---")
 	term.Clear()
 	term.SetCursorPosition(0, 0)
@@ -47,7 +47,7 @@ func main() {
 	term.Write("Press Enter to continue...")
 	fmt.Scanln()
 
-	// Demo 2: Cursor visibility
+	// Demo 2: Cursor visibility.
 	fmt.Println("\n--- Demo 2: Cursor Visibility ---")
 	term.Clear()
 	term.SetCursorPosition(0, 0)
@@ -64,12 +64,12 @@ func main() {
 	term.Write("Press Enter to continue...")
 	fmt.Scanln()
 
-	// Demo 3: ClearLines() - Critical for multiline input
+	// Demo 3: ClearLines() - Critical for multiline input.
 	fmt.Println("\n--- Demo 3: ClearLines (Multiline Clearing) ---")
 	term.Clear()
 	term.SetCursorPosition(0, 0)
 
-	// Write some multiline content
+	// Write some multiline content.
 	lines := []string{
 		"Line 1: This is the first line",
 		"Line 2: This is the second line",
@@ -86,10 +86,10 @@ func main() {
 	term.Write("Press Enter to clear 3 lines...")
 	fmt.Scanln()
 
-	// Position cursor at line 3 (index 2)
+	// Position cursor at line 3 (index 2).
 	term.SetCursorPosition(0, 2)
 
-	// Clear 3 lines (lines 2, 3, 4)
+	// Clear 3 lines (lines 2, 3, 4).
 	term.ClearLines(3)
 	term.Write("Cleared 3 lines! Notice lines 2-4 are gone.")
 
@@ -97,7 +97,7 @@ func main() {
 	term.Write("Press Enter to continue...")
 	fmt.Scanln()
 
-	// Demo 4: Screen operations
+	// Demo 4: Screen operations.
 	fmt.Println("\n--- Demo 4: Screen Operations ---")
 	term.Clear()
 	term.SetCursorPosition(0, 0)
@@ -123,11 +123,11 @@ func main() {
 	term.Write("Press Enter to continue...")
 	fmt.Scanln()
 
-	// Demo 5: WriteAt (optimized write at position)
+	// Demo 5: WriteAt (optimized write at position).
 	fmt.Println("\n--- Demo 5: WriteAt ---")
 	term.Clear()
 
-	// Draw a box using WriteAt
+	// Draw a box using WriteAt.
 	for i := 0; i < 20; i++ {
 		term.WriteAt(10+i, 5, "-")
 		term.WriteAt(10+i, 15, "-")
@@ -142,7 +142,7 @@ func main() {
 	term.Write("Press Enter to finish...")
 	fmt.Scanln()
 
-	// Cleanup
+	// Cleanup.
 	term.Clear()
 	term.SetCursorPosition(0, 0)
 	term.ShowCursor()

@@ -1,7 +1,7 @@
 // Package list provides a universal selectable list component for Phoenix TUI.
 //
-// The List component is a foundation for building selection interfaces like file pickers,
-// menus, and searchable lists. It supports both single and multi-selection modes,
+// The List component is a foundation for building selection interfaces like file pickers,.
+// menus, and searchable lists. It supports both single and multi-selection modes,.
 // custom item rendering, filtering, keyboard navigation, and scrolling for long lists.
 //
 // Example (basic file picker):
@@ -17,9 +17,9 @@
 //	people := []Person{{"Alice", 30}, {"Bob", 25}}
 //
 //	l := list.New(people, getLabels(people), value.SelectionModeSingle).
-//		ItemRenderer(func(item interface{}, idx int, selected, focused bool) string {
+//		ItemRenderer(func(item interface{}, idx int, selected, focused bool) string {.
 //			p := item.(Person)
-//			prefix := "  "
+//			prefix := "  ".
 //			if selected { prefix = "✓ " }
 //			if focused { prefix = "> " }
 //			return fmt.Sprintf("%s%s (age %d)", prefix, p.Name, p.Age)
@@ -83,7 +83,7 @@ func (l *List) Height(height int) *List {
 // The function receives the item, index, selected state, and focused state.
 func (l *List) ItemRenderer(renderer func(item interface{}, index int, selected, focused bool) string) *List {
 	newList := l.clone()
-	// Wrap the user's renderer to work with domain Item
+	// Wrap the user's renderer to work with domain Item.
 	wrappedRenderer := func(domainItem *value.Item, index int, selected, focused bool) string {
 		return renderer(domainItem.Value(), index, selected, focused)
 	}
@@ -95,7 +95,7 @@ func (l *List) ItemRenderer(renderer func(item interface{}, index int, selected,
 // The function receives the item and query, and returns true if the item matches.
 func (l *List) Filter(filterFunc func(item interface{}, query string) bool) *List {
 	newList := l.clone()
-	// Wrap the user's filter to work with domain Item
+	// Wrap the user's filter to work with domain Item.
 	wrappedFilter := func(domainItem *value.Item, query string) bool {
 		return filterFunc(domainItem.Value(), query)
 	}
@@ -117,7 +117,7 @@ func (l *List) KeyBindings(bindings []infrastructure.KeyBinding) *List {
 	return newList
 }
 
-// clone creates a shallow copy of the list for immutability
+// clone creates a shallow copy of the list for immutability.
 func (l *List) clone() *List {
 	return &List{
 		domain:     l.domain,
@@ -201,13 +201,13 @@ func (l *List) handleKey(msg tea.KeyMsg) (*List, tea.Cmd) {
 	case "quit":
 		return newList, tea.Quit()
 	default:
-		// If no action matched, check if it's a printable character for filtering
+		// If no action matched, check if it's a printable character for filtering.
 		if newList.showFilter && msg.Type == tea.KeyRune {
-			// Add character to filter query
+			// Add character to filter query.
 			currentQuery := string(msg.Rune)
 			newList.domain = newList.domain.SetFilterQuery(currentQuery)
 		} else if newList.showFilter && msg.Type == tea.KeyBackspace {
-			// Remove last character from filter query
+			// Remove last character from filter query.
 			newList.domain = newList.domain.ClearFilter()
 		}
 	}
@@ -219,7 +219,7 @@ func (l *List) handleKey(msg tea.KeyMsg) (*List, tea.Cmd) {
 func (l *List) View() string {
 	var b strings.Builder
 
-	// Render visible items
+	// Render visible items.
 	items := l.domain.RenderVisibleItems()
 	if len(items) == 0 {
 		if l.domain.IsFiltered() {
@@ -236,7 +236,7 @@ func (l *List) View() string {
 		}
 	}
 
-	// Show filter status if enabled
+	// Show filter status if enabled.
 	if l.showFilter && l.domain.IsFiltered() {
 		b.WriteRune('\n')
 		b.WriteString("Filter: (active)")

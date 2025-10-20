@@ -1,3 +1,5 @@
+// Package main demonstrates styled progress bar usage.
+// This example shows progress bars with custom colors and formatting.
 package main
 
 import (
@@ -7,20 +9,20 @@ import (
 	progress "github.com/phoenix-tui/phoenix/components/progress/api"
 )
 
-// Styled progress bar example
-// Demonstrates customization with labels, percentage, and custom characters
+// Styled progress bar example.
+// Demonstrates customization with labels, percentage, and custom characters.
 func main() {
 	fmt.Println("Styled Progress Bar Example")
 	fmt.Println("============================")
 
-	// Create a styled progress bar
+	// Create a styled progress bar.
 	bar := progress.NewBar(50).
 		FillChar('█').
 		EmptyChar('░').
 		ShowPercent(true).
 		Label("Downloading...")
 
-	// Simulate download progress
+	// Simulate download progress.
 	for i := 0; i <= 100; i += 5 {
 		bar.SetProgress(i)
 		fmt.Printf("\r%s", bar.View())
@@ -29,7 +31,7 @@ func main() {
 
 	fmt.Println()
 
-	// Example 2: Custom styling with different characters
+	// Example 2: Custom styling with different characters.
 	bar2 := progress.NewBar(50).
 		FillChar('▓').
 		EmptyChar('▒').

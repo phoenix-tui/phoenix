@@ -1,3 +1,4 @@
+// Package infrastructure provides keybindings for viewport.
 package infrastructure
 
 import tea "github.com/phoenix-tui/phoenix/tea/api"
@@ -13,7 +14,7 @@ type KeyBinding struct {
 // Key string format follows tea.KeyMsg.String() representation:
 //   - Arrow keys: "↑", "↓", "←", "→" (Unicode arrows)
 //   - Special keys: "space", "enter", "backspace", etc.
-//   - Modifiers: "ctrl+key", "alt+key", "shift+key"
+//   - Modifiers: "ctrl+key", "alt+key", "shift+key".
 //   - Regular runes: "k", "j", "f", "G", etc.
 func DefaultKeyBindings() map[string]KeyBinding {
 	return map[string]KeyBinding{

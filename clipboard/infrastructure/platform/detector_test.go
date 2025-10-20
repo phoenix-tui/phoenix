@@ -11,14 +11,15 @@ func TestDetector_GetPlatform(t *testing.T) {
 	platform := detector.GetPlatform()
 
 	// Verify it matches runtime.GOOS
-	expected := Type(runtime.GOOS)
-	if runtime.GOOS == "windows" {
+	var expected Type
+	switch runtime.GOOS {
+	case "windows":
 		expected = TypeWindows
-	} else if runtime.GOOS == "darwin" {
+	case "darwin":
 		expected = TypeDarwin
-	} else if runtime.GOOS == "linux" {
+	case "linux":
 		expected = TypeLinux
-	} else {
+	default:
 		expected = TypeUnknown
 	}
 
@@ -85,7 +86,7 @@ func TestDetector_ShouldUseOSC52(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			os.Setenv("SSH_TTY", tt.sshTTY)
 
 			// ShouldUseOSC52 also checks HasTTY, which depends on stdout
@@ -96,7 +97,7 @@ func TestDetector_ShouldUseOSC52(t *testing.T) {
 	}
 }
 
-func TestDetector_HasTTY(t *testing.T) {
+func TestDetector_HasTTY(_ *testing.T) {
 	detector := NewDetector()
 
 	// Just verify it doesn't panic
@@ -169,7 +170,7 @@ func TestDetector_GetPlatform_AllCases(t *testing.T) {
 	}
 
 	// Verify it matches current runtime
-	expected := Type(runtime.GOOS)
+	var expected Type
 	switch runtime.GOOS {
 	case "windows":
 		expected = TypeWindows

@@ -1,13 +1,13 @@
 // Package render provides high-performance differential rendering for Phoenix TUI.
 //
-// The render package implements a sophisticated rendering pipeline:
+// The render package implements a sophisticated rendering pipeline:.
 //   - Virtual buffer representation
 //   - Differential rendering (only changed cells)
 //   - ANSI sequence optimization
 //   - Zero-allocation hot paths
 //   - 60 FPS target performance
 //
-// Example usage:
+// Example usage:.
 //
 //	import "github.com/phoenix-tui/phoenix/render"
 //
@@ -254,13 +254,13 @@ var (
 
 // Predefined styles for convenience.
 var (
-	// Text styles
+	// Text styles.
 	Bold      = StyleDefault().WithBold(true)
 	Italic    = StyleDefault().WithItalic(true)
 	Underline = StyleDefault().WithUnderline(true)
 	Reverse   = StyleDefault().WithReverse(true)
 
-	// Common foreground colors
+	// Common foreground colors.
 	FgRed     = StyleFg(255, 0, 0)
 	FgGreen   = StyleFg(0, 255, 0)
 	FgBlue    = StyleFg(0, 0, 255)
@@ -269,7 +269,7 @@ var (
 	FgCyan    = StyleFg(0, 255, 255)
 	FgWhite   = StyleFg(255, 255, 255)
 
-	// Common background colors
+	// Common background colors.
 	BgRed     = StyleBg(255, 0, 0)
 	BgGreen   = StyleBg(0, 255, 0)
 	BgBlue    = StyleBg(0, 0, 255)

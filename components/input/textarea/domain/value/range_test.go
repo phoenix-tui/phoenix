@@ -66,7 +66,7 @@ func TestNewRange(t *testing.T) {
 				t.Errorf("End() = %v, want %v", r.End(), tt.wantEnd)
 			}
 
-			// Verify start is always before or equal to end
+			// Verify start is always before or equal to end.
 			if r.Start().IsAfter(r.End()) {
 				t.Error("Range not normalized: start is after end")
 			}
@@ -396,12 +396,13 @@ func TestRange_Normalization(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			r := NewRange(tt.start, tt.end)
 
-			// After normalization, start should always be before or equal to end
+			// After normalization, start should always be before or equal to end.
 			if r.Start().IsAfter(r.End()) {
 				t.Errorf("Range not normalized: start=%v > end=%v", r.Start(), r.End())
 			}
 
-			// The smaller position should become start
+			// The smaller position should become start.
+			//nolint:nestif // test validation logic requires branching
 			if tt.start.IsBefore(tt.end) {
 				if !r.Start().Equals(tt.start) {
 					t.Errorf("Forward range: start=%v, want %v", r.Start(), tt.start)
@@ -422,17 +423,17 @@ func TestRange_Normalization(t *testing.T) {
 }
 
 func TestRange_ValueObject(t *testing.T) {
-	// Test that Range behaves as a value object
+	// Test that Range behaves as a value object.
 	r1 := NewRange(NewPosition(1, 5), NewPosition(3, 8))
 	r2 := NewRange(NewPosition(1, 5), NewPosition(3, 8))
 	r3 := NewRange(NewPosition(1, 5), NewPosition(3, 9))
 
-	// Equal ranges should have equal start and end
+	// Equal ranges should have equal start and end.
 	if !r1.Start().Equals(r2.Start()) || !r1.End().Equals(r2.End()) {
 		t.Error("Equal ranges should have equal start and end")
 	}
 
-	// Different ranges should not be equal
+	// Different ranges should not be equal.
 	if r1.Start().Equals(r3.Start()) && r1.End().Equals(r3.End()) {
 		t.Error("Different ranges should not be equal")
 	}
@@ -475,11 +476,11 @@ func TestRange_EdgeCases(t *testing.T) {
 			name: "contains boundary positions",
 			test: func(t *testing.T) {
 				r := NewRange(NewPosition(2, 5), NewPosition(5, 10))
-				// Should contain start
+				// Should contain start.
 				if !r.Contains(r.Start()) {
 					t.Error("Range should contain its start position")
 				}
-				// Should contain end
+				// Should contain end.
 				if !r.Contains(r.End()) {
 					t.Error("Range should contain its end position")
 				}
@@ -505,7 +506,7 @@ func TestRange_EdgeCases(t *testing.T) {
 }
 
 func TestRange_ContainsEdgeCases(t *testing.T) {
-	// Test Contains with various edge cases
+	// Test Contains with various edge cases.
 	r := NewRange(NewPosition(2, 5), NewPosition(4, 10))
 
 	tests := []struct {
@@ -513,18 +514,18 @@ func TestRange_ContainsEdgeCases(t *testing.T) {
 		pos  Position
 		want bool
 	}{
-		// Boundary tests
+		// Boundary tests.
 		{name: "start position", pos: NewPosition(2, 5), want: true},
 		{name: "end position", pos: NewPosition(4, 10), want: true},
 		{name: "just before start", pos: NewPosition(2, 4), want: false},
 		{name: "just after end", pos: NewPosition(4, 11), want: false},
 
-		// Middle tests
+		// Middle tests.
 		{name: "middle of range", pos: NewPosition(3, 7), want: true},
 		{name: "start of middle row", pos: NewPosition(3, 0), want: true},
 		{name: "end of middle row", pos: NewPosition(3, 100), want: true},
 
-		// Row tests
+		// Row tests.
 		{name: "row before", pos: NewPosition(1, 100), want: false},
 		{name: "row after", pos: NewPosition(5, 0), want: false},
 		{name: "start row before col", pos: NewPosition(2, 0), want: false},

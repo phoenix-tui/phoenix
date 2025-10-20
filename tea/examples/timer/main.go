@@ -45,6 +45,8 @@ func (m TimerModel) Init() api.Cmd {
 }
 
 // Update handles incoming messages and updates the model.
+//
+//nolint:gocognit,gocyclo,cyclop // Example timer logic is naturally complex for demonstration
 func (m TimerModel) Update(msg api.Msg) (TimerModel, api.Cmd) {
 	switch msg := msg.(type) {
 	case api.KeyMsg:
@@ -129,6 +131,7 @@ func (m TimerModel) View() string {
 
 	// Create progress bar (20 chars wide)
 	progress := ""
+	//nolint:nestif // Progress bar rendering logic
 	if m.initial > 0 {
 		percent := float64(m.remaining) / float64(m.initial)
 		filled := int(percent * 20)

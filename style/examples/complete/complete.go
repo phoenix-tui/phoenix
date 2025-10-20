@@ -9,7 +9,7 @@ import (
 func main() {
 	fmt.Println("=== Phoenix Style Library - Complete Examples ===\n")
 
-	// Example 1: Styled Header
+	// Example 1: Styled Header.
 	fmt.Println("1. Application Header:")
 	headerStyle := style.New().
 		Foreground(style.White).
@@ -22,7 +22,7 @@ func main() {
 	fmt.Println(style.Render(headerStyle, "🚀 Phoenix TUI Framework"))
 	fmt.Println()
 
-	// Example 2: Info Box
+	// Example 2: Info Box.
 	fmt.Println("2. Info Box:")
 	infoStyle := style.New().
 		Border(style.RoundedBorder).
@@ -39,7 +39,7 @@ All tests passed with 100% coverage.`
 	fmt.Println(style.Render(infoStyle, infoMessage))
 	fmt.Println()
 
-	// Example 3: Error Box
+	// Example 3: Error Box.
 	fmt.Println("3. Error Alert:")
 	errorStyle := style.New().
 		Border(style.ThickBorder).
@@ -58,7 +58,7 @@ Please check your configuration.`
 	fmt.Println(style.Render(errorStyle, errorMessage))
 	fmt.Println()
 
-	// Example 4: Success Box
+	// Example 4: Success Box.
 	fmt.Println("4. Success Message:")
 	successStyle := style.New().
 		Border(style.DoubleBorder).
@@ -71,7 +71,7 @@ Please check your configuration.`
 	fmt.Println(style.Render(successStyle, "✅ Build Successful"))
 	fmt.Println()
 
-	// Example 5: Menu Items
+	// Example 5: Menu Items.
 	fmt.Println("5. Styled Menu:")
 	menuItemStyle := style.New().
 		Foreground(style.White).
@@ -91,7 +91,7 @@ Please check your configuration.`
 	fmt.Println(style.Render(menuItemStyle, "  Exit"))
 	fmt.Println()
 
-	// Example 6: Table-like layout
+	// Example 6: Table-like layout.
 	fmt.Println("6. Data Display:")
 	headerCellStyle := style.New().
 		Background(style.RGB(60, 60, 60)).
@@ -120,7 +120,7 @@ Please check your configuration.`
 	fmt.Println(style.Render(cellStyle, "75%"))
 	fmt.Println()
 
-	// Example 7: Card Layout
+	// Example 7: Card Layout.
 	fmt.Println("7. Card Component:")
 	cardStyle := style.New().
 		Border(style.RoundedBorder).
@@ -148,7 +148,7 @@ Features:
 	fmt.Println(style.Render(cardStyle, cardContent))
 	fmt.Println()
 
-	// Example 8: Progress Indicator
+	// Example 8: Progress Indicator.
 	fmt.Println("8. Progress Bar:")
 	progressBarStyle := style.New().
 		Border(style.ASCIIBorder).
@@ -170,7 +170,7 @@ Features:
 	fmt.Println(style.Render(style.New().Foreground(style.Cyan), "Progress: 62% complete"))
 	fmt.Println()
 
-	// Example 9: Notification
+	// Example 9: Notification.
 	fmt.Println("9. System Notification:")
 	notificationStyle := style.New().
 		Border(style.RoundedBorder).
@@ -185,7 +185,7 @@ Features:
 	fmt.Println(style.Render(notificationStyle, "⚠️  Warning: Low disk space (15% remaining)"))
 	fmt.Println()
 
-	// Example 10: Complete Dashboard
+	// Example 10: Complete Dashboard.
 	fmt.Println("10. Dashboard Layout:")
 	fmt.Println(style.Render(headerStyle, "System Dashboard"))
 

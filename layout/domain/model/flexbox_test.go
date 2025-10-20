@@ -35,7 +35,7 @@ func TestNewFlexContainer(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			defer func() {
 				r := recover()
 				if (r != nil) != tt.wantPanic {
@@ -126,7 +126,7 @@ func TestFlexContainer_WithDirection(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			defer func() {
 				r := recover()
 				if (r != nil) != tt.wantPanic {
@@ -187,7 +187,7 @@ func TestFlexContainer_WithJustifyContent(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			defer func() {
 				r := recover()
 				if (r != nil) != tt.wantPanic {
@@ -243,7 +243,7 @@ func TestFlexContainer_WithAlignItems(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			defer func() {
 				r := recover()
 				if (r != nil) != tt.wantPanic {
@@ -289,7 +289,7 @@ func TestFlexContainer_WithGap(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			defer func() {
 				r := recover()
 				if (r != nil) != tt.wantPanic {
@@ -328,7 +328,7 @@ func TestFlexContainer_WithSize(t *testing.T) {
 }
 
 func TestFlexContainer_AddItem(t *testing.T) {
-	t.Run("Add valid item", func(t *testing.T) {
+	t.Run("Add valid item", func(_ *testing.T) {
 		container := NewFlexContainer(value.FlexDirectionRow)
 		item := createNode("Item 1")
 
@@ -349,7 +349,7 @@ func TestFlexContainer_AddItem(t *testing.T) {
 		}
 	})
 
-	t.Run("Add nil item panics", func(t *testing.T) {
+	t.Run("Add nil item panics", func(_ *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Errorf("AddItem(nil) should panic")
@@ -380,7 +380,7 @@ func TestFlexContainer_AddItems(t *testing.T) {
 }
 
 func TestFlexContainer_RemoveItem(t *testing.T) {
-	t.Run("Remove valid index", func(t *testing.T) {
+	t.Run("Remove valid index", func(_ *testing.T) {
 		container := NewFlexContainer(value.FlexDirectionRow).
 			AddItems(
 				createNode("Item 1"),
@@ -400,7 +400,7 @@ func TestFlexContainer_RemoveItem(t *testing.T) {
 		}
 	})
 
-	t.Run("Remove negative index panics", func(t *testing.T) {
+	t.Run("Remove negative index panics", func(_ *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Errorf("RemoveItem(-1) should panic")
@@ -411,7 +411,7 @@ func TestFlexContainer_RemoveItem(t *testing.T) {
 		container.RemoveItem(-1)
 	})
 
-	t.Run("Remove out of bounds index panics", func(t *testing.T) {
+	t.Run("Remove out of bounds index panics", func(_ *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {
 				t.Errorf("RemoveItem(out of bounds) should panic")
@@ -424,7 +424,7 @@ func TestFlexContainer_RemoveItem(t *testing.T) {
 }
 
 func TestFlexContainer_ClearItems(t *testing.T) {
-	t.Run("Clear non-empty container", func(t *testing.T) {
+	t.Run("Clear non-empty container", func(_ *testing.T) {
 		container := NewFlexContainer(value.FlexDirectionRow).
 			AddItems(
 				createNode("Item 1"),
@@ -443,7 +443,7 @@ func TestFlexContainer_ClearItems(t *testing.T) {
 		}
 	})
 
-	t.Run("Clear empty container returns self", func(t *testing.T) {
+	t.Run("Clear empty container returns self", func(_ *testing.T) {
 		container := NewFlexContainer(value.FlexDirectionRow)
 		newContainer := container.ClearItems()
 
@@ -493,7 +493,7 @@ func TestFlexContainer_TotalGap(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			container := NewFlexContainer(value.FlexDirectionRow).WithGap(tt.gap)
 
 			for i := 0; i < tt.itemCount; i++ {
@@ -579,7 +579,7 @@ func TestFlexContainer_String(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			container := tt.setup()
 			str := container.String()
 
@@ -622,7 +622,7 @@ func TestFlexContainer_Items_Immutability(t *testing.T) {
 
 	// Try to modify returned slice (should not affect container)
 	items[0] = createNode("Modified")
-	items = append(items, createNode("Extra"))
+	_ = append(items, createNode("Extra"))
 
 	// Check container unchanged
 	if container.ItemCount() != originalCount {

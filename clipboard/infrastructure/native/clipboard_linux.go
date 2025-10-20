@@ -10,15 +10,15 @@ import (
 	"github.com/phoenix-tui/phoenix/clipboard/domain/model"
 )
 
-// Provider implements clipboard operations using Linux clipboard tools
+// Provider implements clipboard operations using Linux clipboard tools.
 // Supports both X11 (xclip/xsel) and Wayland (wl-copy/wl-paste)
 type Provider struct {
 	readCmd  string
 	writeCmd string
 }
 
-// NewProvider creates a new Linux native clipboard provider
-// Automatically detects available clipboard tools
+// NewProvider creates a new Linux native clipboard provider.
+// Automatically detects available clipboard tools.
 func NewProvider() *Provider {
 	p := &Provider{}
 
@@ -49,7 +49,7 @@ func NewProvider() *Provider {
 	return p
 }
 
-// Read reads content from the Linux clipboard
+// Read reads content from the Linux clipboard.
 func (p *Provider) Read() (*model.ClipboardContent, error) {
 	if !p.IsAvailable() {
 		return nil, fmt.Errorf("no clipboard tool available (install xclip, xsel, or wl-clipboard)")
@@ -84,7 +84,7 @@ func (p *Provider) Read() (*model.ClipboardContent, error) {
 	return model.NewTextContent(text)
 }
 
-// Write writes content to the Linux clipboard
+// Write writes content to the Linux clipboard.
 func (p *Provider) Write(content *model.ClipboardContent) error {
 	if content == nil {
 		return fmt.Errorf("content cannot be nil")
@@ -123,12 +123,12 @@ func (p *Provider) Write(content *model.ClipboardContent) error {
 	return nil
 }
 
-// IsAvailable returns true if a clipboard tool is available
+// IsAvailable returns true if a clipboard tool is available.
 func (p *Provider) IsAvailable() bool {
 	return p.readCmd != "" && p.writeCmd != ""
 }
 
-// Name returns the provider name
+// Name returns the provider name.
 func (p *Provider) Name() string {
 	if !p.IsAvailable() {
 		return "Linux Native (no tool available)"

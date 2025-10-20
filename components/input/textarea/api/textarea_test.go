@@ -54,12 +54,12 @@ func TestShowCursor_False(t *testing.T) {
 
 			view := ta.View()
 
-			// MUST NOT contain block cursor character
+			// MUST NOT contain block cursor character.
 			if strings.Contains(view, "█") {
 				t.Errorf("View() with ShowCursor(false) should NOT contain '█' cursor\nView:\n%s", view)
 			}
 
-			// Verify content is rendered correctly
+			// Verify content is rendered correctly.
 			if !strings.Contains(view, tt.text) {
 				t.Errorf("View() should contain text %q\nView:\n%s", tt.text, view)
 			}
@@ -95,7 +95,7 @@ func TestShowCursor_True(t *testing.T) {
 			view := ta.View()
 
 			if tt.shouldShow {
-				// MUST contain block cursor character
+				// MUST contain block cursor character.
 				if !strings.Contains(view, "█") {
 					t.Errorf("View() with ShowCursor(true) should contain '█' cursor\nView:\n%s", view)
 				}
@@ -194,12 +194,12 @@ func TestMoveCursorToEnd_WithShowCursor_False(t *testing.T) {
 
 			view := ta.View()
 
-			// Verify NO cursor rendering
+			// Verify NO cursor rendering.
 			if strings.Contains(view, "█") {
 				t.Errorf("View() with ShowCursor(false) should NOT contain '█'\nView:\n%s", view)
 			}
 
-			// Verify all lines are rendered
+			// Verify all lines are rendered.
 			expectedLines := strings.Split(tt.text, "\n")
 			for i, line := range expectedLines {
 				if !strings.Contains(view, line) {
@@ -207,7 +207,7 @@ func TestMoveCursorToEnd_WithShowCursor_False(t *testing.T) {
 				}
 			}
 
-			// Verify cursor position is correct
+			// Verify cursor position is correct.
 			row, col := ta.CursorPosition()
 			lastLineIdx := len(expectedLines) - 1
 			lastLine := expectedLines[lastLineIdx]
@@ -275,10 +275,11 @@ func TestMultiline_CursorRendering(t *testing.T) {
 				SetValue(text).
 				ShowCursor(tt.showCursor)
 
-			// Note: We can't directly set cursor position via API,
-			// so we test MoveCursorToEnd() behavior instead
+			// Note: We can't directly set cursor position via API,.
+			// so we test MoveCursorToEnd() behavior instead.
 			view := ta.View()
 
+			//nolint:nestif // test validation logic requires branching
 			if tt.expectCursor {
 				if !strings.Contains(view, "█") {
 					t.Errorf("View() should contain cursor '█'\nView:\n%s", view)
@@ -297,13 +298,13 @@ func TestSetValue_ResetsState(t *testing.T) {
 	ta := New().
 		SetValue("initial text")
 
-	// Cursor should be at (0, 0) after SetValue
+	// Cursor should be at (0, 0) after SetValue.
 	row, col := ta.CursorPosition()
 	if row != 0 || col != 0 {
 		t.Errorf("SetValue() should reset cursor to (0, 0), got (%d, %d)", row, col)
 	}
 
-	// Now move to end
+	// Now move to end.
 	ta = ta.MoveCursorToEnd()
 
 	row, col = ta.CursorPosition()
@@ -311,7 +312,7 @@ func TestSetValue_ResetsState(t *testing.T) {
 		t.Errorf("MoveCursorToEnd() cursor = (%d, %d), want (0, 12)", row, col)
 	}
 
-	// SetValue again - should reset
+	// SetValue again - should reset.
 	ta = ta.SetValue("new")
 
 	row, col = ta.CursorPosition()
@@ -327,19 +328,19 @@ func TestChaining_SetValue_MoveCursorToEnd_ShowCursor(t *testing.T) {
 		MoveCursorToEnd().
 		ShowCursor(false)
 
-	// Verify cursor position
+	// Verify cursor position.
 	row, col := ta.CursorPosition()
 	if row != 1 || col != 5 {
 		t.Errorf("CursorPosition() = (%d, %d), want (1, 5)", row, col)
 	}
 
-	// Verify View() has no cursor
+	// Verify View() has no cursor.
 	view := ta.View()
 	if strings.Contains(view, "█") {
 		t.Errorf("View() should NOT contain cursor\nView:\n%s", view)
 	}
 
-	// Verify content
+	// Verify content.
 	if !strings.Contains(view, "hello") || !strings.Contains(view, "world") {
 		t.Errorf("View() should contain both lines\nView:\n%s", view)
 	}

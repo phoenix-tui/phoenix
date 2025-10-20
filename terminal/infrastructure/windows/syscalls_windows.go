@@ -1,5 +1,5 @@
-//go:build windows
-// +build windows
+//go:build windows.
+// +build windows.
 
 package windows
 
@@ -13,16 +13,16 @@ import (
 var (
 	kernel32 = syscall.NewLazyDLL("kernel32.dll")
 
-	// Console cursor functions
+	// Console cursor functions.
 	procGetConsoleCursorInfo = kernel32.NewProc("GetConsoleCursorInfo")
 	procSetConsoleCursorInfo = kernel32.NewProc("SetConsoleCursorInfo")
 
-	// Console output functions
+	// Console output functions.
 	procFillConsoleOutputCharacter = kernel32.NewProc("FillConsoleOutputCharacterW")
 	procFillConsoleOutputAttribute = kernel32.NewProc("FillConsoleOutputAttribute")
 	procReadConsoleOutput          = kernel32.NewProc("ReadConsoleOutputW")
 	procWriteConsoleOutput         = kernel32.NewProc("WriteConsoleOutputW")
-	procScrollConsoleScreenBuffer  = kernel32.NewProc("ScrollConsoleScreenBufferW")
+	// procScrollConsoleScreenBuffer removed (unused - reserved for future scrolling feature)
 )
 
 // ConsoleCursorInfo represents cursor information.

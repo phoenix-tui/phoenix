@@ -99,15 +99,12 @@ func TestFromANSI256(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func(_ *testing.T) {
 			c := FromANSI256(tt.code)
-			r, g, b := c.RGB()
+			_, _, _ = c.RGB()
 
-			// Just verify we got valid RGB values (0-255)
-			if r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255 {
-				t.Errorf("FromANSI256(%d).RGB() = (%d, %d, %d), values out of range",
-					tt.code, r, g, b)
-			}
+			// Just verify we got valid RGB values (0-255).
+			// Note: uint8 is always >= 0 and <= 255, so no need to check bounds.
 		})
 	}
 }

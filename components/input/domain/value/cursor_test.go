@@ -46,12 +46,12 @@ func TestCursor_MoveBy(t *testing.T) {
 			c := NewCursor(tt.initial)
 			result := c.MoveBy(tt.delta, tt.maxOffset)
 
-			// Check immutability
+			// Check immutability.
 			if c.Offset() != tt.initial {
 				t.Errorf("original cursor modified: got %d, want %d", c.Offset(), tt.initial)
 			}
 
-			// Check result
+			// Check result.
 			if result.Offset() != tt.want {
 				t.Errorf("MoveBy(%d, %d) = %d, want %d", tt.delta, tt.maxOffset, result.Offset(), tt.want)
 			}
@@ -80,12 +80,12 @@ func TestCursor_MoveTo(t *testing.T) {
 			c := NewCursor(tt.initial)
 			result := c.MoveTo(tt.target, tt.maxOffset)
 
-			// Check immutability
+			// Check immutability.
 			if c.Offset() != tt.initial {
 				t.Errorf("original cursor modified: got %d, want %d", c.Offset(), tt.initial)
 			}
 
-			// Check result
+			// Check result.
 			if result.Offset() != tt.want {
 				t.Errorf("MoveTo(%d, %d) = %d, want %d", tt.target, tt.maxOffset, result.Offset(), tt.want)
 			}
@@ -97,17 +97,17 @@ func TestCursor_Clone(t *testing.T) {
 	original := NewCursor(5)
 	clone := original.Clone()
 
-	// Check values match
+	// Check values match.
 	if clone.Offset() != original.Offset() {
 		t.Errorf("Clone().Offset() = %d, want %d", clone.Offset(), original.Offset())
 	}
 
-	// Check they're different instances
+	// Check they're different instances.
 	if clone == original {
 		t.Error("Clone() returned same instance, want different instance")
 	}
 
-	// Modify clone and verify original unchanged
+	// Modify clone and verify original unchanged.
 	clone.offset = 10
 	if original.Offset() != 5 {
 		t.Errorf("modifying clone affected original: got %d, want 5", original.Offset())

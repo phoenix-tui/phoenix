@@ -1,3 +1,5 @@
+// Package main demonstrates styled input component usage.
+// This example shows various styling approaches for input fields.
 package main
 
 import (
@@ -19,10 +21,12 @@ type styledModel struct {
 	focused int
 }
 
+//nolint:gocritic // examples use value semantics for clarity
 func (m styledModel) Init() tea.Cmd {
 	return nil
 }
 
+//nolint:gocritic // examples use value semantics for clarity
 func (m styledModel) Update(msg tea.Msg) (styledModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -49,7 +53,7 @@ func (m styledModel) Update(msg tea.Msg) (styledModel, tea.Cmd) {
 		return m, nil
 	}
 
-	// Forward to focused input
+	// Forward to focused input.
 	var cmd tea.Cmd
 	var updated input.Input
 
@@ -68,6 +72,7 @@ func (m styledModel) Update(msg tea.Msg) (styledModel, tea.Cmd) {
 	return m, cmd
 }
 
+//nolint:gocritic // examples use value semantics for clarity
 func (m styledModel) updateFocus() styledModel {
 	m.input1 = m.input1.Focused(m.focused == 0)
 	m.input2 = m.input2.Focused(m.focused == 1)
@@ -75,21 +80,22 @@ func (m styledModel) updateFocus() styledModel {
 	return m
 }
 
+//nolint:gocritic // examples use value semantics for clarity
 func (m styledModel) View() string {
 	var b strings.Builder
 
 	b.WriteString("Styled Input Example\n")
 	b.WriteString("(Full styling coming with phoenix/style integration)\n\n")
 
-	// Style 1: Simple with border
+	// Style 1: Simple with border.
 	b.WriteString(m.renderWithBorder("Normal Input", m.input1, m.focused == 0))
 	b.WriteString("\n")
 
-	// Style 2: Emphasized
+	// Style 2: Emphasized.
 	b.WriteString(m.renderWithBorder("Emphasized Input", m.input2, m.focused == 1))
 	b.WriteString("\n")
 
-	// Style 3: Compact
+	// Style 3: Compact.
 	b.WriteString(m.renderCompact("Compact", m.input3, m.focused == 2))
 	b.WriteString("\n")
 
@@ -98,21 +104,22 @@ func (m styledModel) View() string {
 	return b.String()
 }
 
+//nolint:gocritic // examples use value semantics for clarity
 func (m styledModel) renderWithBorder(label string, input input.Input, isFocused bool) string {
 	var b strings.Builder
 
-	// Label
+	// Label.
 	b.WriteString(label)
 	b.WriteString("\n")
 
-	// Top border
+	// Top border.
 	if isFocused {
 		b.WriteString("╔═══════════════════════════════════════╗\n")
 	} else {
 		b.WriteString("┌───────────────────────────────────────┐\n")
 	}
 
-	// Content
+	// Content.
 	if isFocused {
 		b.WriteString("║ ")
 	} else {
@@ -126,7 +133,7 @@ func (m styledModel) renderWithBorder(label string, input input.Input, isFocused
 	}
 	b.WriteString("\n")
 
-	// Bottom border
+	// Bottom border.
 	if isFocused {
 		b.WriteString("╚═══════════════════════════════════════╝")
 	} else {
@@ -136,6 +143,7 @@ func (m styledModel) renderWithBorder(label string, input input.Input, isFocused
 	return b.String()
 }
 
+//nolint:gocritic // examples use value semantics for clarity
 func (m styledModel) renderCompact(label string, input input.Input, isFocused bool) string {
 	prefix := "  "
 	if isFocused {
@@ -145,7 +153,7 @@ func (m styledModel) renderCompact(label string, input input.Input, isFocused bo
 }
 
 func main() {
-	// Create styled inputs
+	// Create styled inputs.
 	model := styledModel{
 		input1: input.New(40).
 			Placeholder("Type here...").
@@ -159,7 +167,7 @@ func main() {
 		focused: 0,
 	}
 
-	// Run program
+	// Run program.
 	p := tea.New(model)
 	if err := p.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)

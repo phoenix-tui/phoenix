@@ -106,7 +106,7 @@ func TestRenderer_Close(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestBuffer_Set(t *testing.T) {
+func TestBuffer_Set(_ *testing.T) {
 	buffer := NewBuffer(80, 24)
 	style := StyleDefault()
 
@@ -123,7 +123,7 @@ func TestBuffer_SetString(t *testing.T) {
 	assert.Equal(t, 5, written)
 }
 
-func TestBuffer_SetLine(t *testing.T) {
+func TestBuffer_SetLine(_ *testing.T) {
 	buffer := NewBuffer(80, 24)
 	style := StyleDefault()
 
@@ -132,7 +132,7 @@ func TestBuffer_SetLine(t *testing.T) {
 	// Should execute without error
 }
 
-func TestBuffer_Clear(t *testing.T) {
+func TestBuffer_Clear(_ *testing.T) {
 	buffer := NewBuffer(80, 24)
 
 	buffer.SetString(0, 0, "Test", StyleDefault())
@@ -141,7 +141,7 @@ func TestBuffer_Clear(t *testing.T) {
 	// Should execute without error
 }
 
-func TestBuffer_Fill(t *testing.T) {
+func TestBuffer_Fill(_ *testing.T) {
 	buffer := NewBuffer(80, 24)
 	style := StyleBg(0, 0, 255)
 
@@ -150,7 +150,7 @@ func TestBuffer_Fill(t *testing.T) {
 	// Should execute without error
 }
 
-func TestBuffer_Release(t *testing.T) {
+func TestBuffer_Release(_ *testing.T) {
 	var buf bytes.Buffer
 	r := New(80, 24, &buf)
 

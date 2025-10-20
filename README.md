@@ -9,13 +9,13 @@
 
 > Next-generation Terminal User Interface framework for Go
 
-**Status**: ✅ v0.1.0-beta.1 READY - First Public Beta
+**Status**: ✅ v0.1.0-beta.2 READY - TextArea Cursor Control + Multi-Module
 **Progress**: 80% complete (16/20 weeks) 🎉
 **Organization**: [github.com/phoenix-tui](https://github.com/phoenix-tui)
 **Go Version**: 1.25+
 **Test Coverage**: **93.5-96.4%** (Excellent across all modules)
 **Performance**: 29,000 FPS (489x faster than 60 FPS target)
-**Latest**: Ready for first public beta release 🚀
+**Latest**: Advanced cursor control API + Multi-module monorepo structure 🚀
 
 ## Why Phoenix?
 
@@ -37,7 +37,8 @@ Phoenix is a modular framework with 8 independent libraries:
 - **phoenix/tea** ✅ - Elm Architecture (Model-View-Update, type-safe)
 - **phoenix/render** ✅ - High-performance differential renderer (29,000 FPS!)
 - **phoenix/components** ✅ - Universal UI components (94.5% avg coverage):
-  - TextArea (multiline editing, 96.4%) | TextInput (single-line, 90%)
+  - TextArea (multiline editing, 96.4%) **NEW: Advanced cursor control API!**
+  - TextInput (single-line, 90%)
   - List (94.7%) | Viewport (94.5%) | Table (92%) | Menu | Tabs
   - Modal (96.5%) | Progress (98.5%)
 - **phoenix/mouse** ✅ - Mouse events (click, scroll, drag-drop, right-click support)

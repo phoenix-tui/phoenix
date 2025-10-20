@@ -18,7 +18,7 @@ func TestIntegration_MeasureAndLayout(t *testing.T) {
 	measureService := NewMeasureService(unicodeService)
 	layoutService := NewLayoutService(measureService)
 
-	t.Run("simple box centered", func(t *testing.T) {
+	t.Run("simple box centered", func(_ *testing.T) {
 		box := model.NewBox("Hello").
 			WithAlignment(value.NewAlignmentCenter())
 
@@ -35,7 +35,7 @@ func TestIntegration_MeasureAndLayout(t *testing.T) {
 		assert.Equal(t, 11, position.Y()) // (24 - 1) / 2
 	})
 
-	t.Run("box with padding and border", func(t *testing.T) {
+	t.Run("box with padding and border", func(_ *testing.T) {
 		box := model.NewBox("Test").
 			WithPadding(value.NewSpacingAll(1)).
 			WithBorder(true).
@@ -54,7 +54,7 @@ func TestIntegration_MeasureAndLayout(t *testing.T) {
 		assert.Equal(t, 8, position.Y())  // (24 - 7) / 2
 	})
 
-	t.Run("Unicode content", func(t *testing.T) {
+	t.Run("Unicode content", func(_ *testing.T) {
 		box := model.NewBox("你好世界"). // 4 CJK chars = 8 cells
 						WithAlignment(value.NewAlignmentCenter())
 
@@ -78,7 +78,7 @@ func TestIntegration_LayoutAndRender(t *testing.T) {
 	layoutService := NewLayoutService(measureService)
 	renderService := NewRenderService()
 
-	t.Run("simple box", func(t *testing.T) {
+	t.Run("simple box", func(_ *testing.T) {
 		box := model.NewBox("Hello").WithBorder(true)
 
 		// Layout (not critical for render, but verifies integration)
@@ -97,7 +97,7 @@ func TestIntegration_LayoutAndRender(t *testing.T) {
 		assert.Equal(t, expected, output)
 	})
 
-	t.Run("complex box", func(t *testing.T) {
+	t.Run("complex box", func(_ *testing.T) {
 		box := model.NewBox("Test").
 			WithPadding(value.NewSpacingAll(1)).
 			WithBorder(true).
@@ -127,7 +127,7 @@ func TestIntegration_FullPipeline(t *testing.T) {
 	layoutService := NewLayoutService(measureService)
 	renderService := NewRenderService()
 
-	t.Run("complete workflow", func(t *testing.T) {
+	t.Run("complete workflow", func(_ *testing.T) {
 		// Create box
 		box := model.NewBox("Hello\nWorld").
 			WithPadding(value.NewSpacingAll(1)).
@@ -164,7 +164,7 @@ func TestIntegration_FullPipeline(t *testing.T) {
 		t.Logf("Size: %dx%d", size.Width(), size.Height())
 	})
 
-	t.Run("Unicode content workflow", func(t *testing.T) {
+	t.Run("Unicode content workflow", func(_ *testing.T) {
 		box := model.NewBox("你好 👋").
 			WithPadding(value.NewSpacingAll(1)).
 			WithBorder(true).
@@ -189,7 +189,7 @@ func TestIntegration_FullPipeline(t *testing.T) {
 		t.Logf("Unicode output:\n%s", output)
 	})
 
-	t.Run("multi-line dialog workflow", func(t *testing.T) {
+	t.Run("multi-line dialog workflow", func(_ *testing.T) {
 		content := "Are you sure?\n\nThis action cannot be undone.\n\n[OK] [Cancel]"
 		box := model.NewBox(content).
 			WithPadding(value.NewSpacingVH(1, 2)).
@@ -233,7 +233,7 @@ func TestIntegration_NodeTree(t *testing.T) {
 	layoutService := NewLayoutService(measureService)
 	renderService := NewRenderService()
 
-	t.Run("single node tree", func(t *testing.T) {
+	t.Run("single node tree", func(_ *testing.T) {
 		box := model.NewBox("Root").
 			WithBorder(true).
 			WithAlignment(value.NewAlignmentCenter())
@@ -260,7 +260,7 @@ func TestIntegration_NodeTree(t *testing.T) {
 		assert.Equal(t, expected, output)
 	})
 
-	t.Run("node with children", func(t *testing.T) {
+	t.Run("node with children", func(_ *testing.T) {
 		parentBox := model.NewBox("Parent").WithBorder(true)
 		child1Box := model.NewBox("Child1")
 		child2Box := model.NewBox("Child2")
@@ -302,7 +302,7 @@ func TestIntegration_RealWorldScenarios(t *testing.T) {
 	layoutService := NewLayoutService(measureService)
 	renderService := NewRenderService()
 
-	t.Run("centered modal dialog", func(t *testing.T) {
+	t.Run("centered modal dialog", func(_ *testing.T) {
 		box := model.NewBox("Confirm Action\n\nAre you sure you want to continue?\n\n[Yes] [No]").
 			WithPadding(value.NewSpacingVH(1, 3)).
 			WithBorder(true).
@@ -327,7 +327,7 @@ func TestIntegration_RealWorldScenarios(t *testing.T) {
 		t.Logf("Output:\n%s", output)
 	})
 
-	t.Run("status bar (bottom-left)", func(t *testing.T) {
+	t.Run("status bar (bottom-left)", func(_ *testing.T) {
 		box := model.NewBox("Ready | Line 42 | UTF-8").
 			WithPadding(value.NewSpacing(0, 1, 0, 1)).
 			WithAlignment(value.NewAlignment(value.AlignLeft, value.AlignBottom))
@@ -350,7 +350,7 @@ func TestIntegration_RealWorldScenarios(t *testing.T) {
 		t.Logf("Output: %q", output)
 	})
 
-	t.Run("title bar (top-center)", func(t *testing.T) {
+	t.Run("title bar (top-center)", func(_ *testing.T) {
 		box := model.NewBox("Phoenix TUI Editor v1.0").
 			WithPadding(value.NewSpacing(0, 2, 0, 2)).
 			WithAlignment(value.NewAlignment(value.AlignCenter, value.AlignTop))
@@ -372,7 +372,7 @@ func TestIntegration_RealWorldScenarios(t *testing.T) {
 		t.Logf("Output: %q", output)
 	})
 
-	t.Run("sidebar menu (right-aligned)", func(t *testing.T) {
+	t.Run("sidebar menu (right-aligned)", func(_ *testing.T) {
 		box := model.NewBox("File\nEdit\nView\nHelp").
 			WithPadding(value.NewSpacingVH(0, 1)).
 			WithBorder(true).
@@ -407,7 +407,7 @@ func TestIntegration_Performance(t *testing.T) {
 	layoutService := NewLayoutService(measureService)
 	renderService := NewRenderService()
 
-	t.Run("measure 1000 boxes", func(t *testing.T) {
+	t.Run("measure 1000 boxes", func(_ *testing.T) {
 		box := model.NewBox("Test content").
 			WithPadding(value.NewSpacingAll(1)).
 			WithBorder(true)
@@ -417,7 +417,7 @@ func TestIntegration_Performance(t *testing.T) {
 		}
 	})
 
-	t.Run("layout 1000 boxes", func(t *testing.T) {
+	t.Run("layout 1000 boxes", func(_ *testing.T) {
 		box := model.NewBox("Test").
 			WithAlignment(value.NewAlignmentCenter())
 		parentSize := value.NewSizeExact(80, 24)
@@ -427,7 +427,7 @@ func TestIntegration_Performance(t *testing.T) {
 		}
 	})
 
-	t.Run("render 1000 boxes", func(t *testing.T) {
+	t.Run("render 1000 boxes", func(_ *testing.T) {
 		box := model.NewBox("Test").
 			WithPadding(value.NewSpacingAll(1)).
 			WithBorder(true)
@@ -437,7 +437,7 @@ func TestIntegration_Performance(t *testing.T) {
 		}
 	})
 
-	t.Run("full pipeline 1000 times", func(t *testing.T) {
+	t.Run("full pipeline 1000 times", func(_ *testing.T) {
 		box := model.NewBox("Performance test").
 			WithPadding(value.NewSpacingAll(1)).
 			WithBorder(true).

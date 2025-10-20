@@ -43,7 +43,7 @@ func TestViewport_AppendLine_ToEmptyViewport(t *testing.T) {
 func TestViewport_AppendLine_Multiple(t *testing.T) {
 	v := New(80, 24)
 
-	// Chain multiple appends
+	// Chain multiple appends.
 	v = v.AppendLine("Line 1").
 		AppendLine("Line 2").
 		AppendLine("Line 3")
@@ -71,7 +71,7 @@ func TestViewport_AppendLines(t *testing.T) {
 		t.Errorf("AppendLines() content = %v, want %v", content, want)
 	}
 
-	// Original unchanged
+	// Original unchanged.
 	originalContent := v.VisibleLines()
 	if len(originalContent) != 2 {
 		t.Error("Original viewport was mutated")
@@ -119,7 +119,7 @@ func TestViewport_ScrollToBottom_API(t *testing.T) {
 		t.Error("ScrollToBottom() should scroll to bottom")
 	}
 
-	// Original unchanged
+	// Original unchanged.
 	if v.IsAtBottom() {
 		t.Error("Original viewport was mutated")
 	}
@@ -160,7 +160,7 @@ func TestViewport_SetYOffset(t *testing.T) {
 		t.Errorf("SetYOffset(30) offset = %d, want 30", v2.ScrollOffset())
 	}
 
-	// Original unchanged
+	// Original unchanged.
 	if v.ScrollOffset() != 0 {
 		t.Error("Original viewport was mutated")
 	}
@@ -197,7 +197,7 @@ func TestViewport_SetYOffset_ClampTooLarge(t *testing.T) {
 	}
 }
 
-// Test fluent API chaining with new methods
+// Test fluent API chaining with new methods.
 func TestViewport_FluentAPIChaining(t *testing.T) {
 	v := New(80, 20).
 		SetLines([]string{"Initial"}).

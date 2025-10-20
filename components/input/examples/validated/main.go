@@ -1,3 +1,5 @@
+// Package main demonstrates validated input component usage.
+// This example shows email, phone, and URL validation patterns.
 package main
 
 import (
@@ -18,10 +20,12 @@ type validatedModel struct {
 	focused    int // 0=email, 1=phone, 2=url
 }
 
+//nolint:gocritic // examples use value semantics for clarity
 func (m validatedModel) Init() tea.Cmd {
 	return nil
 }
 
+//nolint:gocritic,gocyclo,cyclop // examples use value semantics and demonstrate features
 func (m validatedModel) Update(msg tea.Msg) (validatedModel, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -30,7 +34,7 @@ func (m validatedModel) Update(msg tea.Msg) (validatedModel, tea.Cmd) {
 			return m, tea.Quit()
 
 		case "enter":
-			// Validate all and display results
+			// Validate all and display results.
 			if m.emailInput.IsValid() && m.phoneInput.IsValid() && m.urlInput.IsValid() {
 				fmt.Printf("\n✓ All inputs valid!\n")
 				fmt.Printf("Email: %s\n", m.emailInput.Value())
@@ -42,13 +46,13 @@ func (m validatedModel) Update(msg tea.Msg) (validatedModel, tea.Cmd) {
 			return m, tea.Quit()
 
 		case "tab", "down":
-			// Move to next field
+			// Move to next field.
 			m.focused = (m.focused + 1) % 3
 			m = m.updateFocus()
 			return m, nil
 
 		case "shift+tab", "up":
-			// Move to previous field
+			// Move to previous field.
 			m.focused = (m.focused + 2) % 3
 			m = m.updateFocus()
 			return m, nil
@@ -62,7 +66,7 @@ func (m validatedModel) Update(msg tea.Msg) (validatedModel, tea.Cmd) {
 		return m, nil
 	}
 
-	// Forward to focused input
+	// Forward to focused input.
 	var cmd tea.Cmd
 	var updated input.Input
 
@@ -81,6 +85,7 @@ func (m validatedModel) Update(msg tea.Msg) (validatedModel, tea.Cmd) {
 	return m, cmd
 }
 
+//nolint:gocritic // examples use value semantics for clarity
 func (m validatedModel) updateFocus() validatedModel {
 	m.emailInput = m.emailInput.Focused(m.focused == 0)
 	m.phoneInput = m.phoneInput.Focused(m.focused == 1)
@@ -88,12 +93,13 @@ func (m validatedModel) updateFocus() validatedModel {
 	return m
 }
 
+//nolint:gocritic // examples use value semantics for clarity
 func (m validatedModel) View() string {
 	var b strings.Builder
 
 	b.WriteString("Validated Input Example\n\n")
 
-	// Email field
+	// Email field.
 	b.WriteString("Email: ")
 	b.WriteString(m.emailInput.View())
 	if m.emailInput.Value() != "" {
@@ -105,7 +111,7 @@ func (m validatedModel) View() string {
 	}
 	b.WriteString("\n\n")
 
-	// Phone field
+	// Phone field.
 	b.WriteString("Phone: ")
 	b.WriteString(m.phoneInput.View())
 	if m.phoneInput.Value() != "" {
@@ -117,7 +123,7 @@ func (m validatedModel) View() string {
 	}
 	b.WriteString("\n\n")
 
-	// URL field
+	// URL field.
 	b.WriteString("URL:   ")
 	b.WriteString(m.urlInput.View())
 	if m.urlInput.Value() != "" {
@@ -135,12 +141,12 @@ func (m validatedModel) View() string {
 }
 
 func main() {
-	// Email validator
+	// Email validator.
 	emailValidator := func(s string) error {
 		if s == "" {
 			return fmt.Errorf("email required")
 		}
-		// Simple email regex
+		// Simple email regex.
 		emailRegex := regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 		if !emailRegex.MatchString(s) {
 			return fmt.Errorf("invalid email format")
@@ -148,12 +154,12 @@ func main() {
 		return nil
 	}
 
-	// Phone validator
+	// Phone validator.
 	phoneValidator := func(s string) error {
 		if s == "" {
 			return fmt.Errorf("phone required")
 		}
-		// Format: XXX-XXX-XXXX
+		// Format: XXX-XXX-XXXX.
 		phoneRegex := regexp.MustCompile(`^\d{3}-\d{3}-\d{4}$`)
 		if !phoneRegex.MatchString(s) {
 			return fmt.Errorf("invalid phone format")
@@ -161,7 +167,7 @@ func main() {
 		return nil
 	}
 
-	// URL validator
+	// URL validator.
 	urlValidator := func(s string) error {
 		if s == "" {
 			return fmt.Errorf("url required")
@@ -172,7 +178,7 @@ func main() {
 		return nil
 	}
 
-	// Create inputs
+	// Create inputs.
 	model := validatedModel{
 		emailInput: input.New(40).
 			Placeholder("user@example.com").
@@ -189,7 +195,7 @@ func main() {
 		focused: 0,
 	}
 
-	// Run program
+	// Run program.
 	p := tea.New(model)
 	if err := p.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)

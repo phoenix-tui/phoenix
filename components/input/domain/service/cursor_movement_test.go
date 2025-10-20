@@ -259,7 +259,7 @@ func TestCursorMovementService_GraphemeOffsetToByteOffset(t *testing.T) {
 	}
 }
 
-// Test round-trip conversion
+// Test round-trip conversion.
 func TestCursorMovementService_RoundTrip(t *testing.T) {
 	svc := NewCursorMovementService()
 	testStrings := []string{
@@ -275,7 +275,7 @@ func TestCursorMovementService_RoundTrip(t *testing.T) {
 		t.Run(content, func(t *testing.T) {
 			maxGraphemes := svc.GraphemeCount(content)
 			for graphemeOffset := 0; graphemeOffset <= maxGraphemes; graphemeOffset++ {
-				// Convert grapheme -> byte -> grapheme
+				// Convert grapheme -> byte -> grapheme.
 				byteOffset := svc.GraphemeOffsetToByteOffset(content, graphemeOffset)
 				backToGrapheme := svc.ByteOffsetToGraphemeOffset(content, byteOffset)
 

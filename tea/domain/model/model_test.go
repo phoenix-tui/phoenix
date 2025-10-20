@@ -70,8 +70,9 @@ func testQuitCmd() Cmd {
 }
 
 // TestModel_Interface verifies TestModel implements Model interface.
-func TestModel_Interface(t *testing.T) {
-	var _ Model[TestModel] = TestModel{}
+func TestModel_Interface(_ *testing.T) {
+	// Type explicitly stated for documentation purposes
+	var _ Model[TestModel] = TestModel{} // Simple interface check, no assertion needed
 }
 
 // TestModel_Init verifies Init method works correctly.
@@ -162,6 +163,7 @@ func TestModel_Update_KeyMessages(t *testing.T) {
 			}
 
 			// Check command
+			//nolint:nestif // Test validation logic naturally nested
 			if tt.expectCmd {
 				if cmd == nil {
 					t.Error("expected command, got nil")
@@ -260,7 +262,7 @@ func TestModel_Update_ReturnsCorrectType(t *testing.T) {
 	newModel, _ := m.Update(KeyMsg{Type: KeyRune, Rune: '+'})
 
 	// Should be able to assign to Model[TestModel]
-	var _ Model[TestModel] = newModel
+	var _ Model[TestModel] = newModel //nolint:staticcheck // QF1011: Explicit type for documentation
 
 	// Should also be able to type assert to concrete type
 	concrete, ok := newModel.(TestModel)

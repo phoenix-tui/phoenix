@@ -1,3 +1,4 @@
+// Package main demonstrates basic clipboard read/write operations.
 package main
 
 import (

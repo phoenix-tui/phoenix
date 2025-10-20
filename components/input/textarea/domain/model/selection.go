@@ -21,7 +21,7 @@ func NewSelection(anchor, cursor value.Position) *Selection {
 
 // Range returns selection range (normalized so start <= end).
 func (s *Selection) Range() value.Range {
-	// Normalize so start <= end
+	// Normalize so start <= end.
 	if s.anchor.IsBefore(s.cursor) {
 		return value.NewRange(s.anchor, s.cursor)
 	}

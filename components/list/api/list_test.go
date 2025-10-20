@@ -79,7 +79,7 @@ func TestList_ItemRenderer(t *testing.T) {
 
 	l = l.ItemRenderer(customRenderer)
 
-	// Verify custom renderer is applied by checking view output
+	// Verify custom renderer is applied by checking view output.
 	view := l.View()
 	if !strings.Contains(view, "CUSTOM:") {
 		t.Error("ItemRenderer() should apply custom renderer")
@@ -91,7 +91,7 @@ func TestList_Filter(t *testing.T) {
 	labels := []string{"apple", "banana", "apricot"}
 	l := NewSingleSelect(values, labels)
 
-	// Custom filter: starts with 'a'
+	// Custom filter: starts with 'a'.
 	customFilter := func(item interface{}, query string) bool {
 		s := item.(string)
 		return len(s) > 0 && s[0] == 'a'
@@ -100,8 +100,8 @@ func TestList_Filter(t *testing.T) {
 	l = l.Filter(customFilter)
 
 	// Apply filter via domain (API doesn't expose SetFilterQuery directly in this simple version)
-	// We would need to send filter messages in a real implementation
-	// For now, just verify the filter function is set
+	// We would need to send filter messages in a real implementation.
+	// For now, just verify the filter function is set.
 	if l.domain == nil {
 		t.Error("Filter() should not nil the domain")
 	}
@@ -128,7 +128,7 @@ func TestList_SelectedItems(t *testing.T) {
 	labels := []string{"A", "B", "C"}
 	l := NewMultiSelect(values, labels)
 
-	// Select first item
+	// Select first item.
 	l.domain = l.domain.ToggleSelection()
 
 	selected := l.SelectedItems()
@@ -145,7 +145,7 @@ func TestList_FocusedItem(t *testing.T) {
 	labels := []string{"One", "Two", "Three"}
 	l := NewSingleSelect(values, labels)
 
-	// Move down twice
+	// Move down twice.
 	l.domain = l.domain.MoveDown().MoveDown()
 
 	focused := l.FocusedItem()
@@ -168,7 +168,7 @@ func TestList_SelectedIndices(t *testing.T) {
 	labels := []string{"A", "B", "C"}
 	l := NewMultiSelect(values, labels)
 
-	// Select first and third
+	// Select first and third.
 	l.domain = l.domain.ToggleSelection().MoveDown().MoveDown().ToggleSelection()
 
 	indices := l.SelectedIndices()
@@ -222,7 +222,7 @@ func TestList_Update_MoveDown(t *testing.T) {
 func TestList_Update_VimKeys(t *testing.T) {
 	l := NewSingleSelect([]interface{}{1, 2, 3}, []string{"A", "B", "C"})
 
-	// j = down
+	// j = down.
 	jMsg := tea.KeyMsg{Type: tea.KeyRune, Rune: 'j'}
 	l, _ = l.Update(jMsg)
 
@@ -230,7 +230,7 @@ func TestList_Update_VimKeys(t *testing.T) {
 		t.Errorf("Update(j) focused index = %d, want 1", l.FocusedIndex())
 	}
 
-	// k = up
+	// k = up.
 	kMsg := tea.KeyMsg{Type: tea.KeyRune, Rune: 'k'}
 	l, _ = l.Update(kMsg)
 
@@ -240,7 +240,7 @@ func TestList_Update_VimKeys(t *testing.T) {
 }
 
 func TestList_Update_PageUpDown(t *testing.T) {
-	// Create list with many items
+	// Create list with many items.
 	values := make([]interface{}, 30)
 	labels := make([]string, 30)
 	for i := range values {
@@ -249,7 +249,7 @@ func TestList_Update_PageUpDown(t *testing.T) {
 	}
 	l := NewSingleSelect(values, labels).Height(10)
 
-	// Page down
+	// Page down.
 	msg := tea.KeyMsg{Type: tea.KeyPgDown}
 	l, _ = l.Update(msg)
 
@@ -257,7 +257,7 @@ func TestList_Update_PageUpDown(t *testing.T) {
 		t.Errorf("Update(pgdown) focused index = %d, want 10", l.FocusedIndex())
 	}
 
-	// Page up
+	// Page up.
 	msg = tea.KeyMsg{Type: tea.KeyPgUp}
 	l, _ = l.Update(msg)
 
@@ -270,7 +270,7 @@ func TestList_Update_HomeEnd(t *testing.T) {
 	l := NewSingleSelect([]interface{}{1, 2, 3, 4, 5}, []string{"A", "B", "C", "D", "E"})
 	l.domain = l.domain.MoveToEnd()
 
-	// Home
+	// Home.
 	msg := tea.KeyMsg{Type: tea.KeyHome}
 	l, _ = l.Update(msg)
 
@@ -278,7 +278,7 @@ func TestList_Update_HomeEnd(t *testing.T) {
 		t.Errorf("Update(home) focused index = %d, want 0", l.FocusedIndex())
 	}
 
-	// End
+	// End.
 	msg = tea.KeyMsg{Type: tea.KeyEnd}
 	l, _ = l.Update(msg)
 
@@ -290,7 +290,7 @@ func TestList_Update_HomeEnd(t *testing.T) {
 func TestList_Update_ToggleSelection(t *testing.T) {
 	l := NewSingleSelect([]interface{}{1, 2, 3}, []string{"A", "B", "C"})
 
-	// Space = toggle
+	// Space = toggle.
 	msg := tea.KeyMsg{Type: tea.KeySpace}
 	l, _ = l.Update(msg)
 
@@ -303,7 +303,7 @@ func TestList_Update_ToggleSelection(t *testing.T) {
 func TestList_Update_SelectAll(t *testing.T) {
 	l := NewMultiSelect([]interface{}{1, 2, 3}, []string{"A", "B", "C"})
 
-	// Ctrl+A = select all
+	// Ctrl+A = select all.
 	msg := tea.KeyMsg{Type: tea.KeyRune, Rune: 'a', Ctrl: true}
 	l, _ = l.Update(msg)
 
@@ -317,7 +317,7 @@ func TestList_Update_ClearSelection(t *testing.T) {
 	l := NewMultiSelect([]interface{}{1, 2, 3}, []string{"A", "B", "C"})
 	l.domain = l.domain.SelectAll()
 
-	// Esc = clear selection
+	// Esc = clear selection.
 	msg := tea.KeyMsg{Type: tea.KeyEsc}
 	l, _ = l.Update(msg)
 
@@ -345,7 +345,7 @@ func TestList_View(t *testing.T) {
 
 	view := l.View()
 
-	// Should contain item labels
+	// Should contain item labels.
 	if !strings.Contains(view, "One") {
 		t.Error("View() should contain item label 'One'")
 	}
@@ -372,7 +372,7 @@ func TestList_View_FocusIndicator(t *testing.T) {
 
 	view := l.View()
 
-	// Default renderer uses "> " for focused item
+	// Default renderer uses "> " for focused item.
 	if !strings.Contains(view, ">") {
 		t.Error("View() should show focus indicator '>'")
 	}
@@ -385,14 +385,14 @@ func TestList_View_SelectionIndicator(t *testing.T) {
 	view := l.View()
 
 	// After selection, focused item should show "> " (focused takes precedence)
-	// But we can check that selection affects rendering
+	// But we can check that selection affects rendering.
 	if view == "" {
 		t.Error("View() should not be empty after selection")
 	}
 }
 
 func TestList_View_Scrolling(t *testing.T) {
-	// Create list with more items than visible height
+	// Create list with more items than visible height.
 	values := make([]interface{}, 20)
 	labels := make([]string, 20)
 	for i := range values {
@@ -401,7 +401,7 @@ func TestList_View_Scrolling(t *testing.T) {
 	}
 	l := NewSingleSelect(values, labels).Height(5)
 
-	// Move to end
+	// Move to end.
 	l.domain = l.domain.MoveToEnd()
 
 	view := l.View()
@@ -423,14 +423,14 @@ func TestList_View_Scrolling(t *testing.T) {
 func TestList_KeyBindings(t *testing.T) {
 	l := NewSingleSelect([]interface{}{1, 2}, []string{"A", "B"})
 
-	// Set custom key bindings
+	// Set custom key bindings.
 	customBindings := []infrastructure.KeyBinding{
 		{Key: "w", Action: "move_up"},
 		{Key: "s", Action: "move_down"},
 	}
 	l = l.KeyBindings(customBindings)
 
-	// Test custom binding
+	// Test custom binding.
 	wMsg := tea.KeyMsg{Type: tea.KeyRune, Rune: 'w'}
 	l, _ = l.Update(wMsg)
 
@@ -441,7 +441,7 @@ func TestList_KeyBindings(t *testing.T) {
 }
 
 func TestList_MethodChaining(t *testing.T) {
-	// Test that methods can be chained
+	// Test that methods can be chained.
 	l := NewSingleSelect([]interface{}{1, 2, 3}, []string{"A", "B", "C"}).
 		Height(15).
 		ShowFilter(true)
@@ -472,11 +472,11 @@ func TestList_Update_NonKeyMsg(t *testing.T) {
 func TestList_Immutability(t *testing.T) {
 	l1 := NewSingleSelect([]interface{}{1, 2}, []string{"A", "B"})
 
-	// Perform operations
+	// Perform operations.
 	l2 := l1.Height(20)
 	l3 := l1.ShowFilter(true)
 
-	// Original should be unchanged
+	// Original should be unchanged.
 	if l1.domain.Height() != 10 {
 		t.Error("Original list height should not change")
 	}
@@ -484,7 +484,7 @@ func TestList_Immutability(t *testing.T) {
 		t.Error("Original list showFilter should not change")
 	}
 
-	// New instances should have changes
+	// New instances should have changes.
 	if l2.domain.Height() != 20 {
 		t.Error("New list after Height() should have new height")
 	}

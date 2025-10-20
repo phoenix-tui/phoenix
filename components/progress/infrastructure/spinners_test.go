@@ -32,7 +32,7 @@ func TestPredefinedSpinners(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Type assertion - all should be *value.SpinnerStyle
+			// Type assertion - all should be *value.SpinnerStyle.
 			style := tt.spinner
 			if style == nil {
 				t.Fatalf("%s is nil", tt.name)
@@ -51,7 +51,7 @@ func TestPredefinedSpinners(t *testing.T) {
 					tt.name, s.FPS(), tt.expectedFPS)
 			}
 
-			// Verify all frames are non-empty
+			// Verify all frames are non-empty.
 			frames := s.Frames()
 			for i, frame := range frames {
 				if frame == "" {
@@ -107,7 +107,7 @@ func TestGetSpinnerStyleUnknown(t *testing.T) {
 		t.Fatal("GetSpinnerStyle() should return default, not nil")
 	}
 
-	// Should return SpinnerDots as default
+	// Should return SpinnerDots as default.
 	if style.FrameCount() != SpinnerDots.FrameCount() {
 		t.Errorf("Unknown style should return SpinnerDots")
 	}
@@ -116,12 +116,12 @@ func TestGetSpinnerStyleUnknown(t *testing.T) {
 func TestAvailableStyles(t *testing.T) {
 	styles := AvailableStyles()
 
-	// Check minimum expected styles
+	// Check minimum expected styles.
 	if len(styles) < 15 {
 		t.Errorf("AvailableStyles() = %d styles, expected at least 15", len(styles))
 	}
 
-	// Verify some known styles are present
+	// Verify some known styles are present.
 	knownStyles := []string{"dots", "line", "arrow", "circle", "bounce"}
 	for _, known := range knownStyles {
 		found := false
@@ -153,12 +153,12 @@ func TestSpinnerStylesAreUnique(t *testing.T) {
 			s1 := styles[i].style.(*value.SpinnerStyle)
 			s2 := styles[j].style.(*value.SpinnerStyle)
 
-			// Different styles should have different frame counts or content
+			// Different styles should have different frame counts or content.
 			frames1 := s1.Frames()
 			frames2 := s2.Frames()
 
 			if len(frames1) == len(frames2) {
-				// Same count - check if frames are different
+				// Same count - check if frames are different.
 				allSame := true
 				for k := 0; k < len(frames1); k++ {
 					if frames1[k] != frames2[k] {
@@ -181,7 +181,7 @@ func TestSpinnerDotsFrames(t *testing.T) {
 		t.Errorf("SpinnerDots: expected 10 frames, got %d", len(frames))
 	}
 
-	// Verify specific frames
+	// Verify specific frames.
 	expected := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
 	for i, exp := range expected {
 		if frames[i] != exp {
@@ -219,7 +219,7 @@ func TestSpinnerCircleFrames(t *testing.T) {
 }
 
 func TestStyleRegistryCompleteness(t *testing.T) {
-	// Verify all exported spinners are in registry
+	// Verify all exported spinners are in registry.
 	allStyles := []struct {
 		name  string
 		style interface{}

@@ -15,105 +15,249 @@ func NewNavigationService() *NavigationService {
 // MoveLeft moves cursor left by one character.
 func (s *NavigationService) MoveLeft(ta *model.TextArea) *model.TextArea {
 	row, col := ta.CursorPosition()
+	from := model.NewCursorPos(row, col)
 
+	var newRow, newCol int
+	//nolint:gocritic // if-else is more readable than switch for position logic
 	if col > 0 {
-		// Move left within line
-		return ta.WithCursor(model.NewCursor(row, col-1))
+		// Move left within line.
+		newRow, newCol = row, col-1
+	} else if row > 0 {
+		// Move to end of previous line.
+		newRow = row - 1
+		newCol = len([]rune(ta.Lines()[newRow]))
+	} else {
+		// Already at start - no movement.
+		return ta
 	}
 
-	if row > 0 {
-		// Move to end of previous line
-		prevLineLen := len([]rune(ta.Lines()[row-1]))
-		return ta.WithCursor(model.NewCursor(row-1, prevLineLen))
+	to := model.NewCursorPos(newRow, newCol)
+
+	// Check validator (if set)
+	//nolint:nestif // domain validation logic requires nested conditions
+	if validator := ta.GetMovementValidator(); validator != nil {
+		if !validator(from, to) {
+			// Movement blocked - fire boundary hit.
+			if handler := ta.GetBoundaryHitHandler(); handler != nil {
+				handler(to, "movement blocked by validator")
+			}
+			return ta // Return unchanged
+		}
 	}
 
-	// Already at start
-	return ta
+	// Apply movement.
+	result := ta.WithCursor(model.NewCursor(newRow, newCol))
+
+	// Fire cursor moved event.
+	if handler := ta.GetCursorMovedHandler(); handler != nil {
+		handler(from, to)
+	}
+
+	return result
 }
 
 // MoveRight moves cursor right by one character.
 func (s *NavigationService) MoveRight(ta *model.TextArea) *model.TextArea {
 	row, col := ta.CursorPosition()
+	from := model.NewCursorPos(row, col)
 	currentLine := ta.CurrentLine()
 	currentLineLen := len([]rune(currentLine))
 
+	var newRow, newCol int
+	//nolint:gocritic // if-else is more readable than switch for position logic
 	if col < currentLineLen {
-		// Move right within line
-		return ta.WithCursor(model.NewCursor(row, col+1))
+		// Move right within line.
+		newRow, newCol = row, col+1
+	} else if row < ta.LineCount()-1 {
+		// Move to start of next line.
+		newRow, newCol = row+1, 0
+	} else {
+		// Already at end - no movement.
+		return ta
 	}
 
-	if row < ta.LineCount()-1 {
-		// Move to start of next line
-		return ta.WithCursor(model.NewCursor(row+1, 0))
+	to := model.NewCursorPos(newRow, newCol)
+
+	// Check validator (if set)
+	//nolint:nestif // domain validation logic requires nested conditions
+	if validator := ta.GetMovementValidator(); validator != nil {
+		if !validator(from, to) {
+			// Movement blocked - fire boundary hit.
+			if handler := ta.GetBoundaryHitHandler(); handler != nil {
+				handler(to, "movement blocked by validator")
+			}
+			return ta // Return unchanged
+		}
 	}
 
-	// Already at end
-	return ta
+	// Apply movement.
+	result := ta.WithCursor(model.NewCursor(newRow, newCol))
+
+	// Fire cursor moved event.
+	if handler := ta.GetCursorMovedHandler(); handler != nil {
+		handler(from, to)
+	}
+
+	return result
 }
 
 // MoveUp moves cursor up one line.
 func (s *NavigationService) MoveUp(ta *model.TextArea) *model.TextArea {
 	row, col := ta.CursorPosition()
+	from := model.NewCursorPos(row, col)
 
+	//nolint:nestif // domain boundary validation requires nested conditions
 	if row == 0 {
+		// Already at top - check if validator wants to handle this.
+		if validator := ta.GetMovementValidator(); validator != nil {
+			to := model.NewCursorPos(row-1, col) // Attempted position
+			if !validator(from, to) {
+				if handler := ta.GetBoundaryHitHandler(); handler != nil {
+					handler(to, "already at top")
+				}
+			}
+		}
 		return ta
 	}
 
-	// Try to maintain column position
+	// Try to maintain column position.
 	newRow := row - 1
 	newLineLen := len([]rune(ta.Lines()[newRow]))
-
 	newCol := col
 	if newCol > newLineLen {
 		newCol = newLineLen
 	}
 
-	return ta.WithCursor(model.NewCursor(newRow, newCol))
+	to := model.NewCursorPos(newRow, newCol)
+
+	// Check validator (if set)
+	//nolint:nestif // domain validation logic requires nested conditions
+	if validator := ta.GetMovementValidator(); validator != nil {
+		if !validator(from, to) {
+			// Movement blocked - fire boundary hit.
+			if handler := ta.GetBoundaryHitHandler(); handler != nil {
+				handler(to, "movement blocked by validator")
+			}
+			return ta // Return unchanged
+		}
+	}
+
+	// Apply movement.
+	result := ta.WithCursor(model.NewCursor(newRow, newCol))
+
+	// Fire cursor moved event.
+	if handler := ta.GetCursorMovedHandler(); handler != nil {
+		handler(from, to)
+	}
+
+	return result
 }
 
 // MoveDown moves cursor down one line.
 func (s *NavigationService) MoveDown(ta *model.TextArea) *model.TextArea {
 	row, col := ta.CursorPosition()
+	from := model.NewCursorPos(row, col)
 
+	//nolint:nestif // domain boundary validation requires nested conditions
 	if row >= ta.LineCount()-1 {
+		// Already at bottom - check if validator wants to handle this.
+		if validator := ta.GetMovementValidator(); validator != nil {
+			to := model.NewCursorPos(row+1, col) // Attempted position
+			if !validator(from, to) {
+				if handler := ta.GetBoundaryHitHandler(); handler != nil {
+					handler(to, "already at bottom")
+				}
+			}
+		}
 		return ta
 	}
 
-	// Try to maintain column position
+	// Try to maintain column position.
 	newRow := row + 1
 	newLineLen := len([]rune(ta.Lines()[newRow]))
-
 	newCol := col
 	if newCol > newLineLen {
 		newCol = newLineLen
 	}
 
-	return ta.WithCursor(model.NewCursor(newRow, newCol))
+	to := model.NewCursorPos(newRow, newCol)
+
+	// Check validator (if set)
+	//nolint:nestif // domain validation logic requires nested conditions
+	if validator := ta.GetMovementValidator(); validator != nil {
+		if !validator(from, to) {
+			// Movement blocked - fire boundary hit.
+			if handler := ta.GetBoundaryHitHandler(); handler != nil {
+				handler(to, "movement blocked by validator")
+			}
+			return ta // Return unchanged
+		}
+	}
+
+	// Apply movement.
+	result := ta.WithCursor(model.NewCursor(newRow, newCol))
+
+	// Fire cursor moved event.
+	if handler := ta.GetCursorMovedHandler(); handler != nil {
+		handler(from, to)
+	}
+
+	return result
 }
 
 // MoveToLineStart moves cursor to start of current line (Ctrl+A / Home).
+// If validator blocks column 0, tries to find first allowed position (col 1, 2, ...).
 func (s *NavigationService) MoveToLineStart(ta *model.TextArea) *model.TextArea {
-	row, _ := ta.CursorPosition()
-	return ta.WithCursor(model.NewCursor(row, 0))
+	row, col := ta.CursorPosition()
+	from := model.NewCursorPos(row, col)
+
+	validator := ta.GetMovementValidator()
+	if validator == nil {
+		// No validator - move to column 0.
+		return s.moveCursor(ta, row, col, row, 0)
+	}
+
+	// Try column 0 first.
+	to := model.NewCursorPos(row, 0)
+	if validator(from, to) {
+		return s.moveCursor(ta, row, col, row, 0)
+	}
+
+	// Column 0 blocked - find first allowed position.
+	lineLen := len([]rune(ta.CurrentLine()))
+	for tryCol := 1; tryCol <= lineLen; tryCol++ {
+		to = model.NewCursorPos(row, tryCol)
+		if validator(from, to) {
+			return s.moveCursor(ta, row, col, row, tryCol)
+		}
+	}
+
+	// All positions blocked - fire boundary hit and stay put.
+	if handler := ta.GetBoundaryHitHandler(); handler != nil {
+		handler(model.NewCursorPos(row, 0), "no valid position found in line")
+	}
+	return ta
 }
 
 // MoveToLineEnd moves cursor to end of current line (Ctrl+E / End).
 func (s *NavigationService) MoveToLineEnd(ta *model.TextArea) *model.TextArea {
-	row, _ := ta.CursorPosition()
+	row, col := ta.CursorPosition()
 	lineLen := len([]rune(ta.CurrentLine()))
-	return ta.WithCursor(model.NewCursor(row, lineLen))
+	return s.moveCursor(ta, row, col, row, lineLen)
 }
 
 // MoveToBufferStart moves cursor to start of buffer (Alt+<).
 func (s *NavigationService) MoveToBufferStart(ta *model.TextArea) *model.TextArea {
-	return ta.WithCursor(model.NewCursor(0, 0))
+	row, col := ta.CursorPosition()
+	return s.moveCursor(ta, row, col, 0, 0)
 }
 
 // MoveToBufferEnd moves cursor to end of buffer (Alt+>).
 func (s *NavigationService) MoveToBufferEnd(ta *model.TextArea) *model.TextArea {
+	row, col := ta.CursorPosition()
 	lastRow := ta.LineCount() - 1
 	lastLineLen := len([]rune(ta.Lines()[lastRow]))
-	return ta.WithCursor(model.NewCursor(lastRow, lastLineLen))
+	return s.moveCursor(ta, row, col, lastRow, lastLineLen)
 }
 
 // ForwardWord moves cursor forward by one word (Alt+F).
@@ -121,17 +265,18 @@ func (s *NavigationService) ForwardWord(ta *model.TextArea) *model.TextArea {
 	row, col := ta.CursorPosition()
 	line := []rune(ta.CurrentLine())
 
-	// Skip current word
-	for col < len(line) && !isWordBoundary(line[col]) {
-		col++
+	newCol := col
+	// Skip current word.
+	for newCol < len(line) && !isWordBoundary(line[newCol]) {
+		newCol++
 	}
 
-	// Skip whitespace
-	for col < len(line) && isWordBoundary(line[col]) {
-		col++
+	// Skip whitespace.
+	for newCol < len(line) && isWordBoundary(line[newCol]) {
+		newCol++
 	}
 
-	return ta.WithCursor(model.NewCursor(row, col))
+	return s.moveCursor(ta, row, col, row, newCol)
 }
 
 // BackwardWord moves cursor backward by one word (Alt+B).
@@ -143,19 +288,53 @@ func (s *NavigationService) BackwardWord(ta *model.TextArea) *model.TextArea {
 		return ta
 	}
 
-	col-- // Move back one
+	newCol := col - 1 // Move back one
 
-	// Skip whitespace
-	for col > 0 && isWordBoundary(line[col]) {
-		col--
+	// Skip whitespace.
+	for newCol > 0 && isWordBoundary(line[newCol]) {
+		newCol--
 	}
 
-	// Skip current word
-	for col > 0 && !isWordBoundary(line[col-1]) {
-		col--
+	// Skip current word.
+	for newCol > 0 && !isWordBoundary(line[newCol-1]) {
+		newCol--
 	}
 
-	return ta.WithCursor(model.NewCursor(row, col))
+	return s.moveCursor(ta, row, col, row, newCol)
+}
+
+// moveCursor is a helper that handles validation and callbacks for cursor movement.
+// This reduces code duplication across all movement methods.
+func (s *NavigationService) moveCursor(ta *model.TextArea, fromRow, fromCol, toRow, toCol int) *model.TextArea {
+	from := model.NewCursorPos(fromRow, fromCol)
+	to := model.NewCursorPos(toRow, toCol)
+
+	// No movement - return unchanged.
+	if from.Equals(to) {
+		return ta
+	}
+
+	// Check validator (if set)
+	//nolint:nestif // domain validation logic requires nested conditions
+	if validator := ta.GetMovementValidator(); validator != nil {
+		if !validator(from, to) {
+			// Movement blocked - fire boundary hit.
+			if handler := ta.GetBoundaryHitHandler(); handler != nil {
+				handler(to, "movement blocked by validator")
+			}
+			return ta // Return unchanged
+		}
+	}
+
+	// Apply movement.
+	result := ta.WithCursor(model.NewCursor(toRow, toCol))
+
+	// Fire cursor moved event.
+	if handler := ta.GetCursorMovedHandler(); handler != nil {
+		handler(from, to)
+	}
+
+	return result
 }
 
 // isWordBoundary returns true if rune is word boundary (space, punctuation).

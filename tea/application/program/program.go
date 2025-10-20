@@ -36,7 +36,7 @@ type Program[T any] struct {
 	output io.Writer
 
 	// Input reader for parsing stdin
-	inputReader *input.InputReader
+	inputReader *input.Reader
 
 	// Configuration flags
 	altScreen      bool // Use alternate screen buffer
@@ -66,7 +66,7 @@ type Program[T any] struct {
 //		program.WithAltScreen(),
 //		program.WithMouseAllMotion(),
 //	)
-func New[T any](m model.Model[T], opts ...ProgramOption[T]) *Program[T] {
+func New[T any](m model.Model[T], opts ...Option[T]) *Program[T] {
 	p := &Program[T]{
 		model:  m,
 		input:  os.Stdin,  // Default
@@ -107,6 +107,8 @@ func New[T any](m model.Model[T], opts ...ProgramOption[T]) *Program[T] {
 //	}
 //
 // Returns error if program is already running or initialization fails.
+//
+//nolint:gocognit // Event loop orchestration requires sequential logic
 func (p *Program[T]) Run() error {
 	p.mu.Lock()
 	if p.running {
@@ -192,6 +194,8 @@ func (p *Program[T]) Run() error {
 //	p.Stop()
 //
 // Returns error if program is already running.
+//
+//nolint:gocognit // Event loop orchestration requires sequential logic
 func (p *Program[T]) Start() error {
 	p.mu.Lock()
 	if p.running {
@@ -391,7 +395,7 @@ func (p *Program[T]) renderView() {
 func (p *Program[T]) startInputReader() {
 	// Create input reader if not yet created
 	if p.inputReader == nil {
-		p.inputReader = input.NewInputReader(p.input)
+		p.inputReader = input.NewReader(p.input)
 	}
 
 	go func() {

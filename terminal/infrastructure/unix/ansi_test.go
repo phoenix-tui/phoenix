@@ -2,7 +2,6 @@ package unix
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -11,46 +10,10 @@ import (
 	"github.com/phoenix-tui/phoenix/terminal/api"
 )
 
-// testWriter captures output for testing without needing *os.File
-type testWriter struct {
-	buf bytes.Buffer
-}
+// Note: testWriter and createTestTerminal removed (unused helper functions).
+// Tests now use direct ANSITerminal creation with os.Stdout.
 
-func (tw *testWriter) Write(p []byte) (n int, err error) {
-	return tw.buf.Write(p)
-}
-
-func (tw *testWriter) String() string {
-	return tw.buf.String()
-}
-
-func (tw *testWriter) Reset() {
-	tw.buf.Reset()
-}
-
-// createTestTerminal creates ANSI terminal with pipe for output capture
-func createTestTerminal() (*ANSITerminal, *testWriter) {
-	r, w, err := os.Pipe()
-	if err != nil {
-		panic(fmt.Sprintf("failed to create pipe: %v", err))
-	}
-
-	// Create terminal with write end of pipe
-	term := &ANSITerminal{
-		output: w,
-	}
-
-	// Capture output in background
-	writer := &testWriter{}
-	go func() {
-		io.Copy(writer, r)
-		r.Close()
-	}()
-
-	return term, writer
-}
-
-// captureANSI executes function and captures ANSI output
+// captureANSI executes function and captures ANSI output.
 func captureANSI(fn func(*ANSITerminal)) string {
 	r, w, _ := os.Pipe()
 	term := &ANSITerminal{output: w}
@@ -65,9 +28,9 @@ func captureANSI(fn func(*ANSITerminal)) string {
 	return buf.String()
 }
 
-// ┌─────────────────────────────────────────────────────────────────┐
-// │ Cursor Position Tests                                           │
-// └─────────────────────────────────────────────────────────────────┘
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Cursor Position Tests                                           │.
+// └─────────────────────────────────────────────────────────────────┘.
 
 func TestANSI_SetCursorPosition(t *testing.T) {
 	tests := []struct {
@@ -209,7 +172,7 @@ func TestANSI_MoveCursorRight(t *testing.T) {
 }
 
 func TestANSI_SaveRestoreCursorPosition(t *testing.T) {
-	// Test Save
+	// Test Save.
 	got := captureANSI(func(term *ANSITerminal) {
 		term.SaveCursorPosition()
 	})
@@ -217,7 +180,7 @@ func TestANSI_SaveRestoreCursorPosition(t *testing.T) {
 		t.Errorf("SaveCursorPosition = %q, want %q", got, "\033[s")
 	}
 
-	// Test Restore
+	// Test Restore.
 	got = captureANSI(func(term *ANSITerminal) {
 		term.RestoreCursorPosition()
 	})
@@ -226,9 +189,9 @@ func TestANSI_SaveRestoreCursorPosition(t *testing.T) {
 	}
 }
 
-// ┌─────────────────────────────────────────────────────────────────┐
-// │ Cursor Visibility Tests                                         │
-// └─────────────────────────────────────────────────────────────────┘
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Cursor Visibility Tests                                         │.
+// └─────────────────────────────────────────────────────────────────┘.
 
 func TestANSI_HideCursor(t *testing.T) {
 	got := captureANSI(func(term *ANSITerminal) {
@@ -285,9 +248,9 @@ func TestANSI_SetCursorStyle_Invalid(t *testing.T) {
 	}
 }
 
-// ┌─────────────────────────────────────────────────────────────────┐
-// │ Screen Operations Tests                                         │
-// └─────────────────────────────────────────────────────────────────┘
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Screen Operations Tests                                         │.
+// └─────────────────────────────────────────────────────────────────┘.
 
 func TestANSI_Clear(t *testing.T) {
 	got := captureANSI(func(term *ANSITerminal) {
@@ -349,9 +312,9 @@ func TestANSI_ClearLines(t *testing.T) {
 	}
 }
 
-// ┌─────────────────────────────────────────────────────────────────┐
-// │ Output Tests                                                    │
-// └─────────────────────────────────────────────────────────────────┘
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Output Tests                                                    │.
+// └─────────────────────────────────────────────────────────────────┘.
 
 func TestANSI_Write(t *testing.T) {
 	tests := []struct {
@@ -388,9 +351,9 @@ func TestANSI_WriteAt(t *testing.T) {
 	}
 }
 
-// ┌─────────────────────────────────────────────────────────────────┐
-// │ Screen Buffer Tests                                             │
-// └─────────────────────────────────────────────────────────────────┘
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Screen Buffer Tests                                             │.
+// └─────────────────────────────────────────────────────────────────┘.
 
 func TestANSI_ReadScreenBuffer_NotSupported(t *testing.T) {
 	term := NewANSI()
@@ -409,22 +372,22 @@ func TestANSI_ReadScreenBuffer_NotSupported(t *testing.T) {
 	}
 }
 
-// ┌─────────────────────────────────────────────────────────────────┐
-// │ Terminal Info Tests                                             │
-// └─────────────────────────────────────────────────────────────────┘
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Terminal Info Tests                                             │.
+// └─────────────────────────────────────────────────────────────────┘.
 
 func TestANSI_Size(t *testing.T) {
 	term := NewANSI()
 	w, h, err := term.Size()
 
-	// Size detection might fail in test environment, but should return fallback
-	if err != nil {
-		// Fallback should be 80x24
+	// Size detection might fail in test environment, but should return fallback.
+	if err != nil { //nolint:nestif // Test validation requires nested checks for fallback behavior
+		// Fallback should be 80x24.
 		if w != 80 || h != 24 {
 			t.Errorf("Size fallback should be 80x24, got %dx%d", w, h)
 		}
 	} else {
-		// Real terminal size should be positive
+		// Real terminal size should be positive.
 		if w <= 0 || h <= 0 {
 			t.Errorf("Size should return positive values, got %dx%d", w, h)
 		}
@@ -435,7 +398,7 @@ func TestANSI_ColorDepth(t *testing.T) {
 	term := NewANSI()
 	depth := term.ColorDepth()
 
-	// Color depth should be one of: 16, 256, or 16777216
+	// Color depth should be one of: 16, 256, or 16777216.
 	validDepths := map[int]bool{
 		16:       true,
 		256:      true,
@@ -447,9 +410,9 @@ func TestANSI_ColorDepth(t *testing.T) {
 	}
 }
 
-// ┌─────────────────────────────────────────────────────────────────┐
-// │ Capabilities Tests                                              │
-// └─────────────────────────────────────────────────────────────────┘
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Capabilities Tests                                              │.
+// └─────────────────────────────────────────────────────────────────┘.
 
 func TestANSI_SupportsDirectPositioning(t *testing.T) {
 	term := NewANSI()
@@ -465,10 +428,10 @@ func TestANSI_SupportsReadback(t *testing.T) {
 	}
 }
 
-func TestANSI_SupportsTrueColor(t *testing.T) {
+func TestANSI_SupportsTrueColor(_ *testing.T) {
 	term := NewANSI()
-	// TrueColor support depends on environment
-	// Just verify method works
+	// TrueColor support depends on environment.
+	// Just verify method works.
 	_ = term.SupportsTrueColor()
 }
 
@@ -481,9 +444,9 @@ func TestANSI_Platform(t *testing.T) {
 	}
 }
 
-// ┌─────────────────────────────────────────────────────────────────┐
-// │ Benchmark Tests                                                 │
-// └─────────────────────────────────────────────────────────────────┘
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Benchmark Tests                                                 │.
+// └─────────────────────────────────────────────────────────────────┘.
 
 func BenchmarkANSI_SetCursorPosition(b *testing.B) {
 	r, w, _ := os.Pipe()

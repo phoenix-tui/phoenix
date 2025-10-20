@@ -67,15 +67,15 @@ func TestSpinnerStyleFrames(t *testing.T) {
 	original := []string{"⠋", "⠙", "⠹"}
 	style := NewSpinnerStyle(original, 10)
 
-	// Get frames
+	// Get frames.
 	frames := style.Frames()
 
-	// Verify content
+	// Verify content.
 	if !reflect.DeepEqual(frames, original) {
 		t.Errorf("Frames() = %v, expected %v", frames, original)
 	}
 
-	// Verify immutability - modify returned slice
+	// Verify immutability - modify returned slice.
 	frames[0] = "MODIFIED"
 	framesAgain := style.Frames()
 	if framesAgain[0] == "MODIFIED" {
@@ -117,7 +117,7 @@ func TestSpinnerStyleGetFrameEmptyFrames(t *testing.T) {
 	// Create style with empty frames (will default to single frame)
 	style := NewSpinnerStyle([]string{}, 10)
 
-	// GetFrame should return default frame
+	// GetFrame should return default frame.
 	frame := style.GetFrame(0)
 	if frame != "•" {
 		t.Errorf("GetFrame(0) on default = %s, expected '•'", frame)
@@ -127,11 +127,11 @@ func TestSpinnerStyleGetFrameEmptyFrames(t *testing.T) {
 func TestSpinnerStyleImmutability(t *testing.T) {
 	original := []string{"⠋", "⠙", "⠹"}
 
-	// Modify original after creating style
+	// Modify original after creating style.
 	style := NewSpinnerStyle(original, 10)
 	original[0] = "MODIFIED"
 
-	// Style should not be affected
+	// Style should not be affected.
 	frames := style.Frames()
 	if frames[0] == "MODIFIED" {
 		t.Errorf("SpinnerStyle was affected by mutation of input slice")

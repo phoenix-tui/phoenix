@@ -18,7 +18,7 @@ func NewSelection(start, end int) *Selection {
 		end = 0
 	}
 
-	// Normalize so start <= end
+	// Normalize so start <= end.
 	if start > end {
 		start, end = end, start
 	}

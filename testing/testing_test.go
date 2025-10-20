@@ -11,7 +11,7 @@ import (
 // │ NullTerminal Tests                                          │
 // └─────────────────────────────────────────────────────────────┘
 
-func TestNullTerminal_ImplementsTerminalInterface(t *testing.T) {
+func TestNullTerminal_ImplementsTerminalInterface(_ *testing.T) {
 	var _ api.Terminal = (*NullTerminal)(nil)
 }
 
@@ -127,7 +127,7 @@ func TestNullTerminal_ReasonableDefaults(t *testing.T) {
 // │ MockTerminal Tests                                          │
 // └─────────────────────────────────────────────────────────────┘
 
-func TestMockTerminal_ImplementsTerminalInterface(t *testing.T) {
+func TestMockTerminal_ImplementsTerminalInterface(_ *testing.T) {
 	var _ api.Terminal = (*MockTerminal)(nil)
 }
 
@@ -310,7 +310,7 @@ func TestMockTerminal_AllMethodsRecord(t *testing.T) {
 // └─────────────────────────────────────────────────────────────┘
 
 // TestNullTerminal_InRealModel demonstrates using NullTerminal in a model test.
-func TestNullTerminal_InRealModel(t *testing.T) {
+func TestNullTerminal_InRealModel(_ *testing.T) {
 	type Model struct {
 		terminal api.Terminal
 	}

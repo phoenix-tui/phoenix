@@ -9,21 +9,21 @@ import (
 //
 // GoSh scenario:
 // 1. User types "hello" → Enter (incomplete command)
-// 2. Continuation prompt appears: ">>    "
-// 3. User types "world" → Enter
-// 4. Command executes: "hello\nworld"
+// 2. Continuation prompt appears: ">>    ".
+// 3. User types "world" → Enter.
+// 4. Command executes: "hello\nworld".
 //
 // This test verifies that Phoenix TextArea correctly handles:
 // - SetValue("hello\n") → MoveCursorToEnd() → cursor at (1, 0)
 // - User types "world" → cursor at (1, 5)
-// - View() with ShowCursor(false) shows "hello\nworld" without "█"
+// - View() with ShowCursor(false) shows "hello\nworld" without "█".
 func TestMultiline_GoSh_Scenario(t *testing.T) {
-	// Step 1: User types "hello" and presses Enter
+	// Step 1: User types "hello" and presses Enter.
 	ta := New().
 		SetValue("hello").
 		ShowCursor(false)
 
-	// Verify initial state
+	// Verify initial state.
 	if ta.Value() != "hello" {
 		t.Errorf("Step 1: Value() = %q, want %q", ta.Value(), "hello")
 	}
@@ -34,7 +34,7 @@ func TestMultiline_GoSh_Scenario(t *testing.T) {
 	}
 
 	// Step 2: Continuation line started (shell adds newline)
-	// CRITICAL: This is what GoSh does - it adds "\n" to trigger multiline
+	// CRITICAL: This is what GoSh does - it adds "\n" to trigger multiline.
 	ta = ta.SetValue("hello\n").MoveCursorToEnd()
 
 	// Verify cursor is at end of first line (after newline)
@@ -43,37 +43,37 @@ func TestMultiline_GoSh_Scenario(t *testing.T) {
 		t.Errorf("Step 2: CursorPosition() = (%d, %d), want (1, 0)", row, col)
 	}
 
-	// Verify View() has NO cursor
+	// Verify View() has NO cursor.
 	view := ta.View()
 	if strings.Contains(view, "█") {
 		t.Errorf("Step 2: View() should NOT contain cursor '█'\nView:\n%s", view)
 	}
 
-	// Verify content rendering
+	// Verify content rendering.
 	expectedLines := []string{"hello", ""}
 	actualLines := strings.Split(view, "\n")
 	if len(actualLines) != len(expectedLines) {
 		t.Errorf("Step 2: View() lines = %d, want %d\nView:\n%s", len(actualLines), len(expectedLines), view)
 	}
 
-	// Step 3: User types "world" on continuation line
+	// Step 3: User types "world" on continuation line.
 	// In real usage, this would be done character-by-character via Update(KeyMsg)
-	// But we can simulate by directly setting value
+	// But we can simulate by directly setting value.
 	ta = ta.SetValue("hello\nworld").MoveCursorToEnd()
 
-	// Verify cursor is at end of second line
+	// Verify cursor is at end of second line.
 	row, col = ta.CursorPosition()
 	if row != 1 || col != 5 {
 		t.Errorf("Step 3: CursorPosition() = (%d, %d), want (1, 5)", row, col)
 	}
 
-	// Verify View() has NO cursor
+	// Verify View() has NO cursor.
 	view = ta.View()
 	if strings.Contains(view, "█") {
 		t.Errorf("Step 3: View() should NOT contain cursor '█'\nView:\n%s", view)
 	}
 
-	// Verify final content
+	// Verify final content.
 	if ta.Value() != "hello\nworld" {
 		t.Errorf("Step 3: Value() = %q, want %q", ta.Value(), "hello\nworld")
 	}
@@ -85,15 +85,15 @@ func TestMultiline_GoSh_Scenario(t *testing.T) {
 // TestMultiline_GoSh_ViewWithPrompts simulates ViewWithPrompts() rendering.
 //
 // This is what GoSh actually does:
-// 1. Phoenix TextArea.View() → "hello\nworld"
-// 2. Split by "\n" → ["hello", "world"]
-// 3. Add prompts → "gosh> hello\n>>    world"
+// 1. Phoenix TextArea.View() → "hello\nworld".
+// 2. Split by "\n" → ["hello", "world"].
+// 3. Add prompts → "gosh> hello\n>>    world".
 //
 // PROBLEM INVESTIGATION:
-// When user types each character in "world", does Phoenix correctly
+// When user types each character in "world", does Phoenix correctly.
 // render the cursor position WITHOUT inserting "█"?
 func TestMultiline_GoSh_ViewWithPrompts(t *testing.T) {
-	// Simulate character-by-character typing on continuation line
+	// Simulate character-by-character typing on continuation line.
 	tests := []struct {
 		name      string
 		text      string
@@ -130,18 +130,18 @@ func TestMultiline_GoSh_ViewWithPrompts(t *testing.T) {
 
 			view := ta.View()
 
-			// Verify NO cursor
+			// Verify NO cursor.
 			if strings.Contains(view, "█") {
 				t.Errorf("View() should NOT contain cursor '█'\nView:\n%s", view)
 			}
 
-			// Verify line count
+			// Verify line count.
 			lines := strings.Split(view, "\n")
 			if len(lines) != len(tt.wantLines) {
 				t.Errorf("View() lines = %d, want %d\nView:\n%s", len(lines), len(tt.wantLines), view)
 			}
 
-			// Verify each line content
+			// Verify each line content.
 			for i, wantLine := range tt.wantLines {
 				if i >= len(lines) {
 					t.Errorf("Missing line %d: %q", i, wantLine)
@@ -172,7 +172,7 @@ func TestMultiline_GoSh_ViewWithPrompts(t *testing.T) {
 			withPrompts := result.String()
 			t.Logf("With prompts:\n%s", withPrompts)
 
-			// Verify prompts are added correctly
+			// Verify prompts are added correctly.
 			if !strings.Contains(withPrompts, primaryPrompt) {
 				t.Errorf("Missing primary prompt in: %s", withPrompts)
 			}
@@ -186,7 +186,7 @@ func TestMultiline_GoSh_ViewWithPrompts(t *testing.T) {
 // TestMultiline_Cursor_Position_Bug_Investigation investigates the "jumping" behavior.
 //
 // HYPOTHESIS:
-// When Phoenix TextArea renders with ShowCursor(false), the View() output
+// When Phoenix TextArea renders with ShowCursor(false), the View() output.
 // might not match the expected line structure, causing GoSh's ViewWithPrompts()
 // to add prompts incorrectly.
 //
@@ -197,7 +197,8 @@ func TestMultiline_Cursor_Position_Bug_Investigation(t *testing.T) {
 		MoveCursorToEnd().
 		ShowCursor(false)
 
-	// Record View() output before each character
+	// Record View() output before each character.
+	//nolint:prealloc // slice size is small and dynamic growth is acceptable in tests
 	var views []string
 	texts := []string{"hello\n", "hello\nw", "hello\nwo", "hello\nwor", "hello\nworl", "hello\nworld"}
 
@@ -208,13 +209,13 @@ func TestMultiline_Cursor_Position_Bug_Investigation(t *testing.T) {
 
 		t.Logf("Text: %q\nView:\n%s\n---", text, view)
 
-		// Verify View() structure consistency
+		// Verify View() structure consistency.
 		lines := strings.Split(view, "\n")
 		if len(lines) != 2 {
 			t.Errorf("Text %q: View() lines = %d, want 2\nView:\n%s", text, len(lines), view)
 		}
 
-		// Verify NO cursor
+		// Verify NO cursor.
 		if strings.Contains(view, "█") {
 			t.Errorf("Text %q: View() contains cursor '█'\nView:\n%s", text, view)
 		}
@@ -230,7 +231,7 @@ func TestMultiline_Cursor_Position_Bug_Investigation(t *testing.T) {
 			continue
 		}
 
-		// First line should NEVER change
+		// First line should NEVER change.
 		if prev[0] != curr[0] {
 			t.Errorf("View %d first line CHANGED: %q → %q", i, prev[0], curr[0])
 		}

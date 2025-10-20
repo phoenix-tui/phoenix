@@ -44,17 +44,17 @@ func TestColumn_WithWidth(t *testing.T) {
 	col := NewColumn("name", "Name", 20)
 	col2 := col.WithWidth(30)
 
-	// Original unchanged
+	// Original unchanged.
 	if col.Width() != 20 {
 		t.Errorf("Original column width should be 20, got %v", col.Width())
 	}
 
-	// New column has new width
+	// New column has new width.
 	if col2.Width() != 30 {
 		t.Errorf("New column width = %v, want 30", col2.Width())
 	}
 
-	// Other properties preserved
+	// Other properties preserved.
 	if col2.Key() != "name" {
 		t.Errorf("Key should be preserved")
 	}
@@ -67,12 +67,12 @@ func TestColumn_WithAlignment(t *testing.T) {
 	col := NewColumn("value", "Value", 15)
 	col2 := col.WithAlignment(value.AlignmentCenter)
 
-	// Original unchanged
+	// Original unchanged.
 	if !col.Alignment().IsLeft() {
 		t.Errorf("Original alignment should be left")
 	}
 
-	// New column has new alignment
+	// New column has new alignment.
 	if !col2.Alignment().IsCenter() {
 		t.Errorf("New alignment should be center")
 	}
@@ -82,12 +82,12 @@ func TestColumn_WithSortable(t *testing.T) {
 	col := NewColumn("date", "Date", 12)
 	col2 := col.WithSortable(true)
 
-	// Original unchanged
+	// Original unchanged.
 	if col.IsSortable() {
 		t.Errorf("Original should not be sortable")
 	}
 
-	// New column is sortable
+	// New column is sortable.
 	if !col2.IsSortable() {
 		t.Errorf("New column should be sortable")
 	}
@@ -100,34 +100,34 @@ func TestColumn_WithRenderer(t *testing.T) {
 	}
 	col2 := col.WithRenderer(renderer)
 
-	// Original unchanged
+	// Original unchanged.
 	if col.Renderer() != nil {
 		t.Errorf("Original should have no renderer")
 	}
 
-	// New column has renderer
+	// New column has renderer.
 	if col2.Renderer() == nil {
 		t.Errorf("New column should have renderer")
 	}
 
-	// Test renderer works
+	// Test renderer works.
 	if got := col2.Renderer()("test"); got != "custom" {
 		t.Errorf("Renderer() = %v, want custom", got)
 	}
 }
 
 func TestColumn_Immutability(t *testing.T) {
-	// Create original column
+	// Create original column.
 	col1 := NewColumn("id", "ID", 10)
 
-	// Chain multiple operations
+	// Chain multiple operations.
 	col2 := col1.
 		WithWidth(20).
 		WithAlignment(value.AlignmentRight).
 		WithSortable(true).
 		WithRenderer(func(v interface{}) string { return "test" })
 
-	// Verify original is unchanged
+	// Verify original is unchanged.
 	if col1.Width() != 10 {
 		t.Errorf("Original width changed")
 	}
@@ -141,7 +141,7 @@ func TestColumn_Immutability(t *testing.T) {
 		t.Errorf("Original renderer changed")
 	}
 
-	// Verify new column has all changes
+	// Verify new column has all changes.
 	if col2.Width() != 20 {
 		t.Errorf("New width = %v, want 20", col2.Width())
 	}

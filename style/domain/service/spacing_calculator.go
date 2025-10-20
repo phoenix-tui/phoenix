@@ -42,20 +42,22 @@ func NewSpacingCalculator(unicodeService *service.UnicodeService) SpacingCalcula
 }
 
 // CalculateTotalWidth calculates the total width including content, padding, and margin.
-// Formula: contentWidth + padding.Left + padding.Right + margin.Left + margin.Right
+// Formula: contentWidth + padding.Left + padding.Right + margin.Left + margin.Right.
 func (sc *DefaultSpacingCalculator) CalculateTotalWidth(contentWidth int, padding value.Padding, margin value.Margin) int {
 	return contentWidth + padding.Horizontal() + margin.Horizontal()
 }
 
 // CalculateTotalHeight calculates the total height including content, padding, and margin.
-// Formula: contentHeight + padding.Top + padding.Bottom + margin.Top + margin.Bottom
+// Formula: contentHeight + padding.Top + padding.Bottom + margin.Top + margin.Bottom.
 func (sc *DefaultSpacingCalculator) CalculateTotalHeight(contentHeight int, padding value.Padding, margin value.Margin) int {
 	return contentHeight + padding.Vertical() + margin.Vertical()
 }
 
 // ApplyPadding adds padding around content.
-// - Top/Bottom padding: Adds empty lines
-// - Left/Right padding: Adds spaces to each line
+// - Top/Bottom padding: Adds empty lines.
+// - Left/Right padding: Adds spaces to each line.
+//
+//nolint:dupl // ApplyPadding and ApplyMargin are similar but semantically different (padding inside, margin outside)
 func (sc *DefaultSpacingCalculator) ApplyPadding(content string, padding value.Padding) string {
 	if content == "" {
 		return ""
@@ -63,7 +65,7 @@ func (sc *DefaultSpacingCalculator) ApplyPadding(content string, padding value.P
 
 	lines := strings.Split(content, "\n")
 
-	// Apply horizontal padding (left and right spaces)
+	// Apply horizontal padding (left and right spaces).
 	paddedLines := make([]string, 0, len(lines))
 	leftPad := strings.Repeat(" ", padding.Left())
 	rightPad := strings.Repeat(" ", padding.Right())
@@ -73,12 +75,12 @@ func (sc *DefaultSpacingCalculator) ApplyPadding(content string, padding value.P
 		paddedLines = append(paddedLines, paddedLine)
 	}
 
-	// Apply vertical padding (top and bottom empty lines)
+	// Apply vertical padding (top and bottom empty lines).
 	topPadding := make([]string, padding.Top())
 	bottomPadding := make([]string, padding.Bottom())
 
-	// Calculate width of padded lines for empty padding lines
-	// Use the first line's width if available
+	// Calculate width of padded lines for empty padding lines.
+	// Use the first line's width if available.
 	emptyLineWidth := padding.Left() + padding.Right()
 	if len(paddedLines) > 0 {
 		emptyLineWidth = sc.unicodeService.StringWidth(paddedLines[0])
@@ -92,7 +94,8 @@ func (sc *DefaultSpacingCalculator) ApplyPadding(content string, padding value.P
 		bottomPadding[i] = emptyLine
 	}
 
-	// Combine all parts
+	// Combine all parts.
+	//nolint:gocritic,makezero // appendAssign: Pattern is clear; makezero: topPadding slice size is known
 	result := append(topPadding, paddedLines...)
 	result = append(result, bottomPadding...)
 
@@ -100,8 +103,10 @@ func (sc *DefaultSpacingCalculator) ApplyPadding(content string, padding value.P
 }
 
 // ApplyMargin adds margin around content.
-// - Top/Bottom margin: Adds empty lines
-// - Left/Right margin: Adds spaces to each line (outside content box)
+// - Top/Bottom margin: Adds empty lines.
+// - Left/Right margin: Adds spaces to each line (outside content box).
+//
+//nolint:dupl // ApplyMargin and ApplyPadding are similar but semantically different (margin outside, padding inside)
 func (sc *DefaultSpacingCalculator) ApplyMargin(content string, margin value.Margin) string {
 	if content == "" {
 		return ""
@@ -109,7 +114,7 @@ func (sc *DefaultSpacingCalculator) ApplyMargin(content string, margin value.Mar
 
 	lines := strings.Split(content, "\n")
 
-	// Apply horizontal margin (left and right spaces)
+	// Apply horizontal margin (left and right spaces).
 	marginedLines := make([]string, 0, len(lines))
 	leftMargin := strings.Repeat(" ", margin.Left())
 	rightMargin := strings.Repeat(" ", margin.Right())
@@ -119,11 +124,11 @@ func (sc *DefaultSpacingCalculator) ApplyMargin(content string, margin value.Mar
 		marginedLines = append(marginedLines, marginedLine)
 	}
 
-	// Apply vertical margin (top and bottom empty lines)
+	// Apply vertical margin (top and bottom empty lines).
 	topMargin := make([]string, margin.Top())
 	bottomMargin := make([]string, margin.Bottom())
 
-	// Calculate width of margined lines for empty margin lines
+	// Calculate width of margined lines for empty margin lines.
 	emptyLineWidth := margin.Left() + margin.Right()
 	if len(marginedLines) > 0 {
 		emptyLineWidth = sc.unicodeService.StringWidth(marginedLines[0])
@@ -137,7 +142,8 @@ func (sc *DefaultSpacingCalculator) ApplyMargin(content string, margin value.Mar
 		bottomMargin[i] = emptyLine
 	}
 
-	// Combine all parts
+	// Combine all parts.
+	//nolint:gocritic,makezero // appendAssign: Pattern is clear; makezero: topMargin slice size is known
 	result := append(topMargin, marginedLines...)
 	result = append(result, bottomMargin...)
 

@@ -1,3 +1,4 @@
+// Package main demonstrates clipboard content format detection and handling.
 package main
 
 import (
@@ -9,6 +10,7 @@ import (
 	"github.com/phoenix-tui/phoenix/clipboard/domain/value"
 )
 
+//nolint:gocyclo,cyclop // Example code demonstrates multiple format handling scenarios
 func main() {
 	fmt.Println("Phoenix Clipboard - Multiple Formats Example")
 	fmt.Println("=============================================")

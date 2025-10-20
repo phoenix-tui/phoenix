@@ -27,7 +27,7 @@ func TestNewSpinnerNilStyle(t *testing.T) {
 	if spinner.FrameIndex() != 0 {
 		t.Errorf("FrameIndex() = %d, expected 0", spinner.FrameIndex())
 	}
-	// Should have default style
+	// Should have default style.
 	if spinner.CurrentFrame() == "" {
 		t.Errorf("CurrentFrame() should not be empty with nil style")
 	}
@@ -42,7 +42,7 @@ func TestSpinnerWithLabel(t *testing.T) {
 		t.Errorf("WithLabel() = %s, expected 'Loading...'", newSpinner.Label())
 	}
 
-	// Verify immutability
+	// Verify immutability.
 	if spinner.Label() != "" {
 		t.Errorf("WithLabel() mutated original")
 	}
@@ -53,12 +53,12 @@ func TestSpinnerNextFrame(t *testing.T) {
 	style := value.NewSpinnerStyle(frames, 10)
 	spinner := *NewSpinner(style) // Dereference to get value
 
-	// Frame 0 → A
+	// Frame 0 → A.
 	if spinner.CurrentFrame() != "A" {
 		t.Errorf("Initial CurrentFrame() = %s, expected 'A'", spinner.CurrentFrame())
 	}
 
-	// Frame 1 → B
+	// Frame 1 → B.
 	spinner = spinner.NextFrame()
 	if spinner.CurrentFrame() != "B" {
 		t.Errorf("NextFrame() = %s, expected 'B'", spinner.CurrentFrame())
@@ -67,7 +67,7 @@ func TestSpinnerNextFrame(t *testing.T) {
 		t.Errorf("FrameIndex() = %d, expected 1", spinner.FrameIndex())
 	}
 
-	// Frame 2 → C
+	// Frame 2 → C.
 	spinner = spinner.NextFrame()
 	if spinner.CurrentFrame() != "C" {
 		t.Errorf("NextFrame() = %s, expected 'C'", spinner.CurrentFrame())
@@ -88,13 +88,13 @@ func TestSpinnerReset(t *testing.T) {
 	style := value.NewSpinnerStyle(frames, 10)
 	spinner := *NewSpinner(style) // Dereference to get value
 
-	// Advance to frame 2
+	// Advance to frame 2.
 	spinner = spinner.NextFrame().NextFrame()
 	if spinner.FrameIndex() != 2 {
 		t.Errorf("Setup: FrameIndex() = %d, expected 2", spinner.FrameIndex())
 	}
 
-	// Reset
+	// Reset.
 	newSpinner := spinner.Reset()
 	if newSpinner.FrameIndex() != 0 {
 		t.Errorf("Reset() FrameIndex() = %d, expected 0", newSpinner.FrameIndex())
@@ -103,7 +103,7 @@ func TestSpinnerReset(t *testing.T) {
 		t.Errorf("Reset() CurrentFrame() = %s, expected 'A'", newSpinner.CurrentFrame())
 	}
 
-	// Verify immutability
+	// Verify immutability.
 	if spinner.FrameIndex() != 2 {
 		t.Errorf("Reset() mutated original")
 	}
@@ -113,12 +113,12 @@ func TestSpinnerImmutability(t *testing.T) {
 	style := value.NewSpinnerStyle([]string{"A", "B", "C"}, 10)
 	spinner := NewSpinner(style).WithLabel("Test")
 
-	// Apply all mutations
+	// Apply all mutations.
 	_ = spinner.WithLabel("Changed")
 	_ = spinner.NextFrame()
 	_ = spinner.Reset()
 
-	// Original should be unchanged
+	// Original should be unchanged.
 	if spinner.Label() != "Test" {
 		t.Errorf("Label mutated: %s != 'Test'", spinner.Label())
 	}
@@ -151,7 +151,7 @@ func TestSpinnerSingleFrame(t *testing.T) {
 	style := value.NewSpinnerStyle([]string{"●"}, 10)
 	spinner := *NewSpinner(style) // Dereference to get value
 
-	// Single frame should always return the same frame
+	// Single frame should always return the same frame.
 	for i := 0; i < 5; i++ {
 		if spinner.CurrentFrame() != "●" {
 			t.Errorf("CurrentFrame() = %s, expected '●'", spinner.CurrentFrame())

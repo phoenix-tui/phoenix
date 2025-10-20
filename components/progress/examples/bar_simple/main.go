@@ -1,3 +1,5 @@
+// Package main demonstrates basic progress bar usage.
+// This example shows simple progress bar with percentage display.
 package main
 
 import (
@@ -7,16 +9,16 @@ import (
 	progress "github.com/phoenix-tui/phoenix/components/progress/api"
 )
 
-// Simple progress bar example
-// Demonstrates basic usage without tea.Program
+// Simple progress bar example.
+// Demonstrates basic usage without tea.Program.
 func main() {
 	fmt.Println("Simple Progress Bar Example")
 	fmt.Println("============================")
 
-	// Create a 40-character wide progress bar
+	// Create a 40-character wide progress bar.
 	bar := progress.NewBar(40)
 
-	// Simulate progress from 0% to 100%
+	// Simulate progress from 0% to 100%.
 	for i := 0; i <= 100; i += 10 {
 		bar.SetProgress(i)
 		fmt.Printf("\r%s", bar.View())

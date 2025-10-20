@@ -1,3 +1,4 @@
+// Package value contains value objects for input domain.
 package value
 
 // Cursor represents a grapheme-aware cursor position in text.
@@ -24,7 +25,7 @@ func (c *Cursor) Offset() int {
 // MoveBy moves the cursor by the specified delta.
 // The result is clamped to [0, maxOffset].
 // Returns a new Cursor instance (immutable).
-func (c *Cursor) MoveBy(delta int, maxOffset int) *Cursor {
+func (c *Cursor) MoveBy(delta, maxOffset int) *Cursor {
 	newOffset := c.offset + delta
 	if newOffset < 0 {
 		newOffset = 0
@@ -38,7 +39,7 @@ func (c *Cursor) MoveBy(delta int, maxOffset int) *Cursor {
 // MoveTo moves the cursor to the specified absolute position.
 // The result is clamped to [0, maxOffset].
 // Returns a new Cursor instance (immutable).
-func (c *Cursor) MoveTo(offset int, maxOffset int) *Cursor {
+func (c *Cursor) MoveTo(offset, maxOffset int) *Cursor {
 	if offset < 0 {
 		offset = 0
 	}

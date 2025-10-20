@@ -10,29 +10,29 @@ import (
 
 // NewTerminal creates platform-optimized terminal with auto-detection.
 //
-// Week 16 Implementation (Windows Console API + ANSI):
-//   - Detects Windows platform (runtime.GOOS == "windows")
-//   - Tries Windows Console API first (windows.NewConsole())
-//   - Auto-fallbacks to ANSI on error (Git Bash, redirected I/O)
-//   - Unix platforms always use ANSI
+// Week 16 Implementation (Windows Console API + ANSI):.
+//   - Detects Windows platform (runtime.GOOS == "windows").
+//   - Tries Windows Console API first (windows.NewConsole()).
+//   - Auto-fallbacks to ANSI on error (Git Bash, redirected I/O).
+//   - Unix platforms always use ANSI.
 //
-// Detection Algorithm:
+// Detection Algorithm:.
 //
-//	if runtime.GOOS == "windows" {
-//	    return newWindowsTerminal() // Tries Win32 API, falls back to ANSI
-//	}
-//	return newUnixTerminal() // Linux/macOS - always ANSI
+//	if runtime.GOOS == "windows" {.
+//	    return newWindowsTerminal() // Tries Win32 API, falls back to ANSI.
+//	}.
+//	return newUnixTerminal() // Linux/macOS - always ANSI.
 //
-// Auto-fallback ensures compatibility:
-//   - cmd.exe → Windows Console API (10x faster!)
-//   - PowerShell → Windows Console API (10x faster!)
-//   - Git Bash → ANSI (GetConsoleScreenBufferInfo fails, auto-fallback)
-//   - WSL → ANSI
-//   - Redirected output → ANSI (no console handle, auto-fallback)
+// Auto-fallback ensures compatibility:.
+//   - cmd.exe → Windows Console API (10x faster!).
+//   - PowerShell → Windows Console API (10x faster!).
+//   - Git Bash → ANSI (GetConsoleScreenBufferInfo fails, auto-fallback).
+//   - WSL → ANSI.
+//   - Redirected output → ANSI (no console handle, auto-fallback).
 //
-// Platform-specific implementations:
-//   - detect_windows.go: Windows detection logic (build tag: windows)
-//   - detect_unix.go: Unix stub (build tag: !windows)
+// Platform-specific implementations:.
+//   - detect_windows.go: Windows detection logic (build tag: windows).
+//   - detect_unix.go: Unix stub (build tag: !windows).
 func NewTerminal() api.Terminal {
 	if runtime.GOOS == "windows" {
 		return newWindowsTerminal() // Implemented in detect_windows.go
@@ -42,12 +42,12 @@ func NewTerminal() api.Terminal {
 
 // NewANSITerminal forces ANSI implementation regardless of platform.
 //
-// Use cases:
-//   - Testing ANSI code generation
-//   - Forcing fallback behavior
-//   - Redirected output (pipes, files)
-//   - Environments where Win32 API shouldn't be used
-//   - Cross-platform consistency testing
+// Use cases:.
+//   - Testing ANSI code generation.
+//   - Forcing fallback behavior.
+//   - Redirected output (pipes, files).
+//   - Environments where Win32 API shouldn't be used.
+//   - Cross-platform consistency testing.
 func NewANSITerminal() api.Terminal {
 	return unix.NewANSI()
 }
@@ -60,20 +60,20 @@ func newUnixTerminal() api.Terminal {
 
 // DetectPlatform identifies current terminal platform type.
 //
-// Week 16 Implementation:
-//   - Detects Windows Console vs Windows ANSI vs Unix
-//   - Returns platform-specific identifier for diagnostics
+// Week 16 Implementation:.
+//   - Detects Windows Console vs Windows ANSI vs Unix.
+//   - Returns platform-specific identifier for diagnostics.
 //
-// Detection logic:
+// Detection logic:.
 //
-//	if runtime.GOOS != "windows" {
-//	    return api.PlatformUnix
-//	}
-//	return detectWindowsPlatform() // Try Win32 API, check TERM env
+//	if runtime.GOOS != "windows" {.
+//	    return api.PlatformUnix.
+//	}.
+//	return detectWindowsPlatform() // Try Win32 API, check TERM env.
 //
-// Platform-specific implementations:
-//   - detect_windows.go: Windows detection (build tag: windows)
-//   - detect_unix.go: Unix stub (build tag: !windows)
+// Platform-specific implementations:.
+//   - detect_windows.go: Windows detection (build tag: windows).
+//   - detect_unix.go: Unix stub (build tag: !windows).
 func DetectPlatform() api.Platform {
 	if runtime.GOOS != "windows" {
 		return api.PlatformUnix

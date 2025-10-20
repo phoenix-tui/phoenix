@@ -2,9 +2,9 @@ package program
 
 import "io"
 
-// ProgramOption configures a Program at creation time.
+// Option configures a Program at creation time.
 // Uses the functional options pattern for clean, extensible API.
-type ProgramOption[T any] func(*Program[T])
+type Option[T any] func(*Program[T])
 
 // WithInput sets a custom input reader (default: os.Stdin).
 //
@@ -12,7 +12,7 @@ type ProgramOption[T any] func(*Program[T])
 //
 //	customInput := strings.NewReader("test input")
 //	p := program.New(model, program.WithInput(customInput))
-func WithInput[T any](r io.Reader) ProgramOption[T] {
+func WithInput[T any](r io.Reader) Option[T] {
 	return func(p *Program[T]) {
 		p.input = r
 	}
@@ -24,7 +24,7 @@ func WithInput[T any](r io.Reader) ProgramOption[T] {
 //
 //	var buf bytes.Buffer
 //	p := program.New(model, program.WithOutput(&buf))
-func WithOutput[T any](w io.Writer) ProgramOption[T] {
+func WithOutput[T any](w io.Writer) Option[T] {
 	return func(p *Program[T]) {
 		p.output = w
 	}
@@ -36,7 +36,7 @@ func WithOutput[T any](w io.Writer) ProgramOption[T] {
 // Example:
 //
 //	p := program.New(model, program.WithAltScreen())
-func WithAltScreen[T any]() ProgramOption[T] {
+func WithAltScreen[T any]() Option[T] {
 	return func(p *Program[T]) {
 		p.altScreen = true
 	}
@@ -48,7 +48,7 @@ func WithAltScreen[T any]() ProgramOption[T] {
 // Example:
 //
 //	p := program.New(model, program.WithMouseAllMotion())
-func WithMouseAllMotion[T any]() ProgramOption[T] {
+func WithMouseAllMotion[T any]() Option[T] {
 	return func(p *Program[T]) {
 		p.mouseAllMotion = true
 	}

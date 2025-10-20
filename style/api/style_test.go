@@ -146,7 +146,7 @@ func TestAPI_SpacingConstructors(t *testing.T) {
 	})
 }
 
-func TestAPI_SizeConstructor(t *testing.T) {
+func TestAPI_SizeConstructor(_ *testing.T) {
 	size := style.NewSize()
 
 	// Size should be usable (even if empty)
@@ -334,7 +334,7 @@ func TestAPI_ErrorHandling(t *testing.T) {
 		}
 	})
 
-	t.Run("InvalidStyle", func(t *testing.T) {
+	t.Run("InvalidStyle", func(_ *testing.T) {
 		// Style with border sides but no border
 		s := style.New().BorderTop(true)
 		output := style.Render(s, "Test")

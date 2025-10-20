@@ -23,33 +23,33 @@ func TestCalculateFilledWidth(t *testing.T) {
 		percentage int
 		expected   int
 	}{
-		// Normal cases
+		// Normal cases.
 		{"0% of 40", 40, 0, 0},
 		{"25% of 40", 40, 25, 10},
 		{"50% of 40", 40, 50, 20},
 		{"75% of 40", 40, 75, 30},
 		{"100% of 40", 40, 100, 40},
 
-		// Edge cases
+		// Edge cases.
 		{"0% of 100", 100, 0, 0},
 		{"100% of 100", 100, 100, 100},
 		{"50% of 1", 1, 50, 0}, // Rounds down
 		{"100% of 1", 1, 100, 1},
 
-		// Rounding
+		// Rounding.
 		{"33% of 100", 100, 33, 33},
 		{"66% of 100", 100, 66, 66},
 		{"10% of 50", 50, 10, 5},
 		{"20% of 50", 50, 20, 10},
 
-		// Zero width
+		// Zero width.
 		{"Any % of 0", 0, 50, 0},
 
 		// Negative (invalid but handled)
 		{"Negative width", -10, 50, 0},
 		{"Negative percentage", 40, -10, 0},
 
-		// Over 100%
+		// Over 100%.
 		{"Over 100%", 40, 150, 40},
 	}
 
@@ -152,17 +152,17 @@ func TestRenderBarStructure(t *testing.T) {
 
 	result := service.RenderBar(bar)
 
-	// Check for label
+	// Check for label.
 	if !strings.HasPrefix(result, "Test ") {
 		t.Errorf("Result should start with label: %q", result)
 	}
 
-	// Check for percentage
+	// Check for percentage.
 	if !strings.HasSuffix(result, " 050%") {
 		t.Errorf("Result should end with percentage: %q", result)
 	}
 
-	// Check that result contains expected parts
+	// Check that result contains expected parts.
 	// (Don't check byte length as Unicode chars take 3 bytes each)
 	parts := strings.Split(result, " ")
 	if len(parts) != 3 { // "Test" + bar + "050%"
@@ -181,12 +181,12 @@ func TestRenderBarEmptyLabel(t *testing.T) {
 
 	result := service.RenderBar(bar)
 
-	// Should not have leading space
+	// Should not have leading space.
 	if strings.HasPrefix(result, " ") {
 		t.Errorf("Result should not start with space: %q", result)
 	}
 
-	// Should be just the bar
+	// Should be just the bar.
 	if result != "█████░░░░░" {
 		t.Errorf("Result = %q, expected bar only", result)
 	}
@@ -212,7 +212,7 @@ func TestRenderBarDifferentWidths(t *testing.T) {
 		bar := model.NewBarWithPercentage(tt.width, tt.percentage)
 		result := service.RenderBar(bar)
 
-		// Count characters (not bytes) - Unicode chars are 3 bytes each
+		// Count characters (not bytes) - Unicode chars are 3 bytes each.
 		totalChars := strings.Count(result, "█") + strings.Count(result, "░")
 		if totalChars != tt.width {
 			t.Errorf("Width %d, percentage %d: chars = %d, expected %d: %q",
@@ -248,12 +248,12 @@ func TestFormatPercentage(t *testing.T) {
 func TestRenderBarAllPercentages(t *testing.T) {
 	service := NewRenderService()
 
-	// Test all percentages 0-100
+	// Test all percentages 0-100.
 	for pct := 0; pct <= 100; pct++ {
 		bar := model.NewBarWithPercentage(100, pct)
 		result := service.RenderBar(bar)
 
-		// Count filled chars
+		// Count filled chars.
 		filled := strings.Count(result, "█")
 		empty := strings.Count(result, "░")
 
@@ -261,7 +261,7 @@ func TestRenderBarAllPercentages(t *testing.T) {
 			t.Errorf("Percentage %d: total chars = %d, expected 100", pct, filled+empty)
 		}
 
-		// Verify filled is correct
+		// Verify filled is correct.
 		expectedFilled := service.CalculateFilledWidth(100, pct)
 		if filled != expectedFilled {
 			t.Errorf("Percentage %d: filled = %d, expected %d", pct, filled, expectedFilled)

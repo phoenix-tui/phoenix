@@ -1,3 +1,4 @@
+// Package progress provides progress bar and spinner components for TUI applications.
 package progress
 
 import (
@@ -26,7 +27,7 @@ func NewBar(width int) *Bar {
 
 // NewBarWithProgress creates a new progress bar with initial percentage.
 // Returns pointer for initialization, but store as value in Model.
-func NewBarWithProgress(width int, percentage int) *Bar {
+func NewBarWithProgress(width, percentage int) *Bar {
 	return &Bar{
 		domain:  *model.NewBarWithPercentage(width, percentage), // Dereference!
 		service: service.NewRenderService(),
@@ -35,7 +36,7 @@ func NewBarWithProgress(width int, percentage int) *Bar {
 
 // FillChar sets the character used for the filled portion of the bar.
 // Returns new Bar for method chaining (value semantics).
-// IMPORTANT: Must reassign: bar = bar.FillChar('█')
+// IMPORTANT: Must reassign: bar = bar.FillChar('█').
 func (b Bar) FillChar(char rune) Bar {
 	b.domain = b.domain.WithFillChar(char)
 	return b
@@ -43,7 +44,7 @@ func (b Bar) FillChar(char rune) Bar {
 
 // EmptyChar sets the character used for the empty portion of the bar.
 // Returns new Bar for method chaining (value semantics).
-// IMPORTANT: Must reassign: bar = bar.EmptyChar('░')
+// IMPORTANT: Must reassign: bar = bar.EmptyChar('░').
 func (b Bar) EmptyChar(char rune) Bar {
 	b.domain = b.domain.WithEmptyChar(char)
 	return b
@@ -51,7 +52,7 @@ func (b Bar) EmptyChar(char rune) Bar {
 
 // ShowPercent toggles whether to display the percentage text.
 // Returns new Bar for method chaining (value semantics).
-// IMPORTANT: Must reassign: bar = bar.ShowPercent(true)
+// IMPORTANT: Must reassign: bar = bar.ShowPercent(true).
 func (b Bar) ShowPercent(show bool) Bar {
 	b.domain = b.domain.WithShowPercent(show)
 	return b
@@ -59,7 +60,7 @@ func (b Bar) ShowPercent(show bool) Bar {
 
 // Label sets the label text displayed before the bar.
 // Returns new Bar for method chaining (value semantics).
-// IMPORTANT: Must reassign: bar = bar.Label("Loading")
+// IMPORTANT: Must reassign: bar = bar.Label("Loading").
 func (b Bar) Label(label string) Bar {
 	b.domain = b.domain.WithLabel(label)
 	return b
@@ -68,7 +69,7 @@ func (b Bar) Label(label string) Bar {
 // SetProgress sets the progress percentage (0-100).
 // Values are automatically clamped to valid range.
 // Returns new Bar for method chaining (value semantics).
-// IMPORTANT: Must reassign: bar = bar.SetProgress(50)
+// IMPORTANT: Must reassign: bar = bar.SetProgress(50).
 func (b Bar) SetProgress(pct int) Bar {
 	b.domain = b.domain.WithPercentage(pct)
 	return b
@@ -77,7 +78,7 @@ func (b Bar) SetProgress(pct int) Bar {
 // Increment increases the progress by the specified delta.
 // Result is clamped to [0, 100].
 // Returns new Bar for method chaining (value semantics).
-// IMPORTANT: Must reassign: bar = bar.Increment(10)
+// IMPORTANT: Must reassign: bar = bar.Increment(10).
 func (b Bar) Increment(delta int) Bar {
 	b.domain = b.domain.Increment(delta)
 	return b
@@ -86,7 +87,7 @@ func (b Bar) Increment(delta int) Bar {
 // Decrement decreases the progress by the specified delta.
 // Result is clamped to [0, 100].
 // Returns new Bar for method chaining (value semantics).
-// IMPORTANT: Must reassign: bar = bar.Decrement(10)
+// IMPORTANT: Must reassign: bar = bar.Decrement(10).
 func (b Bar) Decrement(delta int) Bar {
 	b.domain = b.domain.Decrement(delta)
 	return b
@@ -110,10 +111,10 @@ func (b Bar) Init() tea.Cmd {
 
 // Update handles messages (implements tea model contract).
 // Progress bars don't respond to standard messages - use SetProgress() instead.
-// IMPORTANT: Must reassign: bar = bar.Update(msg)
-func (b Bar) Update(msg tea.Msg) (Bar, tea.Cmd) {
-	// Progress bars are controlled programmatically, not by messages
-	// Application code should call SetProgress() to update
+// IMPORTANT: Must reassign: bar = bar.Update(msg).
+func (b Bar) Update(_ tea.Msg) (Bar, tea.Cmd) {
+	// Progress bars are controlled programmatically, not by messages.
+	// Application code should call SetProgress() to update.
 	return b, nil
 }
 

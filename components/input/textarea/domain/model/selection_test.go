@@ -202,7 +202,7 @@ func TestSelection_WithCursor(t *testing.T) {
 				t.Errorf("WithCursor().Cursor() = %v, want %v", result.Cursor(), tt.wantCursor)
 			}
 
-			// Verify immutability
+			// Verify immutability.
 			if !sel.Cursor().Equals(tt.initialCursor) {
 				t.Errorf("Original selection cursor was modified: %v, want %v", sel.Cursor(), tt.initialCursor)
 			}
@@ -247,7 +247,7 @@ func TestSelection_Copy(t *testing.T) {
 				return
 			}
 
-			// Verify copy has same values
+			// Verify copy has same values.
 			if !result.Anchor().Equals(tt.sel.Anchor()) {
 				t.Errorf("Copy().Anchor() = %v, want %v", result.Anchor(), tt.sel.Anchor())
 			}
@@ -255,12 +255,12 @@ func TestSelection_Copy(t *testing.T) {
 				t.Errorf("Copy().Cursor() = %v, want %v", result.Cursor(), tt.sel.Cursor())
 			}
 
-			// Verify it's a new instance
+			// Verify it's a new instance.
 			if result == tt.sel {
 				t.Error("Copy() returned same instance, want new instance")
 			}
 
-			// Verify modifying copy doesn't affect original
+			// Verify modifying copy doesn't affect original.
 			newCursor := value.NewPosition(999, 888)
 			newCopy := result.WithCursor(newCursor)
 
@@ -279,11 +279,11 @@ func TestSelection_Immutability(t *testing.T) {
 	cursor := value.NewPosition(3, 8)
 	original := NewSelection(anchor, cursor)
 
-	// Test all mutation operations preserve original
+	// Test all mutation operations preserve original.
 	withNewCursor := original.WithCursor(value.NewPosition(5, 10))
 	copied := original.Copy()
 
-	// Original should remain unchanged
+	// Original should remain unchanged.
 	if !original.Anchor().Equals(anchor) {
 		t.Errorf("Original anchor changed: %v, want %v", original.Anchor(), anchor)
 	}
@@ -291,7 +291,7 @@ func TestSelection_Immutability(t *testing.T) {
 		t.Errorf("Original cursor changed: %v, want %v", original.Cursor(), cursor)
 	}
 
-	// Results should have correct values
+	// Results should have correct values.
 	if !withNewCursor.Cursor().Equals(value.NewPosition(5, 10)) {
 		t.Error("WithCursor() produced incorrect selection")
 	}
@@ -341,12 +341,13 @@ func TestSelection_RangeNormalization(t *testing.T) {
 			sel := NewSelection(tt.anchor, tt.cursor)
 			r := sel.Range()
 
-			// Range should always have start <= end
+			// Range should always have start <= end.
 			if r.Start().IsAfter(r.End()) {
 				t.Errorf("Range not normalized: start=%v > end=%v", r.Start(), r.End())
 			}
 
-			// For forward selections, start should be anchor
+			// For forward selections, start should be anchor.
+			//nolint:nestif // test validation logic requires branching
 			if tt.anchor.IsBefore(tt.cursor) {
 				if !r.Start().Equals(tt.anchor) {
 					t.Errorf("Forward selection: start=%v, want %v (anchor)", r.Start(), tt.anchor)
@@ -355,7 +356,7 @@ func TestSelection_RangeNormalization(t *testing.T) {
 					t.Errorf("Forward selection: end=%v, want %v (cursor)", r.End(), tt.cursor)
 				}
 			} else {
-				// For backward selections, start should be cursor
+				// For backward selections, start should be cursor.
 				if !r.Start().Equals(tt.cursor) {
 					t.Errorf("Backward selection: start=%v, want %v (cursor)", r.Start(), tt.cursor)
 				}

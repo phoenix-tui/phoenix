@@ -100,12 +100,12 @@ func calculateWidth(r rune) int {
 		return 1
 	}
 
-	// Use uniseg for accurate width calculation
+	// Use uniseg for accurate width calculation.
 	s := string(r)
 	state := -1
 	var width int
 
-	for len(s) > 0 {
+	for s != "" {
 		var cluster string
 		cluster, s, _, state = uniseg.FirstGraphemeClusterInString(s, state)
 		width += uniseg.StringWidth(cluster)

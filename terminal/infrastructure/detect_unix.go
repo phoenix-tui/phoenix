@@ -1,5 +1,5 @@
-//go:build !windows
-// +build !windows
+//go:build !windows.
+// +build !windows.
 
 package infrastructure
 
@@ -9,10 +9,10 @@ import (
 )
 
 // newWindowsTerminal is a stub for non-Windows platforms.
-// This function is never called on Unix systems, but needs to exist
+// This function is never called on Unix systems, but needs to exist.
 // for compilation to succeed.
 func newWindowsTerminal() api.Terminal {
-	// This should never be called on non-Windows systems,
+	// This should never be called on non-Windows systems,.
 	// but we return ANSI as a safe fallback.
 	return unix.NewANSI()
 }
@@ -20,6 +20,6 @@ func newWindowsTerminal() api.Terminal {
 // detectWindowsPlatform is a stub for non-Windows platforms.
 // This function is never called on Unix systems.
 func detectWindowsPlatform() api.Platform {
-	// This should never be called on non-Windows systems
+	// This should never be called on non-Windows systems.
 	return api.PlatformUnknown
 }

@@ -1,3 +1,4 @@
+// Package application orchestrates the rendering pipeline for terminal output.
 package application
 
 import (
@@ -11,10 +12,10 @@ import (
 )
 
 // Renderer orchestrates the rendering pipeline.
-// This is the main application service that coordinates:
+// This is the main application service that coordinates:.
 // - Diffing (finding changes)
 // - Optimization (reducing ANSI sequences)
-// - Writing (outputting to terminal)
+// - Writing (outputting to terminal).
 type Renderer struct {
 	diffService     *service.DiffService
 	optimizeService *service.OptimizeService
@@ -42,7 +43,7 @@ func NewRenderer(width, height int, output io.Writer) *Renderer {
 		height:          height,
 	}
 
-	// Initialize buffer pool for zero-allocation
+	// Initialize buffer pool for zero-allocation.
 	r.bufferPool.New = func() interface{} {
 		return model.NewBuffer(width, height)
 	}
@@ -79,7 +80,7 @@ func (r *Renderer) Render(buffer *model.Buffer) error {
 		return nil
 	}
 
-	// Check if dimensions changed
+	// Check if dimensions changed.
 	if buffer.Width() != r.width || buffer.Height() != r.height {
 		return r.renderFullScreen(buffer)
 	}
@@ -87,7 +88,7 @@ func (r *Renderer) Render(buffer *model.Buffer) error {
 	// 1. Compute diff
 	ops := r.diffService.Diff(r.previousBuffer, buffer)
 
-	// Early exit if no changes
+	// Early exit if no changes.
 	if len(ops) == 0 {
 		return nil
 	}
@@ -118,18 +119,20 @@ func (r *Renderer) Render(buffer *model.Buffer) error {
 }
 
 // renderFullScreen renders entire buffer (for resize or large changes).
+//
+//nolint:gocognit // Fullscreen rendering orchestrates multiple operations
 func (r *Renderer) renderFullScreen(buffer *model.Buffer) error {
-	// Clear screen
+	// Clear screen.
 	if err := r.writer.Clear(); err != nil {
 		return err
 	}
 
-	// Move to home
+	// Move to home.
 	if err := r.writer.MoveCursor(0, 0); err != nil {
 		return err
 	}
 
-	// Render all non-empty cells
+	// Render all non-empty cells.
 	for y := 0; y < buffer.Height(); y++ {
 		for x := 0; x < buffer.Width(); x++ {
 			cell := buffer.Get(value.NewPosition(x, y))
@@ -144,12 +147,12 @@ func (r *Renderer) renderFullScreen(buffer *model.Buffer) error {
 		}
 	}
 
-	// Flush
+	// Flush.
 	if err := r.writer.Flush(); err != nil {
 		return err
 	}
 
-	// Update state
+	// Update state.
 	r.width = buffer.Width()
 	r.height = buffer.Height()
 	r.previousBuffer = buffer.Clone()
@@ -158,6 +161,8 @@ func (r *Renderer) renderFullScreen(buffer *model.Buffer) error {
 }
 
 // applyOperations applies diff operations to terminal.
+//
+//nolint:gocognit // Operation application requires sequential checks
 func (r *Renderer) applyOperations(ops []service.DiffOp) error {
 	for _, op := range ops {
 		switch op.Type {
@@ -209,7 +214,7 @@ func (r *Renderer) clearUnlocked() error {
 		return err
 	}
 
-	// Reset buffers
+	// Reset buffers.
 	r.currentBuffer.Clear()
 	r.previousBuffer.Clear()
 
@@ -224,11 +229,11 @@ func (r *Renderer) Resize(width, height int) error {
 	r.width = width
 	r.height = height
 
-	// Recreate buffers
+	// Recreate buffers.
 	r.currentBuffer = model.NewBuffer(width, height)
 	r.previousBuffer = model.NewBuffer(width, height)
 
-	// Update buffer pool
+	// Update buffer pool.
 	r.bufferPool.New = func() interface{} {
 		return model.NewBuffer(width, height)
 	}
@@ -265,7 +270,7 @@ func (r *Renderer) Close() error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	// Show cursor on exit
+	// Show cursor on exit.
 	_ = r.writer.ShowCursor()
 
 	return r.writer.Close()

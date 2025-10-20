@@ -9,31 +9,36 @@ import (
 // This is the aggregate root that coordinates all textarea behavior.
 // All operations return new instances (immutable).
 type TextArea struct {
-	// Buffer state
+	// Buffer state.
 	buffer    *Buffer    // Lines of text
 	cursor    *Cursor    // Current cursor position
 	selection *Selection // Current selection (nil if none)
 	killRing  *KillRing  // Kill ring for Emacs-style cut/paste
 
-	// Display configuration
+	// Display configuration.
 	width  int // Display width (for wrapping)
 	height int // Display height (visible lines)
 
-	// Scrolling state
+	// Scrolling state.
 	scrollRow int // First visible row (for viewport)
 	scrollCol int // First visible column (horizontal scroll)
 
-	// Behavior configuration
+	// Behavior configuration.
 	maxLines    int    // Maximum number of lines (0 = unlimited)
 	maxChars    int    // Maximum total characters (0 = unlimited)
 	placeholder string // Placeholder text
 	wrap        bool   // Word wrap (false = horizontal scroll)
 	readOnly    bool   // Read-only mode
 
-	// Appearance
+	// Appearance.
 	showLineNumbers bool // Show line numbers
 	lineNumberWidth int  // Width of line number column
 	showCursor      bool // Show cursor (true = Phoenix renders █, false = use terminal cursor)
+
+	// Cursor control callbacks (opt-in features)
+	movementValidator  func(from, to CursorPos) bool               // Validates cursor movements (can block)
+	cursorMovedHandler func(from, to CursorPos)                    // Observer fired after successful movement
+	boundaryHitHandler func(attemptedPos CursorPos, reason string) // Feedback when movement blocked
 }
 
 // NewTextArea creates a new TextArea with default settings.
@@ -59,76 +64,80 @@ func NewTextArea() *TextArea {
 
 // WithSize sets display dimensions (returns new instance).
 func (t *TextArea) WithSize(width, height int) *TextArea {
-	copy := t.copy()
-	copy.width = width
-	copy.height = height
-	return copy
+	updated := t.copy()
+	updated.width = width
+	updated.height = height
+	return updated
 }
 
 // WithMaxLines sets maximum line limit (0 = unlimited).
+//
+//nolint:revive,gocritic // parameter name 'max' is clearer than 'maximum' in this domain context
 func (t *TextArea) WithMaxLines(max int) *TextArea {
-	copy := t.copy()
-	copy.maxLines = max
-	return copy
+	updated := t.copy()
+	updated.maxLines = max
+	return updated
 }
 
 // WithMaxChars sets maximum character limit (0 = unlimited).
+//
+//nolint:revive,gocritic // parameter name 'max' is clearer than 'maximum' in this domain context
 func (t *TextArea) WithMaxChars(max int) *TextArea {
-	copy := t.copy()
-	copy.maxChars = max
-	return copy
+	updated := t.copy()
+	updated.maxChars = max
+	return updated
 }
 
 // WithWrap enables/disables word wrap.
 func (t *TextArea) WithWrap(wrap bool) *TextArea {
-	copy := t.copy()
-	copy.wrap = wrap
-	return copy
+	updated := t.copy()
+	updated.wrap = wrap
+	return updated
 }
 
 // WithPlaceholder sets placeholder text.
 func (t *TextArea) WithPlaceholder(text string) *TextArea {
-	copy := t.copy()
-	copy.placeholder = text
-	return copy
+	updated := t.copy()
+	updated.placeholder = text
+	return updated
 }
 
 // WithReadOnly enables/disables read-only mode.
 func (t *TextArea) WithReadOnly(readOnly bool) *TextArea {
-	copy := t.copy()
-	copy.readOnly = readOnly
-	return copy
+	updated := t.copy()
+	updated.readOnly = readOnly
+	return updated
 }
 
 // WithLineNumbers enables/disables line numbers.
 func (t *TextArea) WithLineNumbers(show bool) *TextArea {
-	copy := t.copy()
-	copy.showLineNumbers = show
+	updated := t.copy()
+	updated.showLineNumbers = show
 	if show {
-		copy.lineNumberWidth = len(fmt.Sprintf("%d", t.buffer.LineCount()))
+		updated.lineNumberWidth = len(fmt.Sprintf("%d", t.buffer.LineCount()))
 	} else {
-		copy.lineNumberWidth = 0
+		updated.lineNumberWidth = 0
 	}
-	return copy
+	return updated
 }
 
 // WithShowCursor enables/disables Phoenix cursor rendering.
 // true: Phoenix renders █ cursor (default)
-// false: Use terminal cursor (ANSI positioning) - for shell applications
+// false: Use terminal cursor (ANSI positioning) - for shell applications.
 func (t *TextArea) WithShowCursor(show bool) *TextArea {
-	copy := t.copy()
-	copy.showCursor = show
-	return copy
+	updated := t.copy()
+	updated.showCursor = show
+	return updated
 }
 
 // WithBuffer replaces buffer (returns new instance).
 func (t *TextArea) WithBuffer(buffer *Buffer) *TextArea {
-	copy := t.copy()
-	copy.buffer = buffer
-	// Reset cursor to start
-	copy.cursor = NewCursor(0, 0)
-	copy.selection = nil
-	return copy
+	updated := t.copy()
+	updated.buffer = buffer
+	// Reset cursor to start.
+	updated.cursor = NewCursor(0, 0)
+	updated.selection = nil
+	return updated
 }
 
 // WithCursor sets cursor position (returns new instance).
@@ -171,7 +180,7 @@ func (t *TextArea) ContentParts() (before, at, after string) {
 	col := t.cursor.Col()
 
 	if col >= len(runes) {
-		// Cursor at end of line
+		// Cursor at end of line.
 		return line, " ", ""
 	}
 
@@ -260,9 +269,40 @@ func (t *TextArea) MoveCursorToEnd() *TextArea {
 	lastLine := t.buffer.Line(lastRow)
 	lastCol := len([]rune(lastLine))
 
-	copy := t.copy()
-	copy.cursor = NewCursor(lastRow, lastCol)
-	return copy
+	updated := t.copy()
+	updated.cursor = NewCursor(lastRow, lastCol)
+	return updated
+}
+
+// SetCursorPosition sets cursor to specific position with bounds checking.
+// Position is clamped to valid range (0 to buffer bounds).
+// Returns new instance (immutable).
+func (t *TextArea) SetCursorPosition(row, col int) *TextArea {
+	// Clamp row to valid range.
+	maxRow := t.buffer.LineCount() - 1
+	if maxRow < 0 {
+		maxRow = 0
+	}
+	if row < 0 {
+		row = 0
+	}
+	if row > maxRow {
+		row = maxRow
+	}
+
+	// Clamp col to valid range for this row.
+	line := t.buffer.Line(row)
+	maxCol := len([]rune(line))
+	if col < 0 {
+		col = 0
+	}
+	if col > maxCol {
+		col = maxCol
+	}
+
+	updated := t.copy()
+	updated.cursor = NewCursor(row, col)
+	return updated
 }
 
 // Public Methods for Services (used by domain services)
@@ -287,35 +327,68 @@ func (t *TextArea) WithKillRing(killRing *KillRing) *TextArea {
 	return t.withKillRing(killRing)
 }
 
+// Cursor Control Callback Getters (for domain services)
+
+// GetMovementValidator returns movement validator callback (nil if not set).
+func (t *TextArea) GetMovementValidator() func(from, to CursorPos) bool {
+	return t.movementValidator
+}
+
+// GetCursorMovedHandler returns cursor moved callback (nil if not set).
+func (t *TextArea) GetCursorMovedHandler() func(from, to CursorPos) {
+	return t.cursorMovedHandler
+}
+
+// GetBoundaryHitHandler returns boundary hit callback (nil if not set).
+func (t *TextArea) GetBoundaryHitHandler() func(attemptedPos CursorPos, reason string) {
+	return t.boundaryHitHandler
+}
+
+// Cursor Control Callback Setters (public, used by API layer)
+
+// WithMovementValidator sets movement validator callback.
+func (t *TextArea) WithMovementValidator(validator func(from, to CursorPos) bool) *TextArea {
+	updated := t.copy()
+	updated.movementValidator = validator
+	return updated
+}
+
+// WithCursorMovedHandler sets cursor moved callback.
+func (t *TextArea) WithCursorMovedHandler(handler func(from, to CursorPos)) *TextArea {
+	updated := t.copy()
+	updated.cursorMovedHandler = handler
+	return updated
+}
+
+// WithBoundaryHitHandler sets boundary hit callback.
+func (t *TextArea) WithBoundaryHitHandler(handler func(attemptedPos CursorPos, reason string)) *TextArea {
+	updated := t.copy()
+	updated.boundaryHitHandler = handler
+	return updated
+}
+
 // Internal Methods (package-private)
 
 // withCursor returns new TextArea with updated cursor.
 func (t *TextArea) withCursor(cursor *Cursor) *TextArea {
-	copy := t.copy()
-	copy.cursor = cursor
-	copy.ensureCursorVisible()
-	return copy
-}
-
-// withBuffer returns new TextArea with updated buffer.
-func (t *TextArea) withBuffer(buffer *Buffer) *TextArea {
-	copy := t.copy()
-	copy.buffer = buffer
-	return copy
+	updated := t.copy()
+	updated.cursor = cursor
+	updated.ensureCursorVisible()
+	return updated
 }
 
 // withKillRing returns new TextArea with updated kill ring.
 func (t *TextArea) withKillRing(killRing *KillRing) *TextArea {
-	copy := t.copy()
-	copy.killRing = killRing
-	return copy
+	updated := t.copy()
+	updated.killRing = killRing
+	return updated
 }
 
 // ensureCursorVisible adjusts scroll to keep cursor visible.
 func (t *TextArea) ensureCursorVisible() {
 	row := t.cursor.Row()
 
-	// Vertical scrolling
+	// Vertical scrolling.
 	if row < t.scrollRow {
 		t.scrollRow = row
 	}
@@ -338,21 +411,24 @@ func (t *TextArea) ensureCursorVisible() {
 // Private helper: deep copy all fields.
 func (t *TextArea) copy() *TextArea {
 	return &TextArea{
-		buffer:          t.buffer.Copy(),
-		cursor:          t.cursor.Copy(),
-		selection:       t.selection.Copy(), // nil-safe
-		killRing:        t.killRing.Copy(),
-		width:           t.width,
-		height:          t.height,
-		scrollRow:       t.scrollRow,
-		scrollCol:       t.scrollCol,
-		maxLines:        t.maxLines,
-		maxChars:        t.maxChars,
-		placeholder:     t.placeholder,
-		wrap:            t.wrap,
-		readOnly:        t.readOnly,
-		showLineNumbers: t.showLineNumbers,
-		lineNumberWidth: t.lineNumberWidth,
-		showCursor:      t.showCursor,
+		buffer:             t.buffer.Copy(),
+		cursor:             t.cursor.Copy(),
+		selection:          t.selection.Copy(), // nil-safe
+		killRing:           t.killRing.Copy(),
+		width:              t.width,
+		height:             t.height,
+		scrollRow:          t.scrollRow,
+		scrollCol:          t.scrollCol,
+		maxLines:           t.maxLines,
+		maxChars:           t.maxChars,
+		placeholder:        t.placeholder,
+		wrap:               t.wrap,
+		readOnly:           t.readOnly,
+		showLineNumbers:    t.showLineNumbers,
+		lineNumberWidth:    t.lineNumberWidth,
+		showCursor:         t.showCursor,
+		movementValidator:  t.movementValidator,
+		cursorMovedHandler: t.cursorMovedHandler,
+		boundaryHitHandler: t.boundaryHitHandler,
 	}
 }

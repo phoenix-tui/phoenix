@@ -618,7 +618,7 @@ func TestEditingService_ReadOnlyMode(t *testing.T) {
 
 	originalText := ta.Value()
 
-	// Try all editing operations - none should modify text
+	// Try all editing operations - none should modify text.
 	tests := []struct {
 		name string
 		op   func(*model.TextArea) *model.TextArea
@@ -651,7 +651,7 @@ func TestEditingService_Immutability(t *testing.T) {
 	originalText := original.Value()
 	originalRow, originalCol := original.CursorPosition()
 
-	// Apply all editing operations
+	// Apply all editing operations.
 	_ = svc.InsertChar(original, 'X')
 	_ = svc.DeleteCharBackward(original)
 	_ = svc.DeleteCharForward(original)
@@ -660,7 +660,7 @@ func TestEditingService_Immutability(t *testing.T) {
 	_ = svc.KillWord(original)
 	_ = svc.Yank(original)
 
-	// Original should remain unchanged
+	// Original should remain unchanged.
 	if original.Value() != originalText {
 		t.Errorf("Original text changed: %q, want %q", original.Value(), originalText)
 	}
@@ -677,7 +677,7 @@ func TestEditingService_ComplexScenarios(t *testing.T) {
 	t.Run("type and delete sequence", func(t *testing.T) {
 		ta := model.NewTextArea()
 
-		// Type "hello"
+		// Type "hello".
 		for _, ch := range "hello" {
 			ta = svc.InsertChar(ta, ch)
 		}
@@ -685,7 +685,7 @@ func TestEditingService_ComplexScenarios(t *testing.T) {
 			t.Errorf("After typing: %q, want %q", ta.Value(), "hello")
 		}
 
-		// Delete 2 chars
+		// Delete 2 chars.
 		ta = svc.DeleteCharBackward(ta)
 		ta = svc.DeleteCharBackward(ta)
 		if ta.Value() != "hel" {
@@ -698,13 +698,13 @@ func TestEditingService_ComplexScenarios(t *testing.T) {
 			WithBuffer(model.NewBufferFromString("hello world")).
 			WithCursor(model.NewCursor(0, 6))
 
-		// Kill "world"
+		// Kill "world".
 		ta = svc.KillLine(ta)
 		if ta.Value() != "hello " {
 			t.Errorf("After kill: %q, want %q", ta.Value(), "hello ")
 		}
 
-		// Move cursor and yank
+		// Move cursor and yank.
 		ta = ta.WithCursor(model.NewCursor(0, 0))
 		ta = svc.Yank(ta)
 		if ta.Value() != "worldhello " {
@@ -717,9 +717,9 @@ func TestEditingService_ComplexScenarios(t *testing.T) {
 			WithBuffer(model.NewBufferFromString("line1")).
 			WithCursor(model.NewCursor(0, 5))
 
-		// Insert newline
+		// Insert newline.
 		ta = svc.InsertNewline(ta)
-		// Type "line2"
+		// Type "line2".
 		for _, ch := range "line2" {
 			ta = svc.InsertChar(ta, ch)
 		}
@@ -760,7 +760,7 @@ func TestEditingService_EdgeCases(t *testing.T) {
 	})
 
 	t.Run("delete operations at boundaries", func(t *testing.T) {
-		// Delete backward at start
+		// Delete backward at start.
 		ta1 := model.NewTextArea().
 			WithBuffer(model.NewBufferFromString("hello")).
 			WithCursor(model.NewCursor(0, 0))
@@ -769,7 +769,7 @@ func TestEditingService_EdgeCases(t *testing.T) {
 			t.Error("DeleteBackward at start should not change text")
 		}
 
-		// Delete forward at end
+		// Delete forward at end.
 		ta2 := model.NewTextArea().
 			WithBuffer(model.NewBufferFromString("hello")).
 			WithCursor(model.NewCursor(0, 5))

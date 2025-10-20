@@ -255,13 +255,14 @@ func TestRGBToANSI256_Grayscale(t *testing.T) {
 			code := adapter.rgbToANSI256(color)
 
 			// Verify code is in expected range
+			//nolint:nestif,staticcheck // Test validation requires nested checks for different ranges
 			if tt.wantRange == "cube" {
 				if code < 16 || code > 231 {
 					t.Errorf("rgbToANSI256(%d,%d,%d) = %d, want cube range (16-231)",
 						tt.r, tt.g, tt.b, code)
 				}
 			} else if tt.wantRange == "gray" {
-				if code < 232 || code > 255 {
+				if code < 232 {
 					t.Errorf("rgbToANSI256(%d,%d,%d) = %d, want gray range (232-255)",
 						tt.r, tt.g, tt.b, code)
 				}

@@ -10,7 +10,7 @@ import (
 	tea "github.com/phoenix-tui/phoenix/tea/api"
 )
 
-// Person represents a person with name and age
+// Person represents a person with name and age.
 type Person struct {
 	Name string
 	Age  int
@@ -18,7 +18,7 @@ type Person struct {
 }
 
 func main() {
-	// Create a list of people with custom rendering
+	// Create a list of people with custom rendering.
 	people := []interface{}{
 		Person{Name: "Alice", Age: 30, City: "New York"},
 		Person{Name: "Bob", Age: 25, City: "San Francisco"},
@@ -33,7 +33,7 @@ func main() {
 		ItemRenderer(func(item interface{}, index int, selected, focused bool) string {
 			p := item.(Person)
 
-			// Custom rendering with colors and formatting
+			// Custom rendering with colors and formatting.
 			prefix := "  "
 			if selected {
 				prefix = "✓ "
@@ -55,7 +55,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Show selected person
+	// Show selected person.
 	selected := l.SelectedItems()
 	if len(selected) > 0 {
 		person := selected[0].(Person)

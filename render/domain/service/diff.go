@@ -1,3 +1,4 @@
+// Package service provides domain services for rendering optimization.
 package service
 
 import (
@@ -39,21 +40,21 @@ func (s *DiffService) Diff(oldBuf, newBuf *model.Buffer) []DiffOp {
 		return nil
 	}
 
-	// Buffers must have same dimensions
+	// Buffers must have same dimensions.
 	if oldBuf.Width() != newBuf.Width() || oldBuf.Height() != newBuf.Height() {
 		return s.diffFullBuffer(newBuf)
 	}
 
 	var ops []DiffOp
 
-	// Compare cell by cell
+	// Compare cell by cell.
 	for y := 0; y < newBuf.Height(); y++ {
 		for x := 0; x < newBuf.Width(); x++ {
 			pos := value.NewPosition(x, y)
 			oldCell := oldBuf.Get(pos)
 			newCell := newBuf.Get(pos)
 
-			// Only emit operation if cells differ
+			// Only emit operation if cells differ.
 			if !oldCell.Equals(newCell) {
 				ops = append(ops, DiffOp{
 					Type:     OpTypeSet,
@@ -76,7 +77,7 @@ func (s *DiffService) diffFullBuffer(buf *model.Buffer) []DiffOp {
 			pos := value.NewPosition(x, y)
 			cell := buf.Get(pos)
 
-			// Skip empty cells to optimize
+			// Skip empty cells to optimize.
 			if !cell.IsEmpty() {
 				ops = append(ops, DiffOp{
 					Type:     OpTypeSet,
@@ -99,8 +100,8 @@ func (s *DiffService) Optimize(ops []DiffOp) []DiffOp {
 
 	optimized := make([]DiffOp, 0, len(ops))
 
-	// For now, pass through (optimization will be added incrementally)
-	// Future optimizations:
+	// For now, pass through (optimization will be added incrementally).
+	// Future optimizations:.
 	// 1. Merge adjacent cells with same style
 	// 2. Detect clear regions (multiple empty cells)
 	// 3. Optimize cursor movements (relative vs absolute)

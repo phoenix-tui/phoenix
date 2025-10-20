@@ -126,12 +126,12 @@ func TestSelection_Clamp(t *testing.T) {
 			s := NewSelection(tt.start, tt.end)
 			result := s.Clamp(tt.maxOffset)
 
-			// Check immutability
+			// Check immutability.
 			if s.Start() != tt.start || s.End() != tt.end {
 				t.Errorf("original selection modified")
 			}
 
-			// Check result
+			// Check result.
 			if result.Start() != tt.wantStart {
 				t.Errorf("Clamp(%d).Start() = %d, want %d", tt.maxOffset, result.Start(), tt.wantStart)
 			}
@@ -146,7 +146,7 @@ func TestSelection_Clone(t *testing.T) {
 	original := NewSelection(5, 10)
 	clone := original.Clone()
 
-	// Check values match
+	// Check values match.
 	if clone.Start() != original.Start() {
 		t.Errorf("Clone().Start() = %d, want %d", clone.Start(), original.Start())
 	}
@@ -154,12 +154,12 @@ func TestSelection_Clone(t *testing.T) {
 		t.Errorf("Clone().End() = %d, want %d", clone.End(), original.End())
 	}
 
-	// Check they're different instances
+	// Check they're different instances.
 	if clone == original {
 		t.Error("Clone() returned same instance, want different instance")
 	}
 
-	// Modify clone and verify original unchanged
+	// Modify clone and verify original unchanged.
 	clone.start = 20
 	clone.end = 30
 	if original.Start() != 5 || original.End() != 10 {

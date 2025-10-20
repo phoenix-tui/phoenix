@@ -7,7 +7,7 @@ import (
 	"github.com/phoenix-tui/phoenix/clipboard/domain/model"
 )
 
-// MockProvider is a mock implementation of Provider for testing
+// MockProvider is a mock implementation of Provider for testing.
 type MockProvider struct {
 	name      string
 	available bool
@@ -444,7 +444,7 @@ func TestClipboardService_WriteText_ErrorHandling(t *testing.T) {
 			provider: &MockProvider{
 				name:      "mock",
 				available: true,
-				writeFunc: func(content *model.ClipboardContent) error {
+				writeFunc: func(_ *model.ClipboardContent) error {
 					return nil
 				},
 			},
@@ -456,7 +456,7 @@ func TestClipboardService_WriteText_ErrorHandling(t *testing.T) {
 			provider: &MockProvider{
 				name:      "mock",
 				available: true,
-				writeFunc: func(content *model.ClipboardContent) error {
+				writeFunc: func(_ *model.ClipboardContent) error {
 					return fmt.Errorf("write failed")
 				},
 			},

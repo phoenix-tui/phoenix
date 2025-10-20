@@ -49,7 +49,7 @@ func TestPercentageAdd(t *testing.T) {
 			if result.Value() != tt.expected {
 				t.Errorf("Add(%d, %d) = %d, expected %d", tt.initial, tt.delta, result.Value(), tt.expected)
 			}
-			// Verify immutability
+			// Verify immutability.
 			if p.Value() != tt.initial {
 				t.Errorf("Add() mutated original: %d != %d", p.Value(), tt.initial)
 			}
@@ -79,7 +79,7 @@ func TestPercentageSubtract(t *testing.T) {
 			if result.Value() != tt.expected {
 				t.Errorf("Subtract(%d, %d) = %d, expected %d", tt.initial, tt.delta, result.Value(), tt.expected)
 			}
-			// Verify immutability
+			// Verify immutability.
 			if p.Value() != tt.initial {
 				t.Errorf("Subtract() mutated original: %d != %d", p.Value(), tt.initial)
 			}

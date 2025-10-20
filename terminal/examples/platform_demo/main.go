@@ -1,3 +1,4 @@
+// Package main demonstrates terminal platform capabilities and performance.
 package main
 
 import (
@@ -14,15 +15,15 @@ func main() {
 	fmt.Println("================================")
 	fmt.Println()
 
-	// Auto-detect platform
+	// Auto-detect platform.
 	platform := infrastructure.DetectPlatform()
 	fmt.Printf("Detected Platform: %s\n", platform)
 	fmt.Println()
 
-	// Create terminal with auto-detection
+	// Create terminal with auto-detection.
 	term := infrastructure.NewTerminal()
 
-	// Display capabilities
+	// Display capabilities.
 	fmt.Println("Terminal Capabilities:")
 	fmt.Printf("  Direct Positioning:  %v\n", term.SupportsDirectPositioning())
 	fmt.Printf("  Cursor Readback:     %v\n", term.SupportsReadback())
@@ -30,7 +31,7 @@ func main() {
 	fmt.Printf("  Color Depth:         %d colors\n", term.ColorDepth())
 	fmt.Println()
 
-	// Get terminal size
+	// Get terminal size.
 	width, height, err := term.Size()
 	if err != nil {
 		fmt.Printf("  Size:                Error: %v\n", err)
@@ -39,28 +40,29 @@ func main() {
 	}
 	fmt.Println()
 
-	// Wait for user to read capabilities
+	// Wait for user to read capabilities.
 	fmt.Println("Press Enter to run performance demo...")
 	fmt.Scanln()
 
-	// Run performance demonstration
+	// Run performance demonstration.
 	runPerformanceDemo(term, platform)
 
-	// Wait before cleanup
+	// Wait before cleanup.
 	fmt.Println("\nPress Enter to exit...")
 	fmt.Scanln()
 }
 
+//nolint:gocognit,cyclop // Demo function with multiple test scenarios
 func runPerformanceDemo(term api.Terminal, platform api.Platform) {
 	fmt.Println("\n" + strings.Repeat("=", 60))
 	fmt.Println("Performance Demonstration")
 	fmt.Println(strings.Repeat("=", 60))
 
-	// Save cursor position before demo
+	// Save cursor position before demo.
 	term.SaveCursorPosition()
 	defer term.RestoreCursorPosition()
 
-	// Demo 1: Cursor Positioning
+	// Demo 1: Cursor Positioning.
 	fmt.Println("\n1. Cursor Positioning Speed")
 	fmt.Println("   Moving cursor to 100 different positions...")
 	start := time.Now()
@@ -72,8 +74,8 @@ func runPerformanceDemo(term api.Terminal, platform api.Platform) {
 	duration := time.Since(start)
 	fmt.Printf("   Completed in: %v (avg: %v per operation)\n", duration, duration/100)
 
-	// Demo 2: Cursor Readback (if supported)
-	if term.SupportsReadback() {
+	// Demo 2: Cursor Readback (if supported).
+	if term.SupportsReadback() { //nolint:nestif // Demo code with conditional feature testing
 		fmt.Println("\n2. Cursor Position Readback (Windows Console API only)")
 		term.SetCursorPosition(25, 10)
 		start = time.Now()
@@ -88,11 +90,11 @@ func runPerformanceDemo(term api.Terminal, platform api.Platform) {
 		fmt.Println("\n2. Cursor Readback: Not supported (ANSI limitation)")
 	}
 
-	// Demo 3: Multiline Clearing (CRITICAL for GoSh)
+	// Demo 3: Multiline Clearing (CRITICAL for GoSh).
 	fmt.Println("\n3. Multiline Clearing Speed (Critical for GoSh)")
 	fmt.Println("   Clearing 10 lines, repeated 100 times...")
 
-	// Set up test position
+	// Set up test position.
 	term.SetCursorPosition(0, 15)
 
 	start = time.Now()
@@ -109,8 +111,8 @@ func runPerformanceDemo(term api.Terminal, platform api.Platform) {
 		fmt.Println("   ℹ Using ANSI escape codes (universal compatibility)")
 	}
 
-	// Demo 4: Screen Buffer Readback (if supported)
-	if term.SupportsReadback() {
+	// Demo 4: Screen Buffer Readback (if supported).
+	if term.SupportsReadback() { //nolint:nestif // Demo code with conditional feature testing
 		fmt.Println("\n4. Screen Buffer Readback (Windows Console API only)")
 		start = time.Now()
 		buffer, err := term.ReadScreenBuffer()
@@ -126,7 +128,7 @@ func runPerformanceDemo(term api.Terminal, platform api.Platform) {
 		fmt.Println("   ℹ Differential rendering not available on this platform")
 	}
 
-	// Demo 5: Cursor Visibility
+	// Demo 5: Cursor Visibility.
 	fmt.Println("\n5. Cursor Visibility Control")
 	term.SetCursorPosition(0, 20)
 	term.Write("Hiding cursor...")
@@ -139,7 +141,7 @@ func runPerformanceDemo(term api.Terminal, platform api.Platform) {
 	time.Sleep(1 * time.Second)
 	fmt.Println(" Done!")
 
-	// Demo 6: Text Output Performance
+	// Demo 6: Text Output Performance.
 	fmt.Println("\n6. Text Output Speed")
 	text := "Phoenix Terminal Framework - Next-generation TUI for Go!"
 	fmt.Println("   Writing text 1000 times...")
@@ -153,11 +155,11 @@ func runPerformanceDemo(term api.Terminal, platform api.Platform) {
 	duration = time.Since(start)
 	fmt.Printf("   Completed in: %v (avg: %v per write)\n", duration, duration/1000)
 
-	// Final cleanup
+	// Final cleanup.
 	term.SetCursorPosition(0, 23)
 	term.ClearFromCursor()
 
-	// Performance summary
+	// Performance summary.
 	fmt.Println("\n" + strings.Repeat("=", 60))
 	fmt.Println("Platform Summary")
 	fmt.Println(strings.Repeat("=", 60))

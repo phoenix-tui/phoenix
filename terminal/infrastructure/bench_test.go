@@ -1,7 +1,6 @@
 package infrastructure
 
 import (
-	"runtime"
 	"testing"
 
 	"github.com/phoenix-tui/phoenix/terminal/infrastructure/unix"
@@ -83,26 +82,19 @@ func BenchmarkANSI_SaveRestoreCursorPosition(b *testing.B) {
 	}
 }
 
-// Windows-specific benchmarks (only run on Windows)
-
-// skipIfNotWindows skips the benchmark if not running on Windows.
-func skipIfNotWindows(b *testing.B) {
-	if runtime.GOOS != "windows" {
-		b.Skip("Windows-specific benchmark (requires Windows platform)")
-	}
-}
+// Windows-specific benchmarks (only run on Windows).
 
 // The following benchmarks are implemented but will only run on Windows builds.
 // On Unix systems, they'll be skipped with a clear message.
 //
-// To compare performance on Windows:
-//   go test -bench=. -benchmem ./infrastructure
+// To compare performance on Windows:.
+//   go test -bench=. -benchmem ./infrastructure.
 //
-// Expected results (Windows Console API vs ANSI):
-//   - SetCursorPosition: 10x faster
-//   - ClearLines: 10x faster
-//   - GetCursorPosition: Only Windows supports this (ANSI fails)
-//   - ReadScreenBuffer: Only Windows supports this (ANSI fails)
+// Expected results (Windows Console API vs ANSI):.
+//   - SetCursorPosition: 10x faster.
+//   - ClearLines: 10x faster.
+//   - GetCursorPosition: Only Windows supports this (ANSI fails).
+//   - ReadScreenBuffer: Only Windows supports this (ANSI fails).
 
 // Note: These benchmarks require the windows package to be built.
 // They are implemented in bench_windows_test.go with build tags.

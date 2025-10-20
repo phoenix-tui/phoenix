@@ -151,8 +151,10 @@ func (s Style) WithStrike(strike bool) Style {
 }
 
 // Equals checks if two styles are equal.
+//
+//nolint:gocyclo,cyclop // Style equality requires checking all fields
 func (s Style) Equals(other Style) bool {
-	// Compare colors
+	// Compare colors.
 	if (s.fg == nil) != (other.fg == nil) {
 		return false
 	}
@@ -167,7 +169,7 @@ func (s Style) Equals(other Style) bool {
 		return false
 	}
 
-	// Compare attributes
+	// Compare attributes.
 	return s.bold == other.bold &&
 		s.italic == other.italic &&
 		s.underline == other.underline &&
@@ -194,19 +196,19 @@ func (s Style) ToANSI() string {
 
 	var codes []string
 
-	// Foreground color
+	// Foreground color.
 	if s.fg != nil {
 		r, g, b := s.fg.RGB()
 		codes = append(codes, fmt.Sprintf("38;2;%d;%d;%d", r, g, b))
 	}
 
-	// Background color
+	// Background color.
 	if s.bg != nil {
 		r, g, b := s.bg.RGB()
 		codes = append(codes, fmt.Sprintf("48;2;%d;%d;%d", r, g, b))
 	}
 
-	// Attributes
+	// Attributes.
 	if s.bold {
 		codes = append(codes, "1")
 	}

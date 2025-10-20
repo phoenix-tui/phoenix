@@ -1,12 +1,12 @@
 // Package main demonstrates a help screen modal.
 //
 // This example shows:
-//   - Modal with multi-line content
-//   - Larger modal size for documentation
+//   - Modal with multi-line content.
+//   - Larger modal size for documentation.
 //   - No buttons (Esc to close)
-//   - Typical help screen use case
+//   - Typical help screen use case.
 //
-// Run: go run main.go
+// Run: go run main.go.
 package main
 
 import (
@@ -31,25 +31,25 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
-		// Check for quit keys when modal is not visible
+		// Check for quit keys when modal is not visible.
 		if !m.modal.IsVisible() && (msg.String() == "q" || msg.String() == "ctrl+c") {
 			return m, tea.Quit()
 		}
 
-		// Show help modal on '?' or 'h'
+		// Show help modal on '?' or 'h'.
 		if !m.modal.IsVisible() && (msg.String() == "?" || msg.String() == "h") {
 			m.modal = m.modal.Show()
 			return m, nil
 		}
 
 	case tea.WindowSizeMsg:
-		// Pass window size to modal
+		// Pass window size to modal.
 		updatedModal, cmd := m.modal.Update(msg)
 		m.modal = updatedModal
 		return m, cmd
 	}
 
-	// Forward all messages to modal when visible
+	// Forward all messages to modal when visible.
 	if m.modal.IsVisible() {
 		updatedModal, cmd := m.modal.Update(msg)
 		m.modal = updatedModal
@@ -72,7 +72,7 @@ Press Q or Ctrl+C to quit`
 }
 
 func main() {
-	// Help text content
+	// Help text content.
 	helpText := `Keyboard Shortcuts:
 
 Navigation:
@@ -95,15 +95,15 @@ Search:
 
 Press Esc to close this help screen.`
 
-	// Create help modal
+	// Create help modal.
 	m := modal.NewWithTitle("Help", helpText).
 		Size(60, 20).
 		DimBackground(true)
 
-	// Create program
+	// Create program.
 	p := tea.New(Model{modal: m}, tea.WithAltScreen[Model]())
 
-	// Run
+	// Run.
 	if err := p.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)

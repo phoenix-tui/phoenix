@@ -13,7 +13,7 @@ func TestDefaultKeyBindings(t *testing.T) {
 		t.Error("DefaultKeyBindings() should return non-empty bindings")
 	}
 
-	// Check that essential bindings exist
+	// Check that essential bindings exist.
 	essentialActions := map[string]bool{
 		"move_up":          false,
 		"move_down":        false,
@@ -116,7 +116,7 @@ func TestDefaultKeyBindingMap(t *testing.T) {
 		t.Error("DefaultKeyBindingMap() should return non-empty map")
 	}
 
-	// Test some standard key mappings
+	// Test some standard key mappings.
 	tests := []struct {
 		key    string
 		action string
@@ -138,7 +138,7 @@ func TestDefaultKeyBindingMap(t *testing.T) {
 func TestKeyBindingMap_GetAction_IntegrationWithDefaultBindings(t *testing.T) {
 	m := DefaultKeyBindingMap()
 
-	// Test common navigation keys
+	// Test common navigation keys.
 	upKey := tea.KeyMsg{Type: tea.KeyUp}
 	if action := m.GetAction(upKey); action != "move_up" {
 		t.Errorf("GetAction(up) = %s, want move_up", action)
@@ -149,7 +149,7 @@ func TestKeyBindingMap_GetAction_IntegrationWithDefaultBindings(t *testing.T) {
 		t.Errorf("GetAction(down) = %s, want move_down", action)
 	}
 
-	// Test vim keys
+	// Test vim keys.
 	jKey := tea.KeyMsg{Type: tea.KeyRune, Rune: 'j'}
 	if action := m.GetAction(jKey); action != "move_down" {
 		t.Errorf("GetAction(j) = %s, want move_down", action)
@@ -171,7 +171,7 @@ func TestKeyBindingMap_GetAction_EmptyMap(t *testing.T) {
 }
 
 func TestKeyBinding_Duplicates(t *testing.T) {
-	// Test that duplicate keys (last one wins) work as expected
+	// Test that duplicate keys (last one wins) work as expected.
 	bindings := []KeyBinding{
 		{Key: "k", Action: "move_up"},
 		{Key: "k", Action: "kill"}, // Duplicate - should overwrite

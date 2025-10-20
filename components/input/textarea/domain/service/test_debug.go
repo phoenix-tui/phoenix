@@ -6,7 +6,9 @@ import (
 	"testing"
 )
 
-func TestDebugInsertNewline(t *testing.T) {
+// TestDebugInsertNewline is a debug helper for testing newline insertion manually.
+// This is not a regular unit test but a debugging utility.
+func TestDebugInsertNewline(_ *testing.T) {
 	svc := NewEditingService()
 
 	ta := model.NewTextArea().

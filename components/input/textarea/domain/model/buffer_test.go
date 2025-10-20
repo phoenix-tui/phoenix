@@ -122,7 +122,7 @@ func TestBuffer_InsertChar(t *testing.T) {
 				t.Errorf("InsertChar() = %q, want %q", result.String(), tt.expected)
 			}
 
-			// Check immutability
+			// Check immutability.
 			if buf.String() != tt.initial {
 				t.Errorf("Original buffer was modified: %q, want %q", buf.String(), tt.initial)
 			}
@@ -232,7 +232,7 @@ func TestBuffer_Immutability(t *testing.T) {
 	buf := NewBufferFromString("hello")
 	result := buf.InsertChar(0, 0, 'X')
 
-	// Original should be unchanged
+	// Original should be unchanged.
 	if buf.String() != "hello" {
 		t.Errorf("Original buffer was modified: %q, want %q", buf.String(), "hello")
 	}
@@ -298,7 +298,7 @@ func TestBuffer_DeleteToLineEnd(t *testing.T) {
 				t.Errorf("DeleteToLineEnd() killed = %q, want %q", killed, tt.wantKill)
 			}
 
-			// Check immutability
+			// Check immutability.
 			if buf.String() != tt.initial {
 				t.Errorf("Original buffer modified")
 			}
@@ -353,7 +353,7 @@ func TestBuffer_SetLine(t *testing.T) {
 				t.Errorf("SetLine() = %q, want %q", result.String(), tt.want)
 			}
 
-			// Check immutability
+			// Check immutability.
 			if buf.String() != tt.initial {
 				t.Errorf("Original buffer modified")
 			}
@@ -403,7 +403,7 @@ func TestBuffer_JoinWithNextLine(t *testing.T) {
 				t.Errorf("JoinWithNextLine() = %q, want %q", result.String(), tt.want)
 			}
 
-			// Check immutability
+			// Check immutability.
 			if buf.String() != tt.initial {
 				t.Errorf("Original buffer modified")
 			}
@@ -471,7 +471,7 @@ func TestBuffer_TextInRange(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			buf := NewBufferFromString(tt.initial)
-			// Create range using value package
+			// Create range using value package.
 			r := value.NewRange(
 				value.NewPosition(tt.startRow, tt.startCol),
 				value.NewPosition(tt.endRow, tt.endCol),
