@@ -115,6 +115,8 @@ func (f *FlexboxLayoutService) measureItems(container *model.FlexContainer) []va
 
 // calculateMainAxisPositions calculates positions along the main axis (row/column direction).
 // This implements justify-content (start, end, center, space-between).
+//
+//nolint:funlen // Flexbox positioning logic requires sequential calculations
 func (f *FlexboxLayoutService) calculateMainAxisPositions(
 	container *model.FlexContainer,
 	itemSizes []value.Size,
@@ -197,6 +199,7 @@ func (f *FlexboxLayoutService) calculateMainAxisPositions(
 
 	case value.JustifyContentSpaceBetween:
 		// Equal spacing between items
+		//nolint:nestif // Flexbox space-between logic requires nested conditionals
 		if len(itemSizes) == 1 {
 			// Single item: position at start
 			positions[0] = 0

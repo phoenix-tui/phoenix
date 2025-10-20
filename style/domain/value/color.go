@@ -23,20 +23,20 @@ func RGB(r, g, b uint8) Color {
 // Returns error if the hex string is invalid.
 // Supports both 3-digit (#RGB) and 6-digit (#RRGGBB) formats.
 func Hex(hex string) (Color, error) {
-	// Remove leading '#' if present
+	// Remove leading '#' if present.
 	hex = strings.TrimPrefix(hex, "#")
 
-	// Validate length
+	// Validate length.
 	if len(hex) != 3 && len(hex) != 6 {
 		return Color{}, fmt.Errorf("invalid hex color: %q (expected 3 or 6 digits)", hex)
 	}
 
-	// Expand 3-digit format to 6-digit (#RGB -> #RRGGBB)
+	// Expand 3-digit format to 6-digit (#RGB -> #RRGGBB).
 	if len(hex) == 3 {
 		hex = string([]byte{hex[0], hex[0], hex[1], hex[1], hex[2], hex[2]})
 	}
 
-	// Parse RGB components
+	// Parse RGB components.
 	r, err := strconv.ParseUint(hex[0:2], 16, 8)
 	if err != nil {
 		return Color{}, fmt.Errorf("invalid hex color: %q (bad red component)", hex)
@@ -55,35 +55,35 @@ func Hex(hex string) (Color, error) {
 
 // FromANSI256 creates a new Color from an ANSI 256-color code (0-255).
 // Uses standard ANSI 256-color palette conversion to RGB.
-// See: https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit
+// See: https://en.wikipedia.org/wiki/ANSI_escape_code#8-bit.
 func FromANSI256(code uint8) Color {
-	// Basic 16 colors (0-15)
+	// Basic 16 colors (0-15).
 	if code < 16 {
 		return ansi16ToRGB(code)
 	}
 
-	// 216-color cube (16-231): 6x6x6 RGB cube
+	// 216-color cube (16-231): 6x6x6 RGB cube.
 	if code >= 16 && code <= 231 {
 		index := code - 16
 		r := (index / 36) % 6
 		g := (index / 6) % 6
 		b := index % 6
 
-		// Map 0-5 to 0-255 (with standard intensity levels)
+		// Map 0-5 to 0-255 (with standard intensity levels).
 		return Color{
-			r: uint8(intensityMap[r]),
-			g: uint8(intensityMap[g]),
-			b: uint8(intensityMap[b]),
+			r: intensityMap[r],
+			g: intensityMap[g],
+			b: intensityMap[b],
 		}
 	}
 
-	// Grayscale (232-255): 24 shades of gray
+	// Grayscale (232-255): 24 shades of gray.
 	if code >= 232 {
 		gray := 8 + (code-232)*10
 		return Color{r: gray, g: gray, b: gray}
 	}
 
-	// Fallback (should never reach here)
+	// Fallback (should never reach here).
 	return Color{r: 0, g: 0, b: 0}
 }
 
@@ -108,15 +108,15 @@ func (c Color) String() string {
 	return fmt.Sprintf("Color(r=%d, g=%d, b=%d, hex=%s)", c.r, c.g, c.b, c.Hex())
 }
 
-// --- Private helpers ---
+// --- Private helpers ---.
 
-// intensityMap maps 0-5 cube index to RGB intensity (standard ANSI 256-color mapping)
+// intensityMap maps 0-5 cube index to RGB intensity (standard ANSI 256-color mapping).
 var intensityMap = [6]uint8{0, 95, 135, 175, 215, 255}
 
 // ansi16ToRGB converts ANSI 16-color codes to RGB.
 // Standard ANSI color palette (varies by terminal, but these are common defaults).
 func ansi16ToRGB(code uint8) Color {
-	// Standard ANSI colors (approximate RGB values)
+	// Standard ANSI colors (approximate RGB values).
 	ansi16Colors := [16]Color{
 		{0, 0, 0},       // 0: Black
 		{128, 0, 0},     // 1: Red
@@ -140,6 +140,6 @@ func ansi16ToRGB(code uint8) Color {
 		return ansi16Colors[code]
 	}
 
-	// Fallback for invalid codes
+	// Fallback for invalid codes.
 	return Color{0, 0, 0}
 }

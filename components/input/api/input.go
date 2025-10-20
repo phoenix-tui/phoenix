@@ -173,6 +173,7 @@ func (i Input) renderPlaceholder() string {
 }
 
 // renderContent renders the input content with cursor.
+//
 //nolint:gocognit // rendering logic requires multiple conditions
 func (i Input) renderContent() string {
 	before, at, after := i.domain.ContentParts()

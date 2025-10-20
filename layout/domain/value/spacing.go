@@ -46,10 +46,10 @@ type Spacing struct {
 //	spacing := NewSpacing(1, 2, 1, 2)  // CSS: padding: 1 2 1 2
 func NewSpacing(top, right, bottom, left int) Spacing {
 	return Spacing{
-		top:    max(0, top),
-		right:  max(0, right),
-		bottom: max(0, bottom),
-		left:   max(0, left),
+		top:    maxInt(0, top),
+		right:  maxInt(0, right),
+		bottom: maxInt(0, bottom),
+		left:   maxInt(0, left),
 	}
 }
 
@@ -60,7 +60,7 @@ func NewSpacing(top, right, bottom, left int) Spacing {
 //
 //	spacing := NewSpacingAll(2)  // CSS: padding: 2
 func NewSpacingAll(value int) Spacing {
-	v := max(0, value)
+	v := maxInt(0, value)
 	return Spacing{
 		top:    v,
 		right:  v,
@@ -76,8 +76,8 @@ func NewSpacingAll(value int) Spacing {
 //
 //	spacing := NewSpacingVH(1, 2)  // CSS: padding: 1 2 (vertical, horizontal)
 func NewSpacingVH(vertical, horizontal int) Spacing {
-	v := max(0, vertical)
-	h := max(0, horizontal)
+	v := maxInt(0, vertical)
+	h := maxInt(0, horizontal)
 	return Spacing{
 		top:    v,
 		right:  h,
@@ -216,8 +216,10 @@ func (s Spacing) String() string {
 	return fmt.Sprintf("Spacing{%d %d %d %d}", s.top, s.right, s.bottom, s.left)
 }
 
-// Helper function (Go 1.25+ has max, but for clarity)
-func max(a, b int) int {
+// Helper function (Go 1.25+ has max, but for clarity).
+//
+//nolint:unparam // Generic helper, not all params used in every call
+func maxInt(a, b int) int {
 	if a > b {
 		return a
 	}

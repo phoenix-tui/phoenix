@@ -1,5 +1,5 @@
-//go:build windows
-// +build windows
+//go:build windows.
+// +build windows.
 
 package infrastructure
 
@@ -42,7 +42,7 @@ func BenchmarkWindowsAPI_MoveCursorUp(b *testing.B) {
 		b.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Set to middle of screen first
+	// Set to middle of screen first.
 	console.SetCursorPosition(40, 20)
 
 	b.ResetTimer()
@@ -72,13 +72,13 @@ func BenchmarkWindowsAPI_ClearLines(b *testing.B) {
 		b.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Set to position with room to clear upward
+	// Set to position with room to clear upward.
 	console.SetCursorPosition(0, 20)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = console.ClearLines(10)
-		// Reset position for next iteration
+		// Reset position for next iteration.
 		_ = console.SetCursorPosition(0, 20)
 	}
 }
@@ -178,29 +178,29 @@ func BenchmarkWindowsAPI_Size(b *testing.B) {
 	}
 }
 
-// Comparison benchmarks - demonstrate 10x improvement
+// Comparison benchmarks - demonstrate 10x improvement.
 
-// BenchmarkComparison_ClearLines_ANSI vs BenchmarkComparison_ClearLines_WindowsAPI
-// Run both to see the performance difference:
-//   go test -bench=BenchmarkComparison_ClearLines -benchmem ./infrastructure
+// BenchmarkComparison_ClearLines_ANSI vs BenchmarkComparison_ClearLines_WindowsAPI.
+// Run both to see the performance difference:.
+//   go test -bench=BenchmarkComparison_ClearLines -benchmem ./infrastructure.
 //
-// Expected result:
-//   ANSI:       ~500 μs per operation
-//   Windows API: ~50 μs per operation
-//   Improvement: 10x faster
+// Expected result:.
+//   ANSI:       ~500 μs per operation.
+//   Windows API: ~50 μs per operation.
+//   Improvement: 10x faster.
 
 // BenchmarkComparison_ClearLines_ANSI benchmarks ANSI clearing (baseline).
 func BenchmarkComparison_ClearLines_ANSI(b *testing.B) {
-	// Use NewANSITerminal() to force ANSI even on Windows
+	// Use NewANSITerminal() to force ANSI even on Windows.
 	term := NewANSITerminal()
 
-	// Set position with room to clear upward
+	// Set position with room to clear upward.
 	term.SetCursorPosition(0, 20)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = term.ClearLines(10)
-		// Reset position
+		// Reset position.
 		_ = term.SetCursorPosition(0, 20)
 	}
 }
@@ -212,13 +212,13 @@ func BenchmarkComparison_ClearLines_WindowsAPI(b *testing.B) {
 		b.Skipf("Not running in Windows Console: %v", err)
 	}
 
-	// Set position with room to clear upward
+	// Set position with room to clear upward.
 	console.SetCursorPosition(0, 20)
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = console.ClearLines(10)
-		// Reset position
+		// Reset position.
 		_ = console.SetCursorPosition(0, 20)
 	}
 }

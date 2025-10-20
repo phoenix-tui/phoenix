@@ -1,19 +1,20 @@
+// Package ansi provides ANSI escape sequence generation.
 package ansi
 
 import "fmt"
 
 // ANSI control sequences and escape codes.
 const (
-	// CSI - Control Sequence Introducer
+	// CSI - Control Sequence Introducer.
 	CSI = "\x1b["
 
-	// ESC - Escape character
+	// ESC - Escape character.
 	ESC = "\x1b"
 
-	// Reset - Reset all attributes
+	// Reset - Reset all attributes.
 	Reset = CSI + "0m"
 
-	// Text attributes
+	// Text attributes.
 	Bold      = CSI + "1m"
 	Dim       = CSI + "2m"
 	Italic    = CSI + "3m"
@@ -23,7 +24,7 @@ const (
 	Hidden    = CSI + "8m"
 	Strike    = CSI + "9m"
 
-	// Text attribute resets
+	// Text attribute resets.
 	NoBold      = CSI + "22m"
 	NoDim       = CSI + "22m"
 	NoItalic    = CSI + "23m"
@@ -33,7 +34,7 @@ const (
 	NoHidden    = CSI + "28m"
 	NoStrike    = CSI + "29m"
 
-	// Screen operations
+	// Screen operations.
 	ClearScreen      = CSI + "2J"
 	ClearLine        = CSI + "2K"
 	ClearLineFromPos = CSI + "0K"
@@ -41,18 +42,18 @@ const (
 	ClearScreenBelow = CSI + "0J"
 	ClearScreenAbove = CSI + "1J"
 
-	// Cursor operations
+	// Cursor operations.
 	CursorHome    = CSI + "H"
 	CursorHide    = CSI + "?25l"
 	CursorShow    = CSI + "?25h"
 	CursorSave    = CSI + "s"
 	CursorRestore = CSI + "u"
 
-	// Alternative screen buffer
+	// Alternative screen buffer.
 	AltScreenEnable  = CSI + "?1049h"
 	AltScreenDisable = CSI + "?1049l"
 
-	// Mouse tracking
+	// Mouse tracking.
 	MouseTrackingEnable    = CSI + "?1000h"
 	MouseTrackingDisable   = CSI + "?1000l"
 	MouseCellMotionEnable  = CSI + "?1002h"
@@ -131,7 +132,7 @@ func ResetBg() string {
 	return CSI + "49m"
 }
 
-// SetCursorShape sets cursor shape (0=default, 1=blinking block, 2=steady block, etc.)
+// SetCursorShape sets cursor shape (0=default, 1=blinking block, 2=steady block, etc.).
 func SetCursorShape(shape int) string {
 	return fmt.Sprintf("%s%d q", CSI, shape)
 }

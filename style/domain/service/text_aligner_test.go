@@ -429,13 +429,13 @@ func TestTextAlignerEdgeCases(t *testing.T) {
 		}
 	})
 
-	t.Run("zero width", func(t *testing.T) {
+	t.Run("zero width", func(_ *testing.T) {
 		got := aligner.AlignHorizontal("Hi", 0, value.AlignCenter)
 		// Should handle gracefully (may truncate or return empty)
 		_ = got
 	})
 
-	t.Run("zero height", func(t *testing.T) {
+	t.Run("zero height", func(_ *testing.T) {
 		got := aligner.AlignVertical("Hello\nWorld", 0, value.AlignMiddle)
 		// Should handle gracefully (may truncate to empty)
 		_ = got

@@ -1,3 +1,4 @@
+// Package ansi provides ANSI escape sequence parsing for keyboard input.
 package ansi
 
 import (
@@ -19,10 +20,12 @@ func NewParser() *Parser {
 //
 // Supports:
 // - Regular ASCII keys (a-z, A-Z, 0-9, space, etc.)
-// - Enter, Backspace, Tab, Esc
-// - Arrow keys (ESC [ A/B/C/D)
-// - Function keys F1-F12 (basic sequences)
-// - Ctrl combinations (Ctrl+A through Ctrl+Z)
+// - Enter, Backspace, Tab, Esc.
+// - Arrow keys (ESC [ A/B/C/D).
+// - Function keys F1-F12 (basic sequences).
+// - Ctrl combinations (Ctrl+A through Ctrl+Z).
+//
+//nolint:gocognit,gocyclo,cyclop,funlen,nestif // ANSI parsing requires sequential checks for all key types
 func (p *Parser) ParseKey(data []byte) (model.KeyMsg, bool) {
 	if len(data) == 0 {
 		return model.KeyMsg{}, false

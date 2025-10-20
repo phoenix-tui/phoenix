@@ -116,14 +116,12 @@ func (n *Node) AddChild(child *Node) *Node {
 		panic("node: cannot add self as child (cycle detected)")
 	}
 
-	copy := *n
-	copy.children = make([]*Node, len(n.children)+1)
-	for i, c := range n.children {
-		copy.children[i] = c
-	}
-	copy.children[len(copy.children)-1] = child
+	result := *n
+	result.children = make([]*Node, len(n.children)+1)
+	copy(result.children, n.children)
+	result.children[len(result.children)-1] = child
 
-	return &copy
+	return &result
 }
 
 // AddChildren returns a new Node with multiple children appended.
@@ -156,20 +154,20 @@ func (n *Node) RemoveChild(index int) *Node {
 		panic(fmt.Sprintf("node: index %d out of bounds (0-%d)", index, len(n.children)-1))
 	}
 
-	copy := *n
-	copy.children = make([]*Node, len(n.children)-1)
+	result := *n
+	result.children = make([]*Node, len(n.children)-1)
 
 	// Copy children before removed index
 	for i := 0; i < index; i++ {
-		copy.children[i] = n.children[i]
+		result.children[i] = n.children[i]
 	}
 
 	// Copy children after removed index
 	for i := index + 1; i < len(n.children); i++ {
-		copy.children[i-1] = n.children[i]
+		result.children[i-1] = n.children[i]
 	}
 
-	return &copy
+	return &result
 }
 
 // ClearChildren returns a new Node with all children removed.
@@ -182,9 +180,9 @@ func (n *Node) ClearChildren() *Node {
 		return n // Already empty, return self
 	}
 
-	copy := *n
-	copy.children = []*Node{}
-	return &copy
+	result := *n
+	result.children = []*Node{}
+	return &result
 }
 
 // SetPosition returns a new Node with the given position.
@@ -194,9 +192,9 @@ func (n *Node) ClearChildren() *Node {
 //
 //	positioned := node.SetPosition(value.NewPosition(10, 5))
 func (n *Node) SetPosition(p value.Position) *Node {
-	copy := *n
-	copy.position = p
-	return &copy
+	result := *n
+	result.position = p
+	return &result
 }
 
 // SetBox returns a new Node with the given box.
@@ -210,9 +208,9 @@ func (n *Node) SetBox(box *Box) *Node {
 		panic("node: box cannot be nil")
 	}
 
-	copy := *n
-	copy.box = box
-	return &copy
+	result := *n
+	result.box = box
+	return &result
 }
 
 // Walk performs a depth-first traversal of the tree.
@@ -315,7 +313,7 @@ func (n *Node) buildString(sb *strings.Builder, depth int) {
 
 	// Write node info
 	sb.WriteString(indent)
-	sb.WriteString(fmt.Sprintf("Node{%q [pos=%d,%d]", content, n.position.X(), n.position.Y()))
+	fmt.Fprintf(sb, "Node{%q [pos=%d,%d]", content, n.position.X(), n.position.Y())
 
 	if len(n.children) == 0 {
 		sb.WriteString("}")

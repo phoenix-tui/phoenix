@@ -154,7 +154,7 @@ func TestDragTracker_ThresholdDetection(t *testing.T) {
 			)
 			dragEvent := tracker.ProcessMotion(motionEvent)
 
-			if tt.expectDrag {
+			if tt.expectDrag { //nolint:nestif // Test validation requires nested checks
 				if !tracker.IsDrag() {
 					t.Errorf("Expected IsDrag() = true for position %v", tt.pos)
 				}
@@ -507,7 +507,7 @@ func TestDragTracker_ContinuousMotion(t *testing.T) {
 		)
 		dragEvent := tracker.ProcessMotion(motionEvent)
 
-		if expectedDrag[i] {
+		if expectedDrag[i] { //nolint:nestif // Test validation requires nested checks
 			if dragEvent == nil {
 				t.Errorf("Position %d: expected drag event", i)
 			}

@@ -23,6 +23,7 @@ func NewEmacsKeybindings() *EmacsKeybindings {
 }
 
 // Handle processes key message and returns updated TextArea.
+//
 //nolint:gocognit,gocyclo,cyclop,funlen // keybindings require state machine logic
 func (e *EmacsKeybindings) Handle(msg api.KeyMsg, ta *model.TextArea) (*model.TextArea, api.Cmd) {
 	// Handle Ctrl key combinations.

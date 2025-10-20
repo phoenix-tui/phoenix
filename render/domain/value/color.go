@@ -1,3 +1,4 @@
+// Package value defines value objects for rendering (Color, Style).
 package value
 
 import "fmt"
@@ -41,12 +42,12 @@ func (c Color) Equals(other Color) bool {
 // ToANSI256 converts RGB to ANSI 256 color index (approximate).
 // Uses 6x6x6 color cube (colors 16-231).
 func (c Color) ToANSI256() uint8 {
-	// Convert to 6-level scale
+	// Convert to 6-level scale.
 	r := uint8(float64(c.r) / 255.0 * 5.0)
 	g := uint8(float64(c.g) / 255.0 * 5.0)
 	b := uint8(float64(c.b) / 255.0 * 5.0)
 
-	// ANSI 256 color cube formula: 16 + 36*r + 6*g + b
+	// ANSI 256 color cube formula: 16 + 36*r + 6*g + b.
 	return 16 + 36*r + 6*g + b
 }
 
@@ -55,7 +56,7 @@ func (c Color) String() string {
 	return fmt.Sprintf("Color(%d, %d, %d)", c.r, c.g, c.b)
 }
 
-// Common colors (predefined constants)
+// Common colors (predefined constants).
 var (
 	ColorBlack   = NewColor(0, 0, 0)
 	ColorRed     = NewColor(255, 0, 0)
@@ -66,7 +67,7 @@ var (
 	ColorCyan    = NewColor(0, 255, 255)
 	ColorWhite   = NewColor(255, 255, 255)
 
-	// Gray scale
+	// Gray scale.
 	ColorGray        = NewColor(128, 128, 128)
 	ColorDarkGray    = NewColor(64, 64, 64)
 	ColorLightGray   = NewColor(192, 192, 192)

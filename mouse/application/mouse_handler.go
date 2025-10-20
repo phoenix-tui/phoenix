@@ -66,7 +66,7 @@ func (h *MouseHandler) parseRawEvent(sequence string) (*model.MouseEvent, error)
 	sequence = strings.TrimPrefix(sequence, "[")
 
 	// Detect protocol
-	if strings.HasPrefix(sequence, "<") {
+	if strings.HasPrefix(sequence, "<") { //nolint:gocritic // ifElseChain: Sequential string checks are clearer
 		// SGR protocol
 		return h.parseSGR(sequence)
 	} else if strings.HasPrefix(sequence, "M") {

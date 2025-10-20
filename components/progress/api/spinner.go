@@ -29,6 +29,7 @@ func NewSpinner(style string) *Spinner {
 
 // NewSpinnerCustom creates a new spinner with custom frames and FPS.
 // Returns pointer for initialization, but store as value in Model.
+//
 //nolint:revive // frames parameter will be used when custom spinner support is added
 func NewSpinnerCustom(_ []string, fps int) *Spinner {
 	return &Spinner{

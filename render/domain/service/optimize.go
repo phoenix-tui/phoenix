@@ -1,3 +1,4 @@
+//nolint:nestif // Optimization logic requires nested conditionals
 package service
 
 import (
@@ -20,8 +21,8 @@ func (s *OptimizeService) BatchStyles(ops []DiffOp) []DiffOp {
 		return ops
 	}
 
-	// For now, pass through (batching will be implemented incrementally)
-	// Future optimization: detect adjacent cells with same style and merge
+	// For now, pass through (batching will be implemented incrementally).
+	// Future optimization: detect adjacent cells with same style and merge.
 	return ops
 }
 
@@ -37,12 +38,12 @@ func (s *OptimizeService) RemoveRedundant(ops []DiffOp, currentStyle value.Style
 
 	for _, op := range ops {
 		if op.Type == OpTypeSet {
-			// Only include if style differs from last
+			// Only include if style differs from last.
 			if !op.Cell.Style().Equals(lastStyle) {
 				optimized = append(optimized, op)
 				lastStyle = op.Cell.Style()
 			} else {
-				// Style same, but still need to write the cell
+				// Style same, but still need to write the cell.
 				optimized = append(optimized, op)
 			}
 		} else {
@@ -60,8 +61,8 @@ func (s *OptimizeService) OptimizeCursorMoves(ops []DiffOp) []DiffOp {
 		return ops
 	}
 
-	// For now, pass through (cursor optimization will be implemented incrementally)
-	// Future optimization: use relative cursor moves (\x1b[C, \x1b[D) when shorter
+	// For now, pass through (cursor optimization will be implemented incrementally).
+	// Future optimization: use relative cursor moves (\x1b[C, \x1b[D) when shorter.
 	return ops
 }
 
@@ -77,16 +78,16 @@ func (s *OptimizeService) MergeAdjacentOps(ops []DiffOp) []DiffOp {
 	for i < len(ops) {
 		current := ops[i]
 
-		// Look ahead for adjacent cells on same line with same style
+		// Look ahead for adjacent cells on same line with same style.
 		if current.Type == OpTypeSet && i+1 < len(ops) {
 			next := ops[i+1]
 
-			// Check if adjacent and same style
+			// Check if adjacent and same style.
 			if next.Type == OpTypeSet &&
 				current.Position.Y() == next.Position.Y() &&
 				next.Position.X() == current.Position.X()+current.Cell.Width() &&
 				current.Cell.Style().Equals(next.Cell.Style()) {
-				// Can merge - continue looking
+				// Can merge - continue looking.
 				merged = append(merged, current)
 				i++
 				continue
@@ -116,13 +117,13 @@ func (s *OptimizeService) EstimateOutputSize(ops []DiffOp) int {
 	for _, op := range ops {
 		switch op.Type {
 		case OpTypeSet:
-			// ANSI sequence (approx 20 bytes) + cursor move (10 bytes) + char (1-4 bytes)
+			// ANSI sequence (approx 20 bytes) + cursor move (10 bytes) + char (1-4 bytes).
 			size += 35
 		case OpTypeMoveCursor:
-			// Cursor move sequence (10 bytes)
+			// Cursor move sequence (10 bytes).
 			size += 10
 		case OpTypeClear:
-			// Clear sequence (10 bytes)
+			// Clear sequence (10 bytes).
 			size += 10
 		}
 	}
@@ -137,7 +138,7 @@ func (s *OptimizeService) ShouldFullRedraw(changedCells, totalCells int) bool {
 		return false
 	}
 
-	// If more than 75% of cells changed, full redraw is more efficient
+	// If more than 75% of cells changed, full redraw is more efficient.
 	threshold := 0.75
 	ratio := float64(changedCells) / float64(totalCells)
 	return ratio > threshold

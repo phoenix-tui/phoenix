@@ -1,3 +1,4 @@
+//nolint:goconst // Box drawing characters are kept inline for clarity
 package service
 
 import (
@@ -70,8 +71,10 @@ func NewRenderService() *RenderService {
 //
 // Returns:
 //   - Multi-line string (lines joined with \n)
+//
+//nolint:funlen // Box rendering requires sequential processing of borders/padding/content
 func (rs *RenderService) Render(box *model.Box) string {
-	var lines []string
+	lines := make([]string, 0, 20) // Pre-allocate reasonable capacity
 
 	// Get box properties
 	content := box.Content()
@@ -91,8 +94,8 @@ func (rs *RenderService) Render(box *model.Box) string {
 	totalPaddingLeft := padding.Left()
 	totalPaddingRight := padding.Right()
 	if hasBorder {
-		totalPaddingLeft += 1 // Aesthetic spacing between border and content
-		totalPaddingRight += 1
+		totalPaddingLeft++ // Aesthetic spacing between border and content
+		totalPaddingRight++
 	}
 
 	// innerWidth includes content + total padding
@@ -224,18 +227,4 @@ func (rs *RenderService) renderMarginLeft(margin interface{ Left() int }) string
 // renderMarginRight renders right margin spaces.
 func (rs *RenderService) renderMarginRight(margin interface{ Right() int }) string {
 	return strings.Repeat(" ", margin.Right())
-}
-
-// renderPaddingLeft renders left padding spaces.
-func (rs *RenderService) renderPaddingLeft(padding interface{ Left() int }) string {
-	return strings.Repeat(" ", padding.Left())
-}
-
-// renderPaddingRight renders right padding spaces.
-// Pads to contentWidth to align right border.
-func (rs *RenderService) renderPaddingRight(padding interface{ Right() int }, contentLine string, contentWidth int) string {
-	// Calculate spaces needed to reach contentWidth
-	lineWidth := len(contentLine)
-	spacesNeeded := contentWidth - lineWidth
-	return strings.Repeat(" ", spacesNeeded) + strings.Repeat(" ", padding.Right())
 }

@@ -60,7 +60,7 @@ func (p *SGRParser) Parse(sequence string, isPress bool) (*model.MouseEvent, err
 
 	// Determine event type
 	var eventType value.EventType
-	if button.IsWheel() {
+	if button.IsWheel() { //nolint:gocritic // ifElseChain: Event type determination requires conditional checks
 		eventType = value.EventScroll
 	} else if isPress {
 		eventType = value.EventPress

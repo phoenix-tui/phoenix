@@ -21,6 +21,7 @@ func NewDefaultKeyBindings() *DefaultKeyBindings {
 
 // Handle processes a key message and returns the updated input.
 // VALUE SEMANTICS - takes value, returns value!
+//
 //nolint:gocyclo,cyclop // keybindings require state machine logic
 func (kb *DefaultKeyBindings) Handle(input model.TextInput, msg tea.KeyMsg) model.TextInput {
 	// Handle Ctrl key combinations.

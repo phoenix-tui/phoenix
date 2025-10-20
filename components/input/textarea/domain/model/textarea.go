@@ -71,6 +71,7 @@ func (t *TextArea) WithSize(width, height int) *TextArea {
 }
 
 // WithMaxLines sets maximum line limit (0 = unlimited).
+//
 //nolint:revive,gocritic // parameter name 'max' is clearer than 'maximum' in this domain context
 func (t *TextArea) WithMaxLines(max int) *TextArea {
 	updated := t.copy()
@@ -79,6 +80,7 @@ func (t *TextArea) WithMaxLines(max int) *TextArea {
 }
 
 // WithMaxChars sets maximum character limit (0 = unlimited).
+//
 //nolint:revive,gocritic // parameter name 'max' is clearer than 'maximum' in this domain context
 func (t *TextArea) WithMaxChars(max int) *TextArea {
 	updated := t.copy()

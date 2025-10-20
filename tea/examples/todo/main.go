@@ -43,7 +43,11 @@ func (m TodoModel) Init() api.Cmd {
 }
 
 // Update handles incoming messages and updates the model.
+//
+//nolint:gocognit,gocyclo,cyclop // Example todo app logic is naturally complex for demonstration
 func (m TodoModel) Update(msg api.Msg) (TodoModel, api.Cmd) {
+	// Single type switch is clear for examples (simple pattern)
+	//nolint:gocritic // singleCaseSwitch: Keep for example clarity
 	switch msg := msg.(type) {
 	case api.KeyMsg:
 		if m.addMode {
@@ -119,7 +123,7 @@ func (m TodoModel) handleAddMode(msg api.KeyMsg) (TodoModel, api.Cmd) {
 
 	case "backspace":
 		// Delete character
-		if len(m.newText) > 0 {
+		if m.newText != "" {
 			m.newText = m.newText[:len(m.newText)-1]
 		}
 		return m, nil
@@ -140,7 +144,7 @@ func (m TodoModel) View() string {
 	b.WriteString("╔═══════════════════════════════════════╗\n")
 	b.WriteString("║           Todo List Demo              ║\n")
 	b.WriteString("╠═══════════════════════════════════════╣\n")
-
+	//nolint:nestif // View rendering logic for add/normal modes
 	if m.addMode {
 		// Add mode view
 		b.WriteString("║ Adding new todo:                      ║\n")

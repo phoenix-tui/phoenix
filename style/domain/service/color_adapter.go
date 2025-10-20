@@ -1,3 +1,4 @@
+// Package service contains domain services for color adaptation and styling operations.
 package service
 
 import (
@@ -7,7 +8,7 @@ import (
 	"github.com/phoenix-tui/phoenix/style/domain/value"
 )
 
-// ColorAdapter is a domain service that adapts Color value objects
+// ColorAdapter is a domain service that adapts Color value objects.
 // to ANSI escape codes based on terminal capabilities.
 // This is pure business logic with no infrastructure dependencies.
 type ColorAdapter interface {
@@ -58,7 +59,7 @@ func (a *DefaultColorAdapter) ToANSIBackground(color value.Color, capability val
 	}
 }
 
-// --- TrueColor (24-bit RGB) ---
+// --- TrueColor (24-bit RGB) ---.
 
 func (a *DefaultColorAdapter) toTrueColorForeground(color value.Color) string {
 	r, g, b := color.RGB()
@@ -70,7 +71,7 @@ func (a *DefaultColorAdapter) toTrueColorBackground(color value.Color) string {
 	return fmt.Sprintf("\x1b[48;2;%d;%d;%dm", r, g, b)
 }
 
-// --- ANSI 256 colors ---
+// --- ANSI 256 colors ---.
 
 func (a *DefaultColorAdapter) toANSI256Foreground(color value.Color) string {
 	code := a.rgbToANSI256(color)
@@ -87,10 +88,10 @@ func (a *DefaultColorAdapter) toANSI256Background(color value.Color) string {
 func (a *DefaultColorAdapter) rgbToANSI256(color value.Color) uint8 {
 	r, g, b := color.RGB()
 
-	// Check if it's close to a grayscale value (232-255)
+	// Check if it's close to a grayscale value (232-255).
 	if isGrayish(r, g, b) {
-		// Map to grayscale range (232-255): 24 shades from near-black to near-white
-		// gray = 8 + (code-232)*10, so code = (gray-8)/10 + 232
+		// Map to grayscale range (232-255): 24 shades from near-black to near-white.
+		// gray = 8 + (code-232)*10, so code = (gray-8)/10 + 232.
 		gray := (uint16(r) + uint16(g) + uint16(b)) / 3
 		if gray < 8 {
 			return 16 // Use black from color cube
@@ -99,18 +100,19 @@ func (a *DefaultColorAdapter) rgbToANSI256(color value.Color) uint8 {
 			return 231 // Use white from color cube
 		}
 		code := (gray-8)/10 + 232
+		//nolint:gosec // G115: Overflow impossible - result range 232-255
 		return uint8(code)
 	}
 
-	// Use 6x6x6 RGB color cube (16-231)
-	// Map RGB (0-255) to cube index (0-5)
+	// Use 6x6x6 RGB color cube (16-231).
+	// Map RGB (0-255) to cube index (0-5).
 	rCube := rgbToCubeIndex(r)
 	gCube := rgbToCubeIndex(g)
 	bCube := rgbToCubeIndex(b)
 
-	// Calculate ANSI 256 code: 16 + 36*r + 6*g + b
+	// Calculate ANSI 256 code: 16 + 36*r + 6*g + b.
 	code := 16 + 36*rCube + 6*gCube + bCube
-	return uint8(code)
+	return code
 }
 
 // isGrayish returns true if the color is close to grayscale (low color variance).
@@ -124,7 +126,9 @@ func isGrayish(r, g, b uint8) bool {
 }
 
 // rgbToCubeIndex maps RGB value (0-255) to 6x6x6 cube index (0-5).
-// Uses closest match to standard intensity levels: [0, 95, 135, 175, 215, 255]
+// Uses closest match to standard intensity levels: [0, 95, 135, 175, 215, 255].
+//
+//nolint:gocritic // importShadow: 'value' parameter is clear in this domain context
 func rgbToCubeIndex(value uint8) uint8 {
 	intensities := []uint8{0, 95, 135, 175, 215, 255}
 	closestIndex := uint8(0)
@@ -134,6 +138,7 @@ func rgbToCubeIndex(value uint8) uint8 {
 		distance := absDiff(value, intensity)
 		if distance < closestDistance {
 			closestDistance = distance
+			//nolint:gosec // G115: Overflow impossible - i range 0-5 (loop index)
 			closestIndex = uint8(i)
 		}
 	}
@@ -141,32 +146,32 @@ func rgbToCubeIndex(value uint8) uint8 {
 	return closestIndex
 }
 
-// --- ANSI 16 colors ---
+// --- ANSI 16 colors ---.
 
 func (a *DefaultColorAdapter) toANSI16Foreground(color value.Color) string {
 	code := a.rgbToANSI16(color)
 	if code >= 8 {
-		// Bright colors (90-97)
+		// Bright colors (90-97).
 		return fmt.Sprintf("\x1b[%dm", 90+(code-8))
 	}
-	// Normal colors (30-37)
+	// Normal colors (30-37).
 	return fmt.Sprintf("\x1b[%dm", 30+code)
 }
 
 func (a *DefaultColorAdapter) toANSI16Background(color value.Color) string {
 	code := a.rgbToANSI16(color)
 	if code >= 8 {
-		// Bright colors (100-107)
+		// Bright colors (100-107).
 		return fmt.Sprintf("\x1b[%dm", 100+(code-8))
 	}
-	// Normal colors (40-47)
+	// Normal colors (40-47).
 	return fmt.Sprintf("\x1b[%dm", 40+code)
 }
 
 // rgbToANSI16 converts RGB color to closest ANSI 16-color code (0-15).
 // Uses Euclidean distance in RGB space.
 func (a *DefaultColorAdapter) rgbToANSI16(color value.Color) uint8 {
-	// Standard ANSI 16 colors (same as in color.go)
+	// Standard ANSI 16 colors (same as in color.go).
 	ansi16Colors := [16][3]uint8{
 		{0, 0, 0},       // 0: Black
 		{128, 0, 0},     // 1: Red
@@ -194,6 +199,7 @@ func (a *DefaultColorAdapter) rgbToANSI16(color value.Color) uint8 {
 		distance := colorDistance(r, g, b, ansiColor[0], ansiColor[1], ansiColor[2])
 		if distance < closestDistance {
 			closestDistance = distance
+			//nolint:gosec // G115: Overflow impossible - i range 0-15 (ANSI color index)
 			closestIndex = uint8(i)
 		}
 	}
@@ -201,7 +207,7 @@ func (a *DefaultColorAdapter) rgbToANSI16(color value.Color) uint8 {
 	return closestIndex
 }
 
-// --- Helpers ---
+// --- Helpers ---.
 
 // colorDistance calculates Euclidean distance between two RGB colors.
 func colorDistance(r1, g1, b1, r2, g2, b2 uint8) float64 {

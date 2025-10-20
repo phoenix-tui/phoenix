@@ -75,7 +75,7 @@ func (a AlignItems) String() string {
 	case AlignItemsCenter:
 		return "center"
 	default:
-		return "unknown"
+		return "unknown" //nolint:goconst // Generic error string
 	}
 }
 

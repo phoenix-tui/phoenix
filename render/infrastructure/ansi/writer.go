@@ -1,3 +1,4 @@
+//nolint:nestif // Style application requires nested conditionals
 package ansi
 
 import (
@@ -75,7 +76,7 @@ func (w *Writer) SetStyle(style value.Style) error {
 		return nil // Style already set
 	}
 
-	// Write style sequence
+	// Write style sequence.
 	ansi := style.ToANSI()
 	if ansi != "" {
 		_, err := w.buf.WriteString(ansi)
@@ -93,7 +94,7 @@ func (w *Writer) WriteCell(cell model.Cell) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	// Set style if different
+	// Set style if different.
 	if !cell.Style().Equals(w.currentStyle) {
 		ansi := cell.Style().ToANSI()
 		if ansi != "" {
@@ -104,12 +105,12 @@ func (w *Writer) WriteCell(cell model.Cell) error {
 		w.currentStyle = cell.Style()
 	}
 
-	// Write character
+	// Write character.
 	if _, err := w.buf.WriteRune(cell.Char()); err != nil {
 		return err
 	}
 
-	// Update position
+	// Update position.
 	w.currentX += cell.Width()
 	return nil
 }
@@ -127,7 +128,7 @@ func (w *Writer) WriteString(text string, style value.Style) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	// Set style
+	// Set style.
 	if !style.Equals(w.currentStyle) {
 		ansi := style.ToANSI()
 		if ansi != "" {
@@ -138,13 +139,13 @@ func (w *Writer) WriteString(text string, style value.Style) error {
 		w.currentStyle = style
 	}
 
-	// Write text
+	// Write text.
 	_, err := w.buf.WriteString(text)
 	if err != nil {
 		return err
 	}
 
-	// Update position (approximate - assumes single-width chars)
+	// Update position (approximate - assumes single-width chars).
 	w.currentX += len(text)
 	return nil
 }

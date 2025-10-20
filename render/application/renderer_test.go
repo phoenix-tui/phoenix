@@ -445,7 +445,7 @@ func TestRenderer_GetBuffer_FromPool(t *testing.T) {
 	assert.NotNil(t, buf3)
 }
 
-func TestRenderer_PutBuffer_Nil(t *testing.T) {
+func TestRenderer_PutBuffer_Nil(_ *testing.T) {
 	var buf bytes.Buffer
 	r := NewRenderer(80, 24, &buf)
 
@@ -477,7 +477,7 @@ func TestRenderer_Close_ShowsCursor(t *testing.T) {
 	assert.Contains(t, output, "\x1b[?25h") // Show cursor sequence
 }
 
-func TestRenderer_ConcurrentAccess(t *testing.T) {
+func TestRenderer_ConcurrentAccess(_ *testing.T) {
 	var buf bytes.Buffer
 	r := NewRenderer(80, 24, &buf)
 

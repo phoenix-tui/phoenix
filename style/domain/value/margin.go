@@ -1,3 +1,4 @@
+//nolint:dupl // Margin and Padding are separate domain concepts - duplication is intentional
 package value
 
 import "fmt"
@@ -6,7 +7,7 @@ import "fmt"
 // Follows the CSS box model: top, right, bottom, left.
 // This is a value object in DDD terms - immutable and defined by its values.
 //
-// Note: Margin is kept as a separate type from Padding for type safety and
+// Note: Margin is kept as a separate type from Padding for type safety and.
 // future extensibility (e.g., margin might support "auto" in the future).
 type Margin struct {
 	top, right, bottom, left int

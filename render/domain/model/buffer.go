@@ -1,3 +1,4 @@
+// Package model defines domain models for terminal rendering (Buffer, Cell, Position).
 package model
 
 import (
@@ -104,16 +105,16 @@ func (b *Buffer) SetString(pos value.Position, text string, style value.Style) i
 	cellsWritten := 0
 	state := -1
 
-	for len(text) > 0 {
+	for text != "" {
 		if x >= b.width {
 			break
 		}
 
-		// Extract grapheme cluster
+		// Extract grapheme cluster.
 		var cluster string
 		cluster, text, _, state = uniseg.FirstGraphemeClusterInString(text, state)
 
-		// Get rune and calculate width
+		// Get rune and calculate width.
 		runes := []rune(cluster)
 		if len(runes) == 0 {
 			continue
@@ -122,7 +123,7 @@ func (b *Buffer) SetString(pos value.Position, text string, style value.Style) i
 		char := runes[0]
 		width := uniseg.StringWidth(cluster)
 
-		// Create and set cell
+		// Create and set cell.
 		cell := NewCellWithWidth(char, style, width)
 		b.Set(value.NewPosition(x, y), cell)
 
@@ -140,11 +141,11 @@ func (b *Buffer) SetLine(y int, text string, style value.Style) {
 		return
 	}
 
-	// Write text
+	// Write text.
 	pos := value.NewPosition(0, y)
 	written := b.SetString(pos, text, style)
 
-	// Clear rest of line
+	// Clear rest of line.
 	for x := written; x < b.width; x++ {
 		b.Set(value.NewPosition(x, y), NewEmptyCell())
 	}
@@ -166,9 +167,9 @@ func (b *Buffer) Clone() *Buffer {
 func (b *Buffer) Resize(width, height int) *Buffer {
 	newBuffer := NewBuffer(width, height)
 
-	// Copy cells that fit
-	minHeight := min(b.height, height)
-	minWidth := min(b.width, width)
+	// Copy cells that fit.
+	minHeight := minInt(b.height, height)
+	minWidth := minInt(b.width, width)
 
 	for y := 0; y < minHeight; y++ {
 		for x := 0; x < minWidth; x++ {
@@ -184,7 +185,7 @@ func (b *Buffer) GetLine(y int) []Cell {
 	if y < 0 || y >= b.height {
 		return nil
 	}
-	// Return copy to prevent external modification
+	// Return copy to prevent external modification.
 	line := make([]Cell, b.width)
 	copy(line, b.cells[y])
 	return line
@@ -228,7 +229,7 @@ func (b *Buffer) String() string {
 }
 
 // min returns the minimum of two integers.
-func min(a, b int) int {
+func minInt(a, b int) int {
 	if a < b {
 		return a
 	}

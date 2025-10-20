@@ -669,6 +669,8 @@ func (f *Flex) Height(height int) *Flex {
 //		Add(layout.NewBox("Right")).
 //		Render(80, 24)
 //	fmt.Println(output)
+//
+//nolint:gocognit // Flex rendering orchestrates multiple services
 func (f *Flex) Render(containerWidth, containerHeight int) string {
 	// Create services
 	unicodeService := coreService.NewUnicodeService()

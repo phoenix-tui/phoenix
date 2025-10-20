@@ -197,14 +197,14 @@ type Program[T any] struct {
 //
 //	p := tea.New(MyModel{})
 //	p.Run()
-func New[T modelConstraint[T]](m T, opts ...ProgramOption[T]) *Program[T] {
+func New[T modelConstraint[T]](m T, opts ...Option[T]) *Program[T] {
 	// Wrap the model to satisfy model.Model[T] interface
 	wrapped := modelWrapper[T]{model: m}
 
 	// Convert options
-	internalOpts := make([]program.ProgramOption[T], 0, len(opts))
+	internalOpts := make([]program.Option[T], 0, len(opts))
 	for _, opt := range opts {
-		internalOpts = append(internalOpts, program.ProgramOption[T](opt))
+		internalOpts = append(internalOpts, program.Option[T](opt))
 	}
 
 	return &Program[T]{
@@ -255,25 +255,25 @@ func (p *Program[T]) IsRunning() bool {
 	return p.p.IsRunning()
 }
 
-// ProgramOption configures a Program.
-type ProgramOption[T any] program.ProgramOption[T]
+// Option configures a Program.
+type Option[T any] program.Option[T]
 
 // WithInput sets a custom input reader.
-func WithInput[T any](r io.Reader) ProgramOption[T] {
-	return ProgramOption[T](program.WithInput[T](r))
+func WithInput[T any](r io.Reader) Option[T] {
+	return Option[T](program.WithInput[T](r))
 }
 
 // WithOutput sets a custom output writer.
-func WithOutput[T any](w io.Writer) ProgramOption[T] {
-	return ProgramOption[T](program.WithOutput[T](w))
+func WithOutput[T any](w io.Writer) Option[T] {
+	return Option[T](program.WithOutput[T](w))
 }
 
 // WithAltScreen enables alternate screen buffer.
-func WithAltScreen[T any]() ProgramOption[T] {
-	return ProgramOption[T](program.WithAltScreen[T]())
+func WithAltScreen[T any]() Option[T] {
+	return Option[T](program.WithAltScreen[T]())
 }
 
 // WithMouseAllMotion enables all mouse motion events.
-func WithMouseAllMotion[T any]() ProgramOption[T] {
-	return ProgramOption[T](program.WithMouseAllMotion[T]())
+func WithMouseAllMotion[T any]() Option[T] {
+	return Option[T](program.WithMouseAllMotion[T]())
 }

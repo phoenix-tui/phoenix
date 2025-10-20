@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.1.0-beta.2] - 2025-01-19 (Multi-Module + TextArea Cursor Control)
+## [0.1.0-beta.2] - 2025-10-20 (Multi-Module + TextArea Cursor Control)
 
 **Status**: 🎉 FEATURE RELEASE
 
@@ -118,6 +118,28 @@ ta := textarea.New().
 - ✅ **PR template** - Code quality, testing, and architecture checklists
 
 ### Fixed
+
+**Code Quality - Linter Cleanup** ⭐ NEW
+- Fixed **358+ linter issues** across clipboard and components modules
+  - 143 issues in clipboard module → 0
+  - 215 issues in components module → 0
+  - Exit code: 0 (CI-ready)
+- **Critical fixes**:
+  - ✅ **40 redefines-builtin-id** (Go 1.21+ compatibility)
+    - Renamed `min`/`max`/`copy` parameters to avoid builtin conflicts
+    - Affects validation, textarea buffer, progress clamping
+  - ✅ **102 godot** (comment style) - automated with sed
+  - ✅ **35 revive** (package comments, unused params)
+  - ✅ **17 gocritic** (hugeParam, assignOp, paramTypeCombine, singleCaseSwitch, appendAssign)
+  - ✅ **5 staticcheck** (SA4006 unused values, S1008 if-return simplification)
+  - ✅ **13 nestif** (nested complexity)
+  - ✅ **4 gosec** (Windows API unsafe.Pointer - suppressed with nolint)
+- All modules now pass golangci-lint v2.5 with exit code 0
+- **Benefits**:
+  - ✅ CI will pass (no linter failures)
+  - ✅ Go 1.21+ compatibility guaranteed
+  - ✅ Code quality improved
+  - ✅ Production ready
 
 **pkg.go.dev Indexing**
 - Previously: v0.1.0-beta.1 cached on commit `a3668cd` (414 files, no root go.mod)

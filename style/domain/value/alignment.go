@@ -1,3 +1,4 @@
+// Package value contains value objects for text alignment.
 package value
 
 import "fmt"
@@ -5,10 +6,11 @@ import "fmt"
 // HorizontalAlignment represents horizontal text alignment.
 type HorizontalAlignment int
 
+// Horizontal alignment constants.
 const (
-	AlignLeft HorizontalAlignment = iota
-	AlignCenter
-	AlignRight
+	AlignLeft   HorizontalAlignment = iota // AlignLeft aligns text to the left.
+	AlignCenter                            // AlignCenter centers text horizontally.
+	AlignRight                             // AlignRight aligns text to the right.
 )
 
 // String returns a human-readable representation of the horizontal alignment.
@@ -21,6 +23,7 @@ func (h HorizontalAlignment) String() string {
 	case AlignRight:
 		return "Right"
 	default:
+		//nolint:goconst // "Unknown" string literal used in switch defaults - constant not beneficial
 		return "Unknown"
 	}
 }
@@ -28,10 +31,11 @@ func (h HorizontalAlignment) String() string {
 // VerticalAlignment represents vertical text alignment.
 type VerticalAlignment int
 
+// Vertical alignment constants.
 const (
-	AlignTop VerticalAlignment = iota
-	AlignMiddle
-	AlignBottom
+	AlignTop    VerticalAlignment = iota // AlignTop aligns text to the top.
+	AlignMiddle                          // AlignMiddle centers text vertically.
+	AlignBottom                          // AlignBottom aligns text to the bottom.
 )
 
 // String returns a human-readable representation of the vertical alignment.
@@ -63,7 +67,7 @@ func NewAlignment(h HorizontalAlignment, v VerticalAlignment) Alignment {
 	}
 }
 
-// --- Convenience constructors for common alignments ---
+// --- Convenience constructors for common alignments ---.
 
 // LeftTop creates an alignment with left-top positioning.
 func LeftTop() Alignment {

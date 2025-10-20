@@ -42,7 +42,7 @@ func (d *ClickDetector) DetectClick(releaseEvent model.MouseEvent) *model.MouseE
 	}
 
 	// Check if this is a continuation of previous clicks
-	if d.lastClick != nil {
+	if d.lastClick != nil { //nolint:nestif // Multi-click detection requires nested conditions
 		timeSinceLastClick := releaseEvent.Timestamp().Sub(d.lastClick.Timestamp())
 		samePosition := releaseEvent.IsAt(d.lastClick.Position(), d.tolerance)
 		sameButton := releaseEvent.Button() == d.lastClick.Button()

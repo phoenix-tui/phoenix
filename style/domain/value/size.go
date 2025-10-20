@@ -169,12 +169,12 @@ func (s Size) SetMaxHeight(h int) Size {
 // ValidateWidth clamps a width value to the min/max constraints (if set).
 // Returns the clamped width.
 func (s Size) ValidateWidth(w int) int {
-	// Apply minimum constraint
+	// Apply minimum constraint.
 	if s.minWidth != nil && w < *s.minWidth {
 		w = *s.minWidth
 	}
 
-	// Apply maximum constraint
+	// Apply maximum constraint.
 	if s.maxWidth != nil && w > *s.maxWidth {
 		w = *s.maxWidth
 	}
@@ -185,12 +185,12 @@ func (s Size) ValidateWidth(w int) int {
 // ValidateHeight clamps a height value to the min/max constraints (if set).
 // Returns the clamped height.
 func (s Size) ValidateHeight(h int) int {
-	// Apply minimum constraint
+	// Apply minimum constraint.
 	if s.minHeight != nil && h < *s.minHeight {
 		h = *s.minHeight
 	}
 
-	// Apply maximum constraint
+	// Apply maximum constraint.
 	if s.maxHeight != nil && h > *s.maxHeight {
 		h = *s.maxHeight
 	}
@@ -210,7 +210,7 @@ func (s Size) String() string {
 	)
 }
 
-// --- Private helpers ---
+// --- Private helpers ---.
 
 // formatOptionalInt formats an optional int pointer for display.
 func formatOptionalInt(p *int) string {
