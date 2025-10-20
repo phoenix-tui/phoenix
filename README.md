@@ -4,8 +4,11 @@
 [![Release](https://img.shields.io/github/v/release/phoenix-tui/phoenix?include_prereleases)](https://github.com/phoenix-tui/phoenix/releases)
 [![CI](https://github.com/phoenix-tui/phoenix/actions/workflows/test.yml/badge.svg)](https://github.com/phoenix-tui/phoenix/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/phoenix-tui/phoenix)](https://goreportcard.com/report/github.com/phoenix-tui/phoenix)
+[![Coverage](https://img.shields.io/badge/coverage-94.5%25-brightgreen)](https://github.com/phoenix-tui/phoenix)
 [![License](https://img.shields.io/github/license/phoenix-tui/phoenix)](https://github.com/phoenix-tui/phoenix/blob/main/LICENSE)
 [![GoDoc](https://pkg.go.dev/badge/github.com/phoenix-tui/phoenix.svg)](https://pkg.go.dev/github.com/phoenix-tui/phoenix)
+
+> **Multi-module monorepo** - 10 independent libraries. Full metrics in [CI](https://github.com/phoenix-tui/phoenix/actions).
 
 > Next-generation Terminal User Interface framework for Go
 

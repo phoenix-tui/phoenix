@@ -1,6 +1,6 @@
 # TextArea Cursor Control API
 
-**Status**: ✅ Implemented (2025-01-19)
+**Status**: ✅ Released in v0.1.0-beta.2 (2025-10-20)
 **Priority**: HIGH - Enables GoSh shell REPL development
 **Specification**: docs/dev/TEXTAREA_CURSOR_CONTROL_IMPLEMENTATION.md
 
@@ -443,7 +443,7 @@ ta, _ = ta.Update(textarea.KeyMsg{Type: textarea.KeyRight})
 
 ---
 
-## Future Enhancements (Out of Scope for v0.2.0)
+## Future Enhancements (Planned for v0.2.0+)
 
 - SetBounds() - declarative constraints (e.g., "row >= 5 && col >= 2")
 - Mouse event validation
@@ -498,8 +498,8 @@ ta = ta.OnMovement(func(from, to CursorPos) bool {
 
 **Implementation**: Claude Code (phoenix-tui-architect agent)
 **Specification**: Andy (GoSh shell requirements)
-**Date**: 2025-01-19
-**Version**: Phoenix v0.2.0
+**Date**: 2025-10-20
+**Version**: Phoenix v0.1.0-beta.2
 
 ---
 
