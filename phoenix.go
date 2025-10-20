@@ -82,7 +82,13 @@
 //   - Documentation: https://github.com/phoenix-tui/phoenix/tree/main/docs
 //   - Examples: https://github.com/phoenix-tui/phoenix/tree/main/examples
 //   - Releases: https://github.com/phoenix-tui/phoenix/releases
+//
+// # Version
+//
+// Phoenix version is managed through git tags and Go modules.
+// To check your installed version:
+//
+//	go list -m github.com/phoenix-tui/phoenix
+//
+// This will show the exact version you're using, including any pre-release tags.
 package phoenix
-
-// Version is the current Phoenix TUI Framework version.
-const Version = "v0.1.0-beta.2"
