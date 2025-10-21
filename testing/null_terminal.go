@@ -168,3 +168,22 @@ func (n *NullTerminal) SupportsTrueColor() bool {
 func (n *NullTerminal) Platform() api.Platform {
 	return api.PlatformUnknown
 }
+
+// ┌─────────────────────────────────────────────────────────────┐
+// │ Alternate Screen Buffer                                     │
+// └─────────────────────────────────────────────────────────────┘
+
+// EnterAltScreen does nothing (null implementation).
+func (n *NullTerminal) EnterAltScreen() error {
+	return nil
+}
+
+// ExitAltScreen does nothing (null implementation).
+func (n *NullTerminal) ExitAltScreen() error {
+	return nil
+}
+
+// IsInAltScreen returns false (null implementation).
+func (n *NullTerminal) IsInAltScreen() bool {
+	return false
+}
