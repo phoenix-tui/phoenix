@@ -64,15 +64,15 @@ var (
 //   - CreateConsoleScreenBuffer - Alternate screen buffer.
 //   - SetConsoleActiveScreenBuffer - Switch between buffers.
 type Console struct {
-	stdout         windows.Handle // Handle to stdout console
-	stdin          windows.Handle // Handle to stdin console
-	info           windows.ConsoleScreenBufferInfo
+	stdout windows.Handle // Handle to stdout console
+	stdin  windows.Handle // Handle to stdin console
+	info   windows.ConsoleScreenBufferInfo
 
 	// Alternate screen buffer state.
 	originalBuffer windows.Handle // Original stdout buffer (before alt screen)
 	altBuffer      windows.Handle // Alternate screen buffer handle
-	inAltScreen    bool            // True if currently in alternate screen
-	mu             sync.Mutex      // Protects screen buffer state
+	inAltScreen    bool           // True if currently in alternate screen
+	mu             sync.Mutex     // Protects screen buffer state
 }
 
 // NewConsole creates Windows Console API terminal.
@@ -629,11 +629,11 @@ func (c *Console) Platform() api.Platform {
 // terminal content is restored.
 //
 // Implementation:.
-//   1. Check if already in alt screen (prevent double-enter).
-//   2. Save original stdout handle.
-//   3. Create new screen buffer (CreateConsoleScreenBuffer).
-//   4. Set new buffer as active (SetConsoleActiveScreenBuffer).
-//   5. Update state flag.
+//  1. Check if already in alt screen (prevent double-enter).
+//  2. Save original stdout handle.
+//  3. Create new screen buffer (CreateConsoleScreenBuffer).
+//  4. Set new buffer as active (SetConsoleActiveScreenBuffer).
+//  5. Update state flag.
 //
 // Thread-safe via mutex.
 func (c *Console) EnterAltScreen() error {
@@ -686,11 +686,11 @@ func (c *Console) EnterAltScreen() error {
 // the original screen buffer and closing the alternate buffer.
 //
 // Implementation:.
-//   1. Check if in alt screen (prevent double-exit).
-//   2. Restore original buffer as active (SetConsoleActiveScreenBuffer).
-//   3. Close alternate buffer handle.
-//   4. Update stdout handle back to original.
-//   5. Update state flag.
+//  1. Check if in alt screen (prevent double-exit).
+//  2. Restore original buffer as active (SetConsoleActiveScreenBuffer).
+//  3. Close alternate buffer handle.
+//  4. Update stdout handle back to original.
+//  5. Update state flag.
 //
 // Thread-safe via mutex.
 func (c *Console) ExitAltScreen() error {

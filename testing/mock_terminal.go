@@ -27,8 +27,8 @@ import (
 //	assert.Equal(t, "SetCursorPosition(10, 5)", mock.Calls[0])
 type MockTerminal struct {
 	inAltScreen bool // Tracks alternate screen state
-	mu    sync.Mutex
-	Calls []string // All recorded method calls with arguments
+	mu          sync.Mutex
+	Calls       []string // All recorded method calls with arguments
 }
 
 // NewMockTerminal creates a new mock terminal.
@@ -251,13 +251,13 @@ func (m *MockTerminal) Platform() api.Platform {
 func (m *MockTerminal) EnterAltScreen() error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	
+
 	m.Calls = append(m.Calls, "EnterAltScreen")
-	
+
 	if m.inAltScreen {
 		return fmt.Errorf("already in alternate screen")
 	}
-	
+
 	m.inAltScreen = true
 	return nil
 }
@@ -266,13 +266,13 @@ func (m *MockTerminal) EnterAltScreen() error {
 func (m *MockTerminal) ExitAltScreen() error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	
+
 	m.Calls = append(m.Calls, "ExitAltScreen")
-	
+
 	if !m.inAltScreen {
 		return fmt.Errorf("not in alternate screen")
 	}
-	
+
 	m.inAltScreen = false
 	return nil
 }
@@ -281,7 +281,7 @@ func (m *MockTerminal) ExitAltScreen() error {
 func (m *MockTerminal) IsInAltScreen() bool {
 	m.mu.Lock()
 	defer m.mu.Unlock()
-	
+
 	m.Calls = append(m.Calls, "IsInAltScreen")
 	return m.inAltScreen
 }

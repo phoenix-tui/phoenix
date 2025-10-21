@@ -350,9 +350,9 @@ func (a *ANSITerminal) Platform() api.Platform {
 // the original terminal content is restored.
 //
 // Implementation:.
-//   1. Check if already in alt screen (prevent double-enter).
-//   2. Write ANSI escape: "\033[?1049h" (save cursor + switch to alt screen).
-//   3. Update state flag.
+//  1. Check if already in alt screen (prevent double-enter).
+//  2. Write ANSI escape: "\033[?1049h" (save cursor + switch to alt screen).
+//  3. Update state flag.
 //
 // Sequence details:.
 //   - \033[?1049h = CSI ? 1049 h (xterm private mode 1049).
@@ -386,9 +386,9 @@ func (a *ANSITerminal) EnterAltScreen() error {
 // the normal screen buffer.
 //
 // Implementation:.
-//   1. Check if in alt screen (prevent double-exit).
-//   2. Write ANSI escape: "\033[?1049l" (restore cursor + switch to normal screen).
-//   3. Update state flag.
+//  1. Check if in alt screen (prevent double-exit).
+//  2. Write ANSI escape: "\033[?1049l" (restore cursor + switch to normal screen).
+//  3. Update state flag.
 //
 // Sequence details:.
 //   - \033[?1049l = CSI ? 1049 l (xterm private mode 1049 reset).

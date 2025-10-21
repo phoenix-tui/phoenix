@@ -25,7 +25,7 @@ var (
 	// procScrollConsoleScreenBuffer removed (unused - reserved for future scrolling feature)
 
 	// Console screen buffer functions (for alternate screen).
-	procCreateConsoleScreenBuffer = kernel32.NewProc("CreateConsoleScreenBuffer")
+	procCreateConsoleScreenBuffer    = kernel32.NewProc("CreateConsoleScreenBuffer")
 	procSetConsoleActiveScreenBuffer = kernel32.NewProc("SetConsoleActiveScreenBuffer")
 )
 
