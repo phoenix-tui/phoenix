@@ -187,6 +187,49 @@ type Terminal interface {
 
 	// Platform returns the detected terminal platform type.
 	Platform() Platform
+
+	// ┌─────────────────────────────────────────────────────────────┐.
+	// │ Alternate Screen Buffer                                     │.
+	// └─────────────────────────────────────────────────────────────┘.
+
+	// EnterAltScreen switches to alternate screen buffer.
+	//
+	// Creates a "clean slate" for TUI applications, preserving user's.
+	// terminal content. When the TUI exits (via ExitAltScreen), the.
+	// original terminal content is restored.
+	//
+	// Implementation:.
+	//   - Windows Console: CreateConsoleScreenBuffer() + SetConsoleActiveScreenBuffer().
+	//   - Unix/ANSI: CSI ? 1049 h (xterm alternate screen buffer).
+	//
+	// Used by TUI frameworks to avoid polluting user's terminal history.
+	// Essential for phoenix/tea Program when WithAltScreen() option is enabled.
+	//
+	// Returns error if screen buffer creation fails or if already in alt screen.
+	EnterAltScreen() error
+
+	// ExitAltScreen returns to normal screen buffer.
+	//
+	// Restores the user's original terminal content (before EnterAltScreen).
+	// Any content written to alternate screen buffer is discarded.
+	//
+	// Implementation:.
+	//   - Windows Console: SetConsoleActiveScreenBuffer(originalBuffer).
+	//   - Unix/ANSI: CSI ? 1049 l (xterm normal screen buffer).
+	//
+	// IMPORTANT: Always call this before application exit to restore terminal!.
+	// TUI frameworks handle this automatically in cleanup routines.
+	//
+	// Returns error if screen buffer switch fails or if not in alt screen.
+	ExitAltScreen() error
+
+	// IsInAltScreen returns true if currently in alternate screen buffer.
+	//
+	// Used to check terminal state before Enter/Exit operations.
+	// Prevents double-enter or double-exit bugs.
+	//
+	// Always returns accurate state (tracked internally, no syscalls).
+	IsInAltScreen() bool
 }
 
 // Platform identifies the terminal platform type.
