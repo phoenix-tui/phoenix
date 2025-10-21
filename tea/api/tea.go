@@ -43,11 +43,13 @@ package api
 
 import (
 	"io"
+	"os/exec"
 	"time"
 
 	"github.com/phoenix-tui/phoenix/tea/application/program"
 	"github.com/phoenix-tui/phoenix/tea/domain/model"
 	"github.com/phoenix-tui/phoenix/tea/domain/service"
+	terminalapi "github.com/phoenix-tui/phoenix/terminal/api"
 )
 
 // Msg represents any message that can be sent through the event loop.
@@ -276,4 +278,44 @@ func WithAltScreen[T any]() Option[T] {
 // WithMouseAllMotion enables all mouse motion events.
 func WithMouseAllMotion[T any]() Option[T] {
 	return Option[T](program.WithMouseAllMotion[T]())
+}
+
+// WithTerminal sets a custom terminal instance (for testing).
+func WithTerminal[T any](term terminalapi.Terminal) Option[T] {
+	return Option[T](program.WithTerminal[T](term))
+}
+
+// ExecProcess executes an external interactive command with full terminal control.
+//
+// This method temporarily suspends the TUI, giving the external command full.
+// control of stdin/stdout/stderr. When the command exits, the TUI is restored.
+//
+// Essential for running:.
+//   - Text editors: vim, nano, emacs.
+//   - Interactive shells: bash, python REPL.
+//   - Pagers: less, more.
+//   - SSH sessions.
+//
+// Example:
+//
+//	func (m Model) Update(msg Msg) (Model, Cmd) {
+//	    switch msg := msg.(type) {
+//	    case RunVimMsg:
+//	        return m, func() Msg {
+//	            cmd := exec.Command("vim", "file.txt")
+//	            err := m.program.ExecProcess(cmd)
+//	            return VimExitedMsg{Err: err}
+//	        }
+//	    }
+//	    return m, nil
+//	}
+//
+// IMPORTANT:.
+//   - Must be called from Cmd goroutine (NOT directly from Update).
+//   - Blocks until command completes.
+//   - Auto-restores TUI state even if command fails.
+//
+// Returns error if command execution fails.
+func (p *Program[T]) ExecProcess(cmd *exec.Cmd) error {
+	return p.p.ExecProcess(cmd)
 }

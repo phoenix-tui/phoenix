@@ -6,11 +6,14 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"sync"
 	"time"
 
 	"github.com/phoenix-tui/phoenix/tea/domain/model"
 	"github.com/phoenix-tui/phoenix/tea/infrastructure/input"
+	terminalapi "github.com/phoenix-tui/phoenix/terminal/api"
+	terminalinfra "github.com/phoenix-tui/phoenix/terminal/infrastructure"
 )
 
 // Program orchestrates the Elm Architecture event loop.
@@ -34,6 +37,11 @@ type Program[T any] struct {
 	// I/O streams
 	input  io.Reader
 	output io.Writer
+
+	// Terminal for screen management (alternate screen, cursor, etc.)
+	// Created automatically in Run() via detect.NewTerminal()
+	// Can be set via WithTerminal() option for testing
+	terminal terminalapi.Terminal
 
 	// Input reader for parsing stdin
 	inputReader *input.Reader
@@ -420,4 +428,108 @@ func (p *Program[T]) startInputReader() {
 			}
 		}
 	}()
+}
+
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ External Process Execution                                      │.
+// └─────────────────────────────────────────────────────────────────┘.
+
+// ExecProcess executes an external interactive command with full terminal control.
+//
+// The program temporarily:.
+//  1. Exits alternate screen buffer (if active).
+//  2. Shows cursor.
+//  3. Gives command full control of stdin/stdout/stderr.
+//  4. Waits for command completion (BLOCKING - call from Cmd goroutine!).
+//  5. Re-enters alternate screen buffer (if was active).
+//  6. Hides cursor.
+//  7. Forces full TUI refresh.
+//
+// This is essential for running interactive commands like:.
+//   - Text editors (vim, nano, emacs).
+//   - Interactive shells (bash, python REPL, claude).
+//   - Pagers (less, more).
+//   - SSH sessions.
+//   - Any command requiring TTY control.
+//
+// Example:
+//
+//	func (m Model) Update(msg Msg) (Model, Cmd) {
+//	    switch msg := msg.(type) {
+//	    case ExecVimMsg:
+//	        return m, func() Msg {
+//	            cmd := exec.Command("vim", "file.txt")
+//	            err := m.program.ExecProcess(cmd)
+//	            return VimFinishedMsg{Err: err}
+//	        }
+//	    }
+//	    return m, nil
+//	}
+//
+// IMPORTANT:.
+//   - Must be called from a Cmd goroutine (NOT from Update directly).
+//   - Blocks until command completes.
+//   - Requires terminal to be set (auto-created in Run or via WithTerminal).
+//
+// Returns error if command execution fails.
+func (p *Program[T]) ExecProcess(cmd *exec.Cmd) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	// Validate terminal exists.
+	if p.terminal == nil {
+		// Auto-create terminal if not set (fallback for edge cases).
+		p.terminal = terminalinfra.NewTerminal()
+	}
+
+	// Validate command.
+	if cmd == nil {
+		return fmt.Errorf("exec: cmd is nil")
+	}
+
+	// STEP 1: Save TUI state.
+	// Remember if we were in alt screen.
+	wasInAltScreen := p.terminal.IsInAltScreen()
+
+	// STEP 2: Exit alternate screen (if active).
+	if wasInAltScreen {
+		if err := p.terminal.ExitAltScreen(); err != nil {
+			return fmt.Errorf("exec: failed to exit alt screen: %w", err)
+		}
+	}
+
+	// STEP 3: Show cursor (always restore visibility).
+	if err := p.terminal.ShowCursor(); err != nil {
+		// Non-fatal - continue anyway.
+		// Some terminals may not support cursor control.
+	}
+
+	// STEP 4: Setup command I/O - give it full terminal control.
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	// STEP 5: Run command (BLOCKING).
+	cmdErr := cmd.Run()
+
+	// STEP 6: ALWAYS restore TUI state (even if command failed).
+	// Re-enter alternate screen (if we were in it before).
+	if wasInAltScreen {
+		if err := p.terminal.EnterAltScreen(); err != nil {
+			// CRITICAL: TUI state corrupted.
+			return fmt.Errorf("exec: failed to restore alt screen (original error: %v): %w", cmdErr, err)
+		}
+	}
+
+	// STEP 7: Hide cursor (restore TUI cursor state).
+	if err := p.terminal.HideCursor(); err != nil {
+		// Non-fatal - continue anyway.
+	}
+
+	// STEP 8: Force full redraw.
+	// The TUI needs to repaint after external command.
+	p.renderView()
+
+	// Return original command error (if any).
+	return cmdErr
 }
