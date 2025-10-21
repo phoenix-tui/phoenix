@@ -1,5 +1,5 @@
-//go:build windows.
-// +build windows.
+//go:build windows
+// +build windows
 
 // Package windows provides Windows Console API implementation for native Windows terminals.
 //
@@ -26,12 +26,31 @@
 package windows
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"sync"
 
 	"golang.org/x/sys/windows"
 
 	"github.com/phoenix-tui/phoenix/terminal/api"
+)
+
+// Windows API constants for CreateConsoleScreenBuffer.
+const (
+	GENERIC_READ  = 0x80000000
+	GENERIC_WRITE = 0x40000000
+
+	FILE_SHARE_READ  = 0x00000001
+	FILE_SHARE_WRITE = 0x00000002
+
+	CONSOLE_TEXTMODE_BUFFER = 0x00000001
+)
+
+// Screen buffer errors.
+var (
+	ErrAlreadyInAltScreen = errors.New("terminal: already in alternate screen buffer")
+	ErrNotInAltScreen     = errors.New("terminal: not in alternate screen buffer")
 )
 
 // Console implements Terminal interface using Windows Console API.
@@ -42,10 +61,22 @@ import (
 //   - FillConsoleOutputCharacter - Ultra-fast clearing.
 //   - ReadConsoleOutput - Screen buffer readback.
 //   - WriteConsoleOutput - Optimized writing.
+//   - CreateConsoleScreenBuffer - Alternate screen buffer.
+//   - SetConsoleActiveScreenBuffer - Switch between buffers.
 type Console struct {
 	stdout windows.Handle // Handle to stdout console
 	stdin  windows.Handle // Handle to stdin console
 	info   windows.ConsoleScreenBufferInfo
+
+	// Alternate screen buffer state.
+	originalBuffer windows.Handle // Original stdout buffer (before alt screen)
+	altBuffer      windows.Handle // Alternate screen buffer handle
+	inAltScreen    bool           // True if currently in alternate screen
+	mu             sync.Mutex     // Protects screen buffer state
+
+	// Raw mode state.
+	inRawMode         bool   // True if currently in raw mode
+	originalInputMode uint32 // Saved input console mode (for restoration)
 }
 
 // NewConsole creates Windows Console API terminal.
@@ -589,4 +620,218 @@ func (c *Console) SupportsTrueColor() bool {
 // Platform returns Windows Console platform type.
 func (c *Console) Platform() api.Platform {
 	return api.PlatformWindowsConsole
+}
+
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Alternate Screen Buffer                                         │.
+// └─────────────────────────────────────────────────────────────────┘.
+
+// EnterAltScreen switches to alternate screen buffer.
+//
+// Creates a new console screen buffer and sets it as active, preserving.
+// the user's terminal content. When ExitAltScreen is called, the original.
+// terminal content is restored.
+//
+// Implementation:.
+//  1. Check if already in alt screen (prevent double-enter).
+//  2. Save original stdout handle.
+//  3. Create new screen buffer (CreateConsoleScreenBuffer).
+//  4. Set new buffer as active (SetConsoleActiveScreenBuffer).
+//  5. Update state flag.
+//
+// Thread-safe via mutex.
+func (c *Console) EnterAltScreen() error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// Prevent double-enter.
+	if c.inAltScreen {
+		return ErrAlreadyInAltScreen
+	}
+
+	// Save original buffer handle.
+	c.originalBuffer = c.stdout
+
+	// Create new screen buffer with same access rights as stdout.
+	// GENERIC_READ | GENERIC_WRITE (0xC0000000).
+	// FILE_SHARE_READ | FILE_SHARE_WRITE (0x00000003).
+	// CONSOLE_TEXTMODE_BUFFER (0x00000001).
+	altBuffer, err := CreateConsoleScreenBuffer(
+		GENERIC_READ|GENERIC_WRITE,
+		FILE_SHARE_READ|FILE_SHARE_WRITE,
+		nil, // Default security attributes
+		CONSOLE_TEXTMODE_BUFFER,
+		0, // Reserved (must be 0)
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create alternate screen buffer: %w", err)
+	}
+
+	c.altBuffer = altBuffer
+
+	// Set alternate buffer as active.
+	if err := SetConsoleActiveScreenBuffer(c.altBuffer); err != nil {
+		// Cleanup: close the buffer we just created.
+		windows.CloseHandle(c.altBuffer)
+		c.altBuffer = windows.InvalidHandle
+		return fmt.Errorf("failed to activate alternate screen buffer: %w", err)
+	}
+
+	// Update stdout handle to point to alternate buffer.
+	c.stdout = c.altBuffer
+	c.inAltScreen = true
+
+	return nil
+}
+
+// ExitAltScreen returns to normal screen buffer.
+//
+// Restores the user's original terminal content by switching back to.
+// the original screen buffer and closing the alternate buffer.
+//
+// Implementation:.
+//  1. Check if in alt screen (prevent double-exit).
+//  2. Restore original buffer as active (SetConsoleActiveScreenBuffer).
+//  3. Close alternate buffer handle.
+//  4. Update stdout handle back to original.
+//  5. Update state flag.
+//
+// Thread-safe via mutex.
+func (c *Console) ExitAltScreen() error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// Prevent double-exit.
+	if !c.inAltScreen {
+		return ErrNotInAltScreen
+	}
+
+	// Restore original buffer as active.
+	if err := SetConsoleActiveScreenBuffer(c.originalBuffer); err != nil {
+		return fmt.Errorf("failed to restore original screen buffer: %w", err)
+	}
+
+	// Close alternate buffer handle.
+	if err := windows.CloseHandle(c.altBuffer); err != nil {
+		// Non-fatal: buffer already switched, just log the error.
+		// Continue with cleanup even if CloseHandle fails.
+	}
+
+	// Restore stdout handle to original.
+	c.stdout = c.originalBuffer
+	c.altBuffer = windows.InvalidHandle
+	c.inAltScreen = false
+
+	return nil
+}
+
+// IsInAltScreen returns true if currently in alternate screen buffer.
+//
+// Used to check terminal state before Enter/Exit operations.
+// Prevents double-enter or double-exit bugs.
+//
+// Always returns accurate state (tracked internally, no syscalls).
+// Thread-safe via mutex.
+func (c *Console) IsInAltScreen() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.inAltScreen
+}
+
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Terminal Mode (Raw vs Cooked)                                   │.
+// └─────────────────────────────────────────────────────────────────┘.
+
+// IsInRawMode returns true if currently in raw mode.
+//
+// Used to check terminal state before Enter/Exit operations.
+// Thread-safe via mutex.
+func (c *Console) IsInRawMode() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.inRawMode
+}
+
+// EnterRawMode puts terminal into raw mode.
+//
+// Raw mode disables:.
+//   - Line buffering (input sent immediately).
+//   - Echo (typed characters not displayed).
+//   - Signal processing (Ctrl+C doesn't send SIGINT).
+//
+// Windows implementation uses SetConsoleMode with:.
+//   - ENABLE_VIRTUAL_TERMINAL_INPUT (0x0200) - VT input sequences.
+//   - Disables: ENABLE_LINE_INPUT, ENABLE_ECHO_INPUT, ENABLE_PROCESSED_INPUT.
+//
+// Saves original console mode for restoration via ExitRawMode.
+//
+// Thread-safe via mutex.
+func (c *Console) EnterRawMode() error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// Prevent double-enter.
+	if c.inRawMode {
+		return fmt.Errorf("terminal: already in raw mode")
+	}
+
+	// Get current console mode (save for restoration).
+	var mode uint32
+	if err := windows.GetConsoleMode(c.stdin, &mode); err != nil {
+		return fmt.Errorf("failed to get console mode: %w", err)
+	}
+	c.originalInputMode = mode
+
+	// Set raw mode:.
+	// - Remove ENABLE_LINE_INPUT (0x0002) - disable line buffering.
+	// - Remove ENABLE_ECHO_INPUT (0x0004) - disable echo.
+	// - Remove ENABLE_PROCESSED_INPUT (0x0001) - disable Ctrl+C processing.
+	// - Add ENABLE_VIRTUAL_TERMINAL_INPUT (0x0200) - enable VT sequences.
+	const (
+		ENABLE_LINE_INPUT              = 0x0002
+		ENABLE_ECHO_INPUT              = 0x0004
+		ENABLE_PROCESSED_INPUT         = 0x0001
+		ENABLE_VIRTUAL_TERMINAL_INPUT  = 0x0200
+	)
+
+	rawMode := mode
+	rawMode &^= ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_PROCESSED_INPUT
+	rawMode |= ENABLE_VIRTUAL_TERMINAL_INPUT
+
+	if err := windows.SetConsoleMode(c.stdin, rawMode); err != nil {
+		return fmt.Errorf("failed to enter raw mode: %w", err)
+	}
+
+	c.inRawMode = true
+	return nil
+}
+
+// ExitRawMode restores terminal to cooked mode (normal/canonical mode).
+//
+// Cooked mode restores:.
+//   - Line buffering (input buffered until Enter).
+//   - Echo (typed characters displayed).
+//   - Signal processing (Ctrl+C sends SIGINT).
+//
+// CRITICAL: Must call before running external interactive commands!
+// Commands like vim, ssh, python REPL expect cooked mode to function properly.
+//
+// Thread-safe via mutex.
+func (c *Console) ExitRawMode() error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// Prevent exit without enter.
+	if !c.inRawMode {
+		return fmt.Errorf("terminal: not in raw mode")
+	}
+
+	// Restore original console mode.
+	if err := windows.SetConsoleMode(c.stdin, c.originalInputMode); err != nil {
+		return fmt.Errorf("failed to exit raw mode: %w", err)
+	}
+
+	c.inRawMode = false
+	c.originalInputMode = 0
+	return nil
 }

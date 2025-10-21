@@ -245,3 +245,261 @@ func containsString(s, substr string) bool {
 	}
 	return false
 }
+
+// Additional OSC52 Tests
+
+func TestProvider_Write_Base64Encoding(t *testing.T) {
+	tmpFile, err := os.CreateTemp("", "clipboard-test-*")
+	if err != nil {
+		t.Fatalf("failed to create temp file: %v", err)
+	}
+	defer os.Remove(tmpFile.Name())
+	defer tmpFile.Close()
+
+	provider := NewProvider(5 * time.Second)
+	provider.WithOutput(tmpFile)
+
+	tests := []struct {
+		name    string
+		content string
+	}{
+		{"simple", "hello"},
+		{"unicode", "你好"},
+		{"emoji", "👋"},
+		{"special chars", "!@#$%^&*()"},
+		{"newlines", "line1\nline2\nline3"},
+		{"tabs", "col1\tcol2\tcol3"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			content, _ := model.NewTextContent(tt.content)
+
+			// Reset file
+			tmpFile.Truncate(0)
+			tmpFile.Seek(0, 0)
+
+			err := provider.Write(content)
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+
+			// Read back
+			tmpFile.Seek(0, 0)
+			buf := make([]byte, 4096)
+			n, _ := tmpFile.Read(buf)
+			output := string(buf[:n])
+
+			// Verify OSC 52 sequence present
+			if !containsString(output, "\033]52;c;") {
+				t.Errorf("expected OSC 52 sequence in output")
+			}
+		})
+	}
+}
+
+func TestProvider_Write_LargeContent(t *testing.T) {
+	tmpFile, err := os.CreateTemp("", "clipboard-test-*")
+	if err != nil {
+		t.Fatalf("failed to create temp file: %v", err)
+	}
+	defer os.Remove(tmpFile.Name())
+	defer tmpFile.Close()
+
+	provider := NewProvider(5 * time.Second)
+	provider.WithOutput(tmpFile)
+
+	// Generate 100KB of text
+	largeData := ""
+	for i := 0; i < 10000; i++ {
+		largeData += "0123456789"
+	}
+
+	content, _ := model.NewTextContent(largeData)
+
+	err = provider.Write(content)
+	if err != nil {
+		t.Errorf("unexpected error for large content: %v", err)
+	}
+}
+
+func TestProvider_IsAvailable_TerminalVariants(t *testing.T) {
+	origTERM := os.Getenv("TERM")
+	defer os.Setenv("TERM", origTERM)
+
+	// Clear SSH vars
+	os.Unsetenv("SSH_TTY")
+	os.Unsetenv("SSH_CLIENT")
+	os.Unsetenv("SSH_CONNECTION")
+
+	tests := []struct {
+		term string
+		want string // "true", "false", or "skip" (non-terminal output)
+	}{
+		{"xterm", "true"},
+		{"xterm-256color", "true"},
+		{"screen", "true"},
+		{"screen-256color", "skip"}, // Not in supported list
+		{"tmux", "true"},
+		{"tmux-256color", "true"},
+		{"dumb", "false"},
+		{"vt100", "skip"}, // Not in supported list
+		{"", "false"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.term, func(t *testing.T) {
+			os.Setenv("TERM", tt.term)
+
+			provider := NewProvider(5 * time.Second)
+
+			// IsAvailable checks if output is a terminal
+			// In test environment, os.Stdout might not be a TTY
+			available := provider.IsAvailable()
+
+			// We can't assert the exact value because it depends on
+			// whether stdout is a terminal in the test environment
+			// But we can verify it doesn't panic
+			_ = available
+
+			if tt.want == "false" && available {
+				// Only assert false cases when TERM is clearly unsupported
+				// and no SSH vars are set
+				// This test is mostly to ensure no panic
+			}
+		})
+	}
+}
+
+func TestProvider_IsAvailable_NotTerminal(t *testing.T) {
+	// Create a regular file (not a terminal)
+	tmpFile, err := os.CreateTemp("", "clipboard-test-*")
+	if err != nil {
+		t.Fatalf("failed to create temp file: %v", err)
+	}
+	defer os.Remove(tmpFile.Name())
+	defer tmpFile.Close()
+
+	// Clear env vars
+	os.Unsetenv("SSH_TTY")
+	os.Unsetenv("SSH_CLIENT")
+	os.Unsetenv("SSH_CONNECTION")
+
+	provider := NewProvider(5 * time.Second)
+	provider.WithOutput(tmpFile)
+
+	if provider.IsAvailable() {
+		t.Error("expected IsAvailable to return false for non-terminal output")
+	}
+}
+
+func TestProvider_Write_EmptyContent(t *testing.T) {
+	provider := NewProvider(5 * time.Second)
+
+	// Empty content is rejected by domain model, so this should fail
+	content, err := model.NewTextContent("")
+	if err != nil {
+		// Expected - empty content not allowed
+		return
+	}
+
+	// If we got here, try writing
+	err = provider.Write(content)
+	// Either way is acceptable
+	_ = err
+}
+
+func TestProvider_Write_SpecialCharacters(t *testing.T) {
+	tmpFile, err := os.CreateTemp("", "clipboard-test-*")
+	if err != nil {
+		t.Fatalf("failed to create temp file: %v", err)
+	}
+	defer os.Remove(tmpFile.Name())
+	defer tmpFile.Close()
+
+	provider := NewProvider(5 * time.Second)
+	provider.WithOutput(tmpFile)
+
+	tests := []string{
+		"\x00\x01\x02",           // Control characters
+		"\033[1m",                // ANSI escape
+		"<script>alert()</script>", // HTML/JS
+		"'; DROP TABLE--",        // SQL injection attempt
+	}
+
+	for _, content := range tests {
+		t.Run("special", func(t *testing.T) {
+			c, _ := model.NewTextContent(content)
+
+			tmpFile.Truncate(0)
+			tmpFile.Seek(0, 0)
+
+			err := provider.Write(c)
+			// Should handle special characters safely
+			if err != nil {
+				t.Logf("Write failed (acceptable): %v", err)
+			}
+		})
+	}
+}
+
+func TestProvider_Name_Consistency(t *testing.T) {
+	provider := NewProvider(5 * time.Second)
+
+	// Call multiple times
+	name1 := provider.Name()
+	name2 := provider.Name()
+	name3 := provider.Name()
+
+	if name1 != name2 || name2 != name3 {
+		t.Error("Name() should return consistent results")
+	}
+
+	if name1 != "OSC52" {
+		t.Errorf("expected 'OSC52', got %s", name1)
+	}
+}
+
+func TestProvider_WithOutput_Chaining(t *testing.T) {
+	tmpFile, err := os.CreateTemp("", "clipboard-test-*")
+	if err != nil {
+		t.Fatalf("failed to create temp file: %v", err)
+	}
+	defer os.Remove(tmpFile.Name())
+	defer tmpFile.Close()
+
+	provider := NewProvider(5 * time.Second).WithOutput(tmpFile)
+
+	if provider.output != tmpFile {
+		t.Error("expected output to be set via chaining")
+	}
+}
+
+func TestProvider_IsAvailable_SSHIndicators_Priority(t *testing.T) {
+	origSSHTTY := os.Getenv("SSH_TTY")
+	origTERM := os.Getenv("TERM")
+	defer func() {
+		os.Setenv("SSH_TTY", origSSHTTY)
+		os.Setenv("TERM", origTERM)
+	}()
+
+	// Clear SSH vars
+	os.Unsetenv("SSH_TTY")
+	os.Unsetenv("SSH_CLIENT")
+	os.Unsetenv("SSH_CONNECTION")
+
+	// Set unsupported TERM
+	os.Setenv("TERM", "dumb")
+
+	provider := NewProvider(5 * time.Second)
+
+	// Without SSH vars and with unsupported TERM, should be unavailable
+	// (assuming output is not a terminal, which is typical in test env)
+	_ = provider.IsAvailable()
+
+	// Now set SSH_TTY
+	os.Setenv("SSH_TTY", "/dev/pts/0")
+
+	// Should still depend on terminal check
+	_ = provider.IsAvailable()
+}

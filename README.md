@@ -47,10 +47,97 @@ Phoenix is a modular framework with 8 independent libraries:
 - **phoenix/mouse** ✅ - Mouse events (click, scroll, drag-drop, right-click support)
 - **phoenix/clipboard** ✅ - Cross-platform clipboard (OSC 52 for SSH)
 
-## Quick Start
+## Installation
+
+### Install All Libraries (Recommended for new projects)
 
 ```bash
-go get github.com/phoenix-tui/phoenix/tea
+go get github.com/phoenix-tui/phoenix@latest
+```
+
+This installs the umbrella module with convenient access to all Phoenix libraries through a single import:
+
+```go
+import "github.com/phoenix-tui/phoenix"
+
+// Use convenience API
+term := phoenix.AutoDetectTerminal()
+style := phoenix.NewStyle().Foreground("#00FF00").Bold()
+p := phoenix.NewProgram(myModel, phoenix.WithAltScreen[MyModel]())
+```
+
+### Install Individual Libraries (For existing projects or selective use)
+
+```bash
+go get github.com/phoenix-tui/phoenix/tea@latest        # Elm Architecture
+go get github.com/phoenix-tui/phoenix/components@latest # UI Components
+go get github.com/phoenix-tui/phoenix/style@latest      # Styling
+go get github.com/phoenix-tui/phoenix/core@latest       # Terminal primitives
+```
+
+Individual imports give you more control and smaller dependencies:
+
+```go
+import (
+    tea "github.com/phoenix-tui/phoenix/tea/api"
+    "github.com/phoenix-tui/phoenix/components/input/api"
+)
+```
+
+## Quick Start
+
+### Using the Umbrella Module
+
+```bash
+go get github.com/phoenix-tui/phoenix@latest
+```
+
+```go
+package main
+
+import (
+    "fmt"
+    "os"
+    "github.com/phoenix-tui/phoenix"
+    tea "github.com/phoenix-tui/phoenix/tea/api"
+)
+
+type Model struct {
+    count int
+}
+
+func (m Model) Init() tea.Cmd { return nil }
+
+func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+    switch msg := msg.(type) {
+    case tea.KeyMsg:
+        if msg.String() == "q" {
+            return m, phoenix.Quit()
+        }
+        m.count++
+    }
+    return m, nil
+}
+
+func (m Model) View() string {
+    // Use Phoenix convenience API for styling
+    style := phoenix.NewStyle().Foreground("#00FF00").Bold()
+    return style.Render(fmt.Sprintf("Count: %d\n", m.count))
+}
+
+func main() {
+    p := phoenix.NewProgram(Model{}, phoenix.WithAltScreen[Model]())
+    if err := p.Run(); err != nil {
+        fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+        os.Exit(1)
+    }
+}
+```
+
+### Using Individual Libraries
+
+```bash
+go get github.com/phoenix-tui/phoenix/tea@latest
 ```
 
 ```go

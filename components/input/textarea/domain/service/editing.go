@@ -220,6 +220,57 @@ func (s *EditingService) KillWord(ta *model.TextArea) *model.TextArea {
 	return ta.WithBuffer(newBuffer).WithKillRing(killRing)
 }
 
+// KillWordBackward deletes word before cursor (Ctrl+W, Alt+Backspace).
+func (s *EditingService) KillWordBackward(ta *model.TextArea) *model.TextArea {
+	if ta.IsReadOnly() {
+		return ta
+	}
+
+	row, col := ta.CursorPosition()
+	line := []rune(ta.CurrentLine())
+	buffer := ta.GetBuffer()
+
+	if col == 0 {
+		return ta // At start of line, nothing to kill backward
+	}
+
+	// Find start of word backward (similar to BackwardWord navigation).
+	endCol := col
+	newCol := col - 1
+
+	// Skip whitespace backward.
+	for newCol > 0 && isWordBoundary(line[newCol]) {
+		newCol--
+	}
+
+	// Skip current word backward.
+	for newCol > 0 && !isWordBoundary(line[newCol-1]) {
+		newCol--
+	}
+
+	// Note: If newCol is 0 and line[0] is not a word boundary, we delete from start.
+	// No special handling needed as the slice operation handles this correctly.
+
+	if newCol == endCol {
+		return ta // No word to kill
+	}
+
+	// Kill from newCol to endCol.
+	killed := string(line[newCol:endCol])
+	killRing := ta.GetKillRing().Kill(killed)
+
+	// Delete from buffer (delete backward from cursor).
+	newBuffer := buffer
+	for i := newCol; i < endCol; i++ {
+		newBuffer = newBuffer.DeleteChar(row, newCol)
+	}
+
+	// Move cursor to where deletion started.
+	newCursor := model.NewCursor(row, newCol)
+
+	return ta.WithBuffer(newBuffer).WithCursor(newCursor).WithKillRing(killRing)
+}
+
 // Yank inserts text from kill ring (Ctrl+Y).
 func (s *EditingService) Yank(ta *model.TextArea) *model.TextArea {
 	if ta.IsReadOnly() {

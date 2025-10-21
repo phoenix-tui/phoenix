@@ -187,6 +187,93 @@ type Terminal interface {
 
 	// Platform returns the detected terminal platform type.
 	Platform() Platform
+
+	// ┌─────────────────────────────────────────────────────────────┐.
+	// │ Alternate Screen Buffer                                     │.
+	// └─────────────────────────────────────────────────────────────┘.
+
+	// EnterAltScreen switches to alternate screen buffer.
+	//
+	// Creates a "clean slate" for TUI applications, preserving user's.
+	// terminal content. When the TUI exits (via ExitAltScreen), the.
+	// original terminal content is restored.
+	//
+	// Implementation:.
+	//   - Windows Console: CreateConsoleScreenBuffer() + SetConsoleActiveScreenBuffer().
+	//   - Unix/ANSI: CSI ? 1049 h (xterm alternate screen buffer).
+	//
+	// Used by TUI frameworks to avoid polluting user's terminal history.
+	// Essential for phoenix/tea Program when WithAltScreen() option is enabled.
+	//
+	// Returns error if screen buffer creation fails or if already in alt screen.
+	EnterAltScreen() error
+
+	// ExitAltScreen returns to normal screen buffer.
+	//
+	// Restores the user's original terminal content (before EnterAltScreen).
+	// Any content written to alternate screen buffer is discarded.
+	//
+	// Implementation:.
+	//   - Windows Console: SetConsoleActiveScreenBuffer(originalBuffer).
+	//   - Unix/ANSI: CSI ? 1049 l (xterm normal screen buffer).
+	//
+	// IMPORTANT: Always call this before application exit to restore terminal!.
+	// TUI frameworks handle this automatically in cleanup routines.
+	//
+	// Returns error if screen buffer switch fails or if not in alt screen.
+	ExitAltScreen() error
+
+	// IsInAltScreen returns true if currently in alternate screen buffer.
+	//
+	// Used to check terminal state before Enter/Exit operations.
+	// Prevents double-enter or double-exit bugs.
+	//
+	// Always returns accurate state (tracked internally, no syscalls).
+	IsInAltScreen() bool
+
+	// ┌─────────────────────────────────────────────────────────────┐.
+	// │ Terminal Mode (Raw vs Cooked)                               │.
+	// └─────────────────────────────────────────────────────────────┘.
+
+	// IsInRawMode returns true if currently in raw mode.
+	//
+	// Raw mode disables:.
+	//   - Line buffering (input sent immediately, not on Enter).
+	//   - Echo (typed characters not displayed).
+	//   - Signal processing (Ctrl+C doesn't send SIGINT).
+	//
+	// Used to check terminal state before Enter/Exit operations.
+	// Always returns accurate state (tracked internally, no syscalls).
+	IsInRawMode() bool
+
+	// EnterRawMode puts terminal into raw mode.
+	//
+	// Raw mode is required for TUI applications to:.
+	//   - Receive input character-by-character (not line-by-line).
+	//   - Handle all keys (including Ctrl+C, arrows, etc.).
+	//   - Control exact output (no automatic echoing).
+	//
+	// Implementation:.
+	//   - Unix: term.MakeRaw() from golang.org/x/term.
+	//   - Windows: SetConsoleMode with ENABLE_VIRTUAL_TERMINAL_INPUT.
+	//
+	// Saves original terminal state for restoration via ExitRawMode.
+	//
+	// Returns error if already in raw mode or syscall fails.
+	EnterRawMode() error
+
+	// ExitRawMode restores terminal to cooked mode (normal/canonical mode).
+	//
+	// Cooked mode restores:.
+	//   - Line buffering (input buffered until Enter pressed).
+	//   - Echo (typed characters displayed automatically).
+	//   - Signal processing (Ctrl+C sends SIGINT).
+	//
+	// IMPORTANT: Must call before running external interactive commands!
+	// External commands (vim, ssh, python REPL) expect cooked mode.
+	//
+	// Returns error if not in raw mode or syscall fails.
+	ExitRawMode() error
 }
 
 // Platform identifies the terminal platform type.
