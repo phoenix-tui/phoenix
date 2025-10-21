@@ -61,7 +61,7 @@ func (e *EmacsKeybindings) Handle(msg api.KeyMsg, ta *model.TextArea) (*model.Te
 				return e.editing.KillLine(ta), nil
 
 			case 'w', 'W':
-				return e.editing.KillWord(ta), nil
+				return e.editing.KillWordBackward(ta), nil
 
 			case 'y', 'Y':
 				return e.editing.Yank(ta), nil
@@ -100,7 +100,7 @@ func (e *EmacsKeybindings) Handle(msg api.KeyMsg, ta *model.TextArea) (*model.Te
 			}
 
 		case api.KeyBackspace:
-			return e.editing.KillWord(ta), nil
+			return e.editing.KillWordBackward(ta), nil
 		}
 	}
 

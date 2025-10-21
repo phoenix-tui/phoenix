@@ -92,3 +92,221 @@
 //
 // This will show the exact version you're using, including any pre-release tags.
 package phoenix
+
+import (
+	clipboardapi "github.com/phoenix-tui/phoenix/clipboard/api"
+	coreapi "github.com/phoenix-tui/phoenix/core/api"
+	styleapi "github.com/phoenix-tui/phoenix/style/api"
+	teaapi "github.com/phoenix-tui/phoenix/tea/api"
+	terminalapi "github.com/phoenix-tui/phoenix/terminal/api"
+	terminalinfra "github.com/phoenix-tui/phoenix/terminal/infrastructure"
+)
+
+// ┌─────────────────────────────────────────────────────────────┐
+// │ Core - Terminal Primitives                                  │
+// └─────────────────────────────────────────────────────────────┘
+
+// AutoDetectTerminal creates a Terminal by auto-detecting the current environment.
+// This is the recommended way to create a Terminal for most applications.
+//
+// Example:
+//
+//	term := phoenix.AutoDetectTerminal()
+//	fmt.Printf("Terminal size: %dx%d\n", term.Size().Width, term.Size().Height)
+func AutoDetectTerminal() *coreapi.Terminal {
+	return coreapi.AutoDetect()
+}
+
+// NewTerminal creates a new Terminal with default auto-detected capabilities.
+// Equivalent to AutoDetectTerminal() - provided for API completeness.
+//
+// Example:
+//
+//	term := phoenix.NewTerminal()
+//	fmt.Printf("Terminal size: %dx%d\n", term.Size().Width, term.Size().Height)
+func NewTerminal() *coreapi.Terminal {
+	return coreapi.NewTerminal()
+}
+
+// NewTerminalWithCapabilities creates a new Terminal with the specified capabilities.
+// Use this when you need full control over terminal configuration.
+//
+// Example:
+//
+//	caps := phoenix.NewCapabilities(true, phoenix.ColorDepth256, true, true, true)
+//	term := phoenix.NewTerminalWithCapabilities(caps)
+func NewTerminalWithCapabilities(caps *coreapi.Capabilities) *coreapi.Terminal {
+	return coreapi.NewTerminalWithCapabilities(caps)
+}
+
+// NewSize creates a new terminal size (width x height in cells).
+//
+// Example:
+//
+//	size := phoenix.NewSize(80, 24)  // 80 columns, 24 rows
+func NewSize(width, height int) coreapi.Size {
+	return coreapi.NewSize(width, height)
+}
+
+// NewCapabilities creates a new terminal capabilities configuration.
+//
+// Example:
+//
+//	caps := phoenix.NewCapabilities(
+//		true,                      // ANSI support
+//		phoenix.ColorDepth256,     // 256-color support
+//		true,                      // Mouse support
+//		true,                      // Alt screen support
+//		true,                      // Cursor support
+//	)
+func NewCapabilities(ansi bool, colorDepth coreapi.ColorDepth, mouse, altScreen, cursor bool) *coreapi.Capabilities {
+	return coreapi.NewCapabilities(ansi, colorDepth, mouse, altScreen, cursor)
+}
+
+// ColorDepth constants (re-exported from core)
+const (
+	ColorDepthNone      = coreapi.ColorDepthNone
+	ColorDepth8         = coreapi.ColorDepth8
+	ColorDepth256       = coreapi.ColorDepth256
+	ColorDepthTrueColor = coreapi.ColorDepthTrueColor
+)
+
+// ┌─────────────────────────────────────────────────────────────┐
+// │ Style - CSS-like Styling                                    │
+// └─────────────────────────────────────────────────────────────┘
+
+// NewStyle creates a new Style builder for applying colors, borders, padding, etc.
+//
+// Example:
+//
+//	s := phoenix.NewStyle().
+//		Foreground("#00FF00").
+//		Background("#000000").
+//		Bold().
+//		Padding(1)
+//	fmt.Println(s.Render("Styled text"))
+func NewStyle() styleapi.Style {
+	return styleapi.New()
+}
+
+// ┌─────────────────────────────────────────────────────────────┐
+// │ Tea - Elm Architecture (Model-Update-View)                  │
+// └─────────────────────────────────────────────────────────────┘
+
+// modelConstraint defines the interface that models must implement for Tea programs.
+// This is re-exported from tea/api to make the umbrella API self-contained.
+type modelConstraint[T any] interface {
+	Init() teaapi.Cmd
+	Update(teaapi.Msg) (T, teaapi.Cmd)
+	View() string
+}
+
+// NewProgram creates a new Tea Program with the given model.
+// This is the main entry point for building Phoenix TUI applications.
+//
+// Example:
+//
+//	type MyModel struct { count int }
+//	// ... implement tea.Model interface ...
+//
+//	p := phoenix.NewProgram(MyModel{}, phoenix.WithAltScreen[MyModel]())
+//	if err := p.Run(); err != nil {
+//		log.Fatal(err)
+//	}
+func NewProgram[T modelConstraint[T]](model T, opts ...teaapi.Option[T]) *teaapi.Program[T] {
+	return teaapi.New(model, opts...)
+}
+
+// WithAltScreen enables the alternate screen buffer.
+// This allows your TUI to take over the full terminal without affecting the scrollback.
+//
+// Example:
+//
+//	p := phoenix.NewProgram(model, phoenix.WithAltScreen[MyModel]())
+func WithAltScreen[T any]() teaapi.Option[T] {
+	return teaapi.WithAltScreen[T]()
+}
+
+// WithMouseAllMotion enables mouse support with all motion events.
+//
+// Example:
+//
+//	p := phoenix.NewProgram(model, phoenix.WithMouseAllMotion[MyModel]())
+func WithMouseAllMotion[T any]() teaapi.Option[T] {
+	return teaapi.WithMouseAllMotion[T]()
+}
+
+// Quit returns a command that quits the program.
+//
+// Example:
+//
+//	func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+//		if msg.(tea.KeyMsg).String() == "q" {
+//			return m, phoenix.Quit()
+//		}
+//		return m, nil
+//	}
+func Quit() teaapi.Cmd {
+	return teaapi.Quit()
+}
+
+// ┌─────────────────────────────────────────────────────────────┐
+// │ Clipboard - Cross-platform Clipboard Operations             │
+// └─────────────────────────────────────────────────────────────┘
+
+// ReadClipboard reads text from the system clipboard.
+//
+// Example:
+//
+//	text, err := phoenix.ReadClipboard()
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	fmt.Println("Clipboard:", text)
+func ReadClipboard() (string, error) {
+	return clipboardapi.Read()
+}
+
+// WriteClipboard writes text to the system clipboard.
+//
+// Example:
+//
+//	err := phoenix.WriteClipboard("Hello, clipboard!")
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+func WriteClipboard(text string) error {
+	return clipboardapi.Write(text)
+}
+
+// ┌─────────────────────────────────────────────────────────────┐
+// │ Terminal - Platform-optimized Terminal Operations           │
+// └─────────────────────────────────────────────────────────────┘
+
+// NewPlatformTerminal creates a new platform-optimized Terminal.
+// Automatically selects the best implementation for the current platform:
+//   - Windows Console API (fastest on Windows cmd.exe/PowerShell)
+//   - ANSI fallback (for Git Bash, MinTTY, Unix)
+//
+// Note: This is from the terminal/infrastructure package, providing lower-level
+// operations compared to core/api Terminal which focuses on capabilities detection.
+//
+// Example:
+//
+//	term := phoenix.NewPlatformTerminal()
+//	term.HideCursor()
+//	defer term.ShowCursor()
+func NewPlatformTerminal() terminalapi.Terminal {
+	return terminalinfra.NewTerminal()
+}
+
+// NewANSITerminal creates a new ANSI-based Terminal.
+// Use this when you want to force ANSI escape codes (e.g., for SSH, tmux).
+//
+// Example:
+//
+//	term := phoenix.NewANSITerminal()
+//	term.Clear()
+func NewANSITerminal() terminalapi.Terminal {
+	return terminalinfra.NewANSITerminal()
+}

@@ -9,7 +9,8 @@ import (
 
 func main() {
 	fmt.Println("Phoenix Core - Basic Example")
-	fmt.Println("=============================\n")
+	fmt.Println("=============================")
+	fmt.Println()
 
 	// Auto-detect terminal capabilities
 	term := core.AutoDetect()
@@ -24,14 +25,16 @@ func main() {
 	fmt.Printf("Alt Screen: %v\n", caps.SupportsAltScreen())
 	fmt.Printf("Cursor Control: %v\n", caps.SupportsCursorControl())
 
-	fmt.Println("\n--- Position Operations ---")
+	fmt.Println()
+	fmt.Println("--- Position Operations ---")
 	pos := core.NewPosition(5, 10)
 	fmt.Printf("Initial position: Row=%d, Col=%d\n", pos.Row, pos.Col)
 
 	moved := pos.Add(3, 5)
 	fmt.Printf("After Add(3, 5): Row=%d, Col=%d\n", moved.Row, moved.Col)
 
-	fmt.Println("\n--- Size Operations ---")
+	fmt.Println()
+	fmt.Println("--- Size Operations ---")
 	size := core.NewSize(120, 40)
 	fmt.Printf("Custom size: %dx%d\n", size.Width, size.Height)
 
@@ -40,14 +43,16 @@ func main() {
 	fmt.Printf("Original terminal size: %dx%d\n", term.Size().Width, term.Size().Height)
 	fmt.Printf("Resized terminal size: %dx%d\n", resized.Size().Width, resized.Size().Height)
 
-	fmt.Println("\n--- Cell Operations ---")
+	fmt.Println()
+	fmt.Println("--- Cell Operations ---")
 
 	// Manual width (old way - still supported for advanced use)
 	ascii := core.NewCell("A", 1)
 	fmt.Printf("ASCII cell (manual) '%s' has width %d\n", ascii.Content, ascii.Width)
 
 	// Automatic width (new way - recommended!)
-	fmt.Println("\n🔥 Auto-width calculation (NEW!):")
+	fmt.Println()
+	fmt.Println("🔥 Auto-width calculation (NEW!):")
 	asciiAuto := core.NewCellAuto("A")
 	emojiAuto := core.NewCellAuto("😀")
 	cjkAuto := core.NewCellAuto("中")
@@ -57,9 +62,11 @@ func main() {
 	fmt.Printf("  CJK cell (auto) '%s' has width %d\n", cjkAuto.Content, cjkAuto.Width)
 	fmt.Printf("  Mixed cell (auto) '%s' has width %d\n", mixedAuto.Content, mixedAuto.Width)
 
-	fmt.Println("\n--- Manual Capabilities ---")
+	fmt.Println()
+	fmt.Println("--- Manual Capabilities ---")
 	manual := core.NewCapabilities(true, core.ColorDepth256, true, true, true)
 	fmt.Printf("Manual capabilities: %s with mouse support\n", manual.ColorDepth().String())
 
-	fmt.Println("\n✨ Phoenix Core working perfectly!")
+	fmt.Println()
+	fmt.Println("✨ Phoenix Core working perfectly!")
 }

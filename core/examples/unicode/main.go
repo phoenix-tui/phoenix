@@ -7,7 +7,8 @@ import (
 
 func main() {
 	fmt.Println("Phoenix Unicode Service Demo")
-	fmt.Println("================================\n")
+	fmt.Println("================================")
+	fmt.Println()
 
 	us := coreService.NewUnicodeService()
 

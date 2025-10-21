@@ -1,15 +1,16 @@
-package service
+package comparison_test
 
 import (
 	"testing"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/mattn/go-runewidth"
+	"github.com/phoenix-tui/phoenix/core/domain/service"
 )
 
 // TestCorrectness_Lipgloss562Bug verifies if Lipgloss #562 is still broken
 func TestCorrectness_Lipgloss562Bug(t *testing.T) {
-	us := NewUnicodeService()
+	us := service.NewUnicodeService()
 
 	testCases := []struct {
 		name     string

@@ -26,8 +26,10 @@ import (
 //	assert.Equal(t, 1, mock.CallCount("ClearLine"))
 //	assert.Equal(t, "SetCursorPosition(10, 5)", mock.Calls[0])
 type MockTerminal struct {
-	mu    sync.Mutex
-	Calls []string // All recorded method calls with arguments
+	inAltScreen bool // Tracks alternate screen state
+	inRawMode   bool // Tracks raw mode state
+	mu          sync.Mutex
+	Calls       []string // All recorded method calls with arguments
 }
 
 // NewMockTerminal creates a new mock terminal.
@@ -240,4 +242,90 @@ func (m *MockTerminal) SupportsTrueColor() bool {
 func (m *MockTerminal) Platform() api.Platform {
 	m.record("Platform")
 	return api.PlatformUnknown
+}
+
+// ┌─────────────────────────────────────────────────────────────┐
+// │ Alternate Screen Buffer                                     │
+// └─────────────────────────────────────────────────────────────┘
+
+// EnterAltScreen enters alternate screen buffer (mock implementation).
+func (m *MockTerminal) EnterAltScreen() error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	m.Calls = append(m.Calls, "EnterAltScreen")
+
+	if m.inAltScreen {
+		return fmt.Errorf("already in alternate screen")
+	}
+
+	m.inAltScreen = true
+	return nil
+}
+
+// ExitAltScreen exits alternate screen buffer (mock implementation).
+func (m *MockTerminal) ExitAltScreen() error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	m.Calls = append(m.Calls, "ExitAltScreen")
+
+	if !m.inAltScreen {
+		return fmt.Errorf("not in alternate screen")
+	}
+
+	m.inAltScreen = false
+	return nil
+}
+
+// IsInAltScreen returns whether in alternate screen buffer (mock implementation).
+func (m *MockTerminal) IsInAltScreen() bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	m.Calls = append(m.Calls, "IsInAltScreen")
+	return m.inAltScreen
+}
+
+// ┌─────────────────────────────────────────────────────────────┐
+// │ Terminal Mode (Raw vs Cooked)                               │
+// └─────────────────────────────────────────────────────────────┘
+
+// IsInRawMode returns whether in raw mode (mock implementation).
+func (m *MockTerminal) IsInRawMode() bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	m.Calls = append(m.Calls, "IsInRawMode")
+	return m.inRawMode
+}
+
+// EnterRawMode enters raw mode (mock implementation).
+func (m *MockTerminal) EnterRawMode() error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	m.Calls = append(m.Calls, "EnterRawMode")
+
+	if m.inRawMode {
+		return fmt.Errorf("terminal: already in raw mode")
+	}
+
+	m.inRawMode = true
+	return nil
+}
+
+// ExitRawMode exits raw mode (mock implementation).
+func (m *MockTerminal) ExitRawMode() error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	m.Calls = append(m.Calls, "ExitRawMode")
+
+	if !m.inRawMode {
+		return fmt.Errorf("terminal: not in raw mode")
+	}
+
+	m.inRawMode = false
+	return nil
 }

@@ -11,24 +11,42 @@
 package unix
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"sync"
 
 	"golang.org/x/term"
 
 	"github.com/phoenix-tui/phoenix/terminal/api"
 )
 
+// Screen buffer errors.
+var (
+	ErrAlreadyInAltScreen = errors.New("terminal: already in alternate screen buffer")
+	ErrNotInAltScreen     = errors.New("terminal: not in alternate screen buffer")
+)
+
 // ANSITerminal implements Terminal interface using ANSI escape codes.
 type ANSITerminal struct {
 	output *os.File // Usually os.Stdout
+	input  *os.File // Usually os.Stdin (for raw mode management)
+
+	// Alternate screen buffer state.
+	inAltScreen bool       // True if currently in alternate screen
+	mu          sync.Mutex // Protects screen buffer state
+
+	// Raw mode state.
+	inRawMode     bool        // True if currently in raw mode
+	originalState *term.State // Saved cooked mode state (for restoration)
 }
 
 // NewANSI creates new ANSI terminal implementation.
-// Uses os.Stdout by default.
+// Uses os.Stdout and os.Stdin by default.
 func NewANSI() *ANSITerminal {
 	return &ANSITerminal{
 		output: os.Stdout,
+		input:  os.Stdin,
 	}
 }
 
@@ -37,6 +55,7 @@ func NewANSI() *ANSITerminal {
 func NewANSIWithOutput(output *os.File) *ANSITerminal {
 	return &ANSITerminal{
 		output: output,
+		input:  os.Stdin, // Still use default stdin for raw mode
 	}
 }
 
@@ -325,4 +344,177 @@ func (a *ANSITerminal) SupportsTrueColor() bool {
 // Platform returns Unix platform type.
 func (a *ANSITerminal) Platform() api.Platform {
 	return api.PlatformUnix
+}
+
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Alternate Screen Buffer                                         │.
+// └─────────────────────────────────────────────────────────────────┘.
+
+// EnterAltScreen switches to alternate screen buffer.
+//
+// Uses xterm alternate screen buffer via ANSI escape sequence.
+// Preserves the user's terminal content. When ExitAltScreen is called,.
+// the original terminal content is restored.
+//
+// Implementation:.
+//  1. Check if already in alt screen (prevent double-enter).
+//  2. Write ANSI escape: "\033[?1049h" (save cursor + switch to alt screen).
+//  3. Update state flag.
+//
+// Sequence details:.
+//   - \033[?1049h = CSI ? 1049 h (xterm private mode 1049).
+//   - Combines save cursor + clear + alt screen buffer.
+//   - Widely supported (xterm, VTE-based terminals, iTerm2, macOS Terminal).
+//
+// Thread-safe via mutex.
+func (a *ANSITerminal) EnterAltScreen() error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	// Prevent double-enter.
+	if a.inAltScreen {
+		return ErrAlreadyInAltScreen
+	}
+
+	// Switch to alternate screen buffer.
+	// CSI ? 1049 h = Save cursor + clear + switch to alt screen.
+	_, err := fmt.Fprint(a.output, "\033[?1049h")
+	if err != nil {
+		return fmt.Errorf("failed to enter alternate screen buffer: %w", err)
+	}
+
+	a.inAltScreen = true
+	return nil
+}
+
+// ExitAltScreen returns to normal screen buffer.
+//
+// Restores the user's original terminal content by switching back to.
+// the normal screen buffer.
+//
+// Implementation:.
+//  1. Check if in alt screen (prevent double-exit).
+//  2. Write ANSI escape: "\033[?1049l" (restore cursor + switch to normal screen).
+//  3. Update state flag.
+//
+// Sequence details:.
+//   - \033[?1049l = CSI ? 1049 l (xterm private mode 1049 reset).
+//   - Restores cursor position + switches back to normal buffer.
+//   - Widely supported across modern terminals.
+//
+// Thread-safe via mutex.
+func (a *ANSITerminal) ExitAltScreen() error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	// Prevent double-exit.
+	if !a.inAltScreen {
+		return ErrNotInAltScreen
+	}
+
+	// Return to normal screen buffer.
+	// CSI ? 1049 l = Restore cursor + switch to normal screen.
+	_, err := fmt.Fprint(a.output, "\033[?1049l")
+	if err != nil {
+		return fmt.Errorf("failed to exit alternate screen buffer: %w", err)
+	}
+
+	a.inAltScreen = false
+	return nil
+}
+
+// IsInAltScreen returns true if currently in alternate screen buffer.
+//
+// Used to check terminal state before Enter/Exit operations.
+// Prevents double-enter or double-exit bugs.
+//
+// Always returns accurate state (tracked internally, no syscalls).
+// Thread-safe via mutex.
+func (a *ANSITerminal) IsInAltScreen() bool {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return a.inAltScreen
+}
+
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Terminal Mode (Raw vs Cooked)                                   │.
+// └─────────────────────────────────────────────────────────────────┘.
+
+// IsInRawMode returns true if currently in raw mode.
+//
+// Used to check terminal state before Enter/Exit operations.
+// Thread-safe via mutex.
+func (a *ANSITerminal) IsInRawMode() bool {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return a.inRawMode
+}
+
+// EnterRawMode puts terminal into raw mode.
+//
+// Raw mode disables:.
+//   - Line buffering (input sent immediately).
+//   - Echo (typed characters not displayed).
+//   - Signal processing (Ctrl+C doesn't send SIGINT).
+//
+// This is essential for TUI applications to receive character-by-character.
+// input and handle all keys (including Ctrl+C, arrows, etc.).
+//
+// Uses golang.org/x/term.MakeRaw() which saves the original terminal state.
+// Call ExitRawMode() to restore normal terminal behavior.
+//
+// Thread-safe via mutex.
+func (a *ANSITerminal) EnterRawMode() error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	// Prevent double-enter.
+	if a.inRawMode {
+		return fmt.Errorf("terminal: already in raw mode")
+	}
+
+	// Get file descriptor for stdin.
+	fd := int(a.input.Fd())
+
+	// Save original terminal state and switch to raw mode.
+	// term.MakeRaw() returns the old state for restoration.
+	state, err := term.MakeRaw(fd)
+	if err != nil {
+		return fmt.Errorf("failed to enter raw mode: %w", err)
+	}
+
+	a.originalState = state
+	a.inRawMode = true
+	return nil
+}
+
+// ExitRawMode restores terminal to cooked mode (normal/canonical mode).
+//
+// Cooked mode restores:.
+//   - Line buffering (input buffered until Enter).
+//   - Echo (typed characters displayed).
+//   - Signal processing (Ctrl+C sends SIGINT).
+//
+// CRITICAL: Must call before running external interactive commands!
+// Commands like vim, ssh, python REPL expect cooked mode to function properly.
+//
+// Thread-safe via mutex.
+func (a *ANSITerminal) ExitRawMode() error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	// Prevent exit without enter.
+	if !a.inRawMode {
+		return fmt.Errorf("terminal: not in raw mode")
+	}
+
+	// Restore original terminal state.
+	fd := int(a.input.Fd())
+	if err := term.Restore(fd, a.originalState); err != nil {
+		return fmt.Errorf("failed to exit raw mode: %w", err)
+	}
+
+	a.inRawMode = false
+	a.originalState = nil
+	return nil
 }
