@@ -23,6 +23,10 @@ var (
 	procReadConsoleOutput          = kernel32.NewProc("ReadConsoleOutputW")
 	procWriteConsoleOutput         = kernel32.NewProc("WriteConsoleOutputW")
 	// procScrollConsoleScreenBuffer removed (unused - reserved for future scrolling feature)
+
+	// Console screen buffer functions (for alternate screen).
+	procCreateConsoleScreenBuffer = kernel32.NewProc("CreateConsoleScreenBuffer")
+	procSetConsoleActiveScreenBuffer = kernel32.NewProc("SetConsoleActiveScreenBuffer")
 )
 
 // ConsoleCursorInfo represents cursor information.
@@ -155,3 +159,50 @@ func WriteConsoleOutput(
 
 // Coord is an alias for windows.Coord for consistency.
 type Coord = windows.Coord
+
+// CreateConsoleScreenBuffer creates a new console screen buffer.
+//
+// Parameters:
+//   - desiredAccess: GENERIC_READ | GENERIC_WRITE (0xC0000000)
+//   - shareMode: FILE_SHARE_READ | FILE_SHARE_WRITE (0x00000003)
+//   - securityAttributes: nil for default
+//   - flags: CONSOLE_TEXTMODE_BUFFER (0x00000001)
+//   - screenBufferData: Reserved (must be nil)
+//
+// Returns handle to new screen buffer or error.
+func CreateConsoleScreenBuffer(
+	desiredAccess uint32,
+	shareMode uint32,
+	securityAttributes *windows.SecurityAttributes,
+	flags uint32,
+	screenBufferData uintptr,
+) (windows.Handle, error) {
+	r1, _, err := procCreateConsoleScreenBuffer.Call(
+		uintptr(desiredAccess),
+		uintptr(shareMode),
+		uintptr(unsafe.Pointer(securityAttributes)),
+		uintptr(flags),
+		screenBufferData,
+	)
+
+	handle := windows.Handle(r1)
+	if handle == windows.InvalidHandle {
+		return windows.InvalidHandle, err
+	}
+
+	return handle, nil
+}
+
+// SetConsoleActiveScreenBuffer sets the specified screen buffer as active.
+//
+// The active screen buffer is the one displayed on the console.
+// This is used to switch between normal and alternate screen buffers.
+func SetConsoleActiveScreenBuffer(consoleOutput windows.Handle) error {
+	r1, _, err := procSetConsoleActiveScreenBuffer.Call(
+		uintptr(consoleOutput),
+	)
+	if r1 == 0 {
+		return err
+	}
+	return nil
+}

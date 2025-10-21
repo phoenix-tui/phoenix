@@ -26,12 +26,31 @@
 package windows
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"sync"
 
 	"golang.org/x/sys/windows"
 
 	"github.com/phoenix-tui/phoenix/terminal/api"
+)
+
+// Windows API constants for CreateConsoleScreenBuffer.
+const (
+	GENERIC_READ  = 0x80000000
+	GENERIC_WRITE = 0x40000000
+
+	FILE_SHARE_READ  = 0x00000001
+	FILE_SHARE_WRITE = 0x00000002
+
+	CONSOLE_TEXTMODE_BUFFER = 0x00000001
+)
+
+// Screen buffer errors.
+var (
+	ErrAlreadyInAltScreen = errors.New("terminal: already in alternate screen buffer")
+	ErrNotInAltScreen     = errors.New("terminal: not in alternate screen buffer")
 )
 
 // Console implements Terminal interface using Windows Console API.
@@ -42,10 +61,18 @@ import (
 //   - FillConsoleOutputCharacter - Ultra-fast clearing.
 //   - ReadConsoleOutput - Screen buffer readback.
 //   - WriteConsoleOutput - Optimized writing.
+//   - CreateConsoleScreenBuffer - Alternate screen buffer.
+//   - SetConsoleActiveScreenBuffer - Switch between buffers.
 type Console struct {
-	stdout windows.Handle // Handle to stdout console
-	stdin  windows.Handle // Handle to stdin console
-	info   windows.ConsoleScreenBufferInfo
+	stdout         windows.Handle // Handle to stdout console
+	stdin          windows.Handle // Handle to stdin console
+	info           windows.ConsoleScreenBufferInfo
+
+	// Alternate screen buffer state.
+	originalBuffer windows.Handle // Original stdout buffer (before alt screen)
+	altBuffer      windows.Handle // Alternate screen buffer handle
+	inAltScreen    bool            // True if currently in alternate screen
+	mu             sync.Mutex      // Protects screen buffer state
 }
 
 // NewConsole creates Windows Console API terminal.
@@ -589,4 +616,120 @@ func (c *Console) SupportsTrueColor() bool {
 // Platform returns Windows Console platform type.
 func (c *Console) Platform() api.Platform {
 	return api.PlatformWindowsConsole
+}
+
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Alternate Screen Buffer                                         │.
+// └─────────────────────────────────────────────────────────────────┘.
+
+// EnterAltScreen switches to alternate screen buffer.
+//
+// Creates a new console screen buffer and sets it as active, preserving.
+// the user's terminal content. When ExitAltScreen is called, the original.
+// terminal content is restored.
+//
+// Implementation:.
+//   1. Check if already in alt screen (prevent double-enter).
+//   2. Save original stdout handle.
+//   3. Create new screen buffer (CreateConsoleScreenBuffer).
+//   4. Set new buffer as active (SetConsoleActiveScreenBuffer).
+//   5. Update state flag.
+//
+// Thread-safe via mutex.
+func (c *Console) EnterAltScreen() error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// Prevent double-enter.
+	if c.inAltScreen {
+		return ErrAlreadyInAltScreen
+	}
+
+	// Save original buffer handle.
+	c.originalBuffer = c.stdout
+
+	// Create new screen buffer with same access rights as stdout.
+	// GENERIC_READ | GENERIC_WRITE (0xC0000000).
+	// FILE_SHARE_READ | FILE_SHARE_WRITE (0x00000003).
+	// CONSOLE_TEXTMODE_BUFFER (0x00000001).
+	altBuffer, err := CreateConsoleScreenBuffer(
+		GENERIC_READ|GENERIC_WRITE,
+		FILE_SHARE_READ|FILE_SHARE_WRITE,
+		nil, // Default security attributes
+		CONSOLE_TEXTMODE_BUFFER,
+		0, // Reserved (must be 0)
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create alternate screen buffer: %w", err)
+	}
+
+	c.altBuffer = altBuffer
+
+	// Set alternate buffer as active.
+	if err := SetConsoleActiveScreenBuffer(c.altBuffer); err != nil {
+		// Cleanup: close the buffer we just created.
+		windows.CloseHandle(c.altBuffer)
+		c.altBuffer = windows.InvalidHandle
+		return fmt.Errorf("failed to activate alternate screen buffer: %w", err)
+	}
+
+	// Update stdout handle to point to alternate buffer.
+	c.stdout = c.altBuffer
+	c.inAltScreen = true
+
+	return nil
+}
+
+// ExitAltScreen returns to normal screen buffer.
+//
+// Restores the user's original terminal content by switching back to.
+// the original screen buffer and closing the alternate buffer.
+//
+// Implementation:.
+//   1. Check if in alt screen (prevent double-exit).
+//   2. Restore original buffer as active (SetConsoleActiveScreenBuffer).
+//   3. Close alternate buffer handle.
+//   4. Update stdout handle back to original.
+//   5. Update state flag.
+//
+// Thread-safe via mutex.
+func (c *Console) ExitAltScreen() error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// Prevent double-exit.
+	if !c.inAltScreen {
+		return ErrNotInAltScreen
+	}
+
+	// Restore original buffer as active.
+	if err := SetConsoleActiveScreenBuffer(c.originalBuffer); err != nil {
+		return fmt.Errorf("failed to restore original screen buffer: %w", err)
+	}
+
+	// Close alternate buffer handle.
+	if err := windows.CloseHandle(c.altBuffer); err != nil {
+		// Non-fatal: buffer already switched, just log the error.
+		// Continue with cleanup even if CloseHandle fails.
+	}
+
+	// Restore stdout handle to original.
+	c.stdout = c.originalBuffer
+	c.altBuffer = windows.InvalidHandle
+	c.inAltScreen = false
+
+	return nil
+}
+
+// IsInAltScreen returns true if currently in alternate screen buffer.
+//
+// Used to check terminal state before Enter/Exit operations.
+// Prevents double-enter or double-exit bugs.
+//
+// Always returns accurate state (tracked internally, no syscalls).
+// Thread-safe via mutex.
+func (c *Console) IsInAltScreen() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.inAltScreen
 }

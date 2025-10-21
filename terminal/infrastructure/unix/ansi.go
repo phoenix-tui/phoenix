@@ -11,17 +11,29 @@
 package unix
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"sync"
 
 	"golang.org/x/term"
 
 	"github.com/phoenix-tui/phoenix/terminal/api"
 )
 
+// Screen buffer errors.
+var (
+	ErrAlreadyInAltScreen = errors.New("terminal: already in alternate screen buffer")
+	ErrNotInAltScreen     = errors.New("terminal: not in alternate screen buffer")
+)
+
 // ANSITerminal implements Terminal interface using ANSI escape codes.
 type ANSITerminal struct {
 	output *os.File // Usually os.Stdout
+
+	// Alternate screen buffer state.
+	inAltScreen bool       // True if currently in alternate screen
+	mu          sync.Mutex // Protects screen buffer state
 }
 
 // NewANSI creates new ANSI terminal implementation.
@@ -325,4 +337,94 @@ func (a *ANSITerminal) SupportsTrueColor() bool {
 // Platform returns Unix platform type.
 func (a *ANSITerminal) Platform() api.Platform {
 	return api.PlatformUnix
+}
+
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Alternate Screen Buffer                                         │.
+// └─────────────────────────────────────────────────────────────────┘.
+
+// EnterAltScreen switches to alternate screen buffer.
+//
+// Uses xterm alternate screen buffer via ANSI escape sequence.
+// Preserves the user's terminal content. When ExitAltScreen is called,.
+// the original terminal content is restored.
+//
+// Implementation:.
+//   1. Check if already in alt screen (prevent double-enter).
+//   2. Write ANSI escape: "\033[?1049h" (save cursor + switch to alt screen).
+//   3. Update state flag.
+//
+// Sequence details:.
+//   - \033[?1049h = CSI ? 1049 h (xterm private mode 1049).
+//   - Combines save cursor + clear + alt screen buffer.
+//   - Widely supported (xterm, VTE-based terminals, iTerm2, macOS Terminal).
+//
+// Thread-safe via mutex.
+func (a *ANSITerminal) EnterAltScreen() error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	// Prevent double-enter.
+	if a.inAltScreen {
+		return ErrAlreadyInAltScreen
+	}
+
+	// Switch to alternate screen buffer.
+	// CSI ? 1049 h = Save cursor + clear + switch to alt screen.
+	_, err := fmt.Fprint(a.output, "\033[?1049h")
+	if err != nil {
+		return fmt.Errorf("failed to enter alternate screen buffer: %w", err)
+	}
+
+	a.inAltScreen = true
+	return nil
+}
+
+// ExitAltScreen returns to normal screen buffer.
+//
+// Restores the user's original terminal content by switching back to.
+// the normal screen buffer.
+//
+// Implementation:.
+//   1. Check if in alt screen (prevent double-exit).
+//   2. Write ANSI escape: "\033[?1049l" (restore cursor + switch to normal screen).
+//   3. Update state flag.
+//
+// Sequence details:.
+//   - \033[?1049l = CSI ? 1049 l (xterm private mode 1049 reset).
+//   - Restores cursor position + switches back to normal buffer.
+//   - Widely supported across modern terminals.
+//
+// Thread-safe via mutex.
+func (a *ANSITerminal) ExitAltScreen() error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	// Prevent double-exit.
+	if !a.inAltScreen {
+		return ErrNotInAltScreen
+	}
+
+	// Return to normal screen buffer.
+	// CSI ? 1049 l = Restore cursor + switch to normal screen.
+	_, err := fmt.Fprint(a.output, "\033[?1049l")
+	if err != nil {
+		return fmt.Errorf("failed to exit alternate screen buffer: %w", err)
+	}
+
+	a.inAltScreen = false
+	return nil
+}
+
+// IsInAltScreen returns true if currently in alternate screen buffer.
+//
+// Used to check terminal state before Enter/Exit operations.
+// Prevents double-enter or double-exit bugs.
+//
+// Always returns accurate state (tracked internally, no syscalls).
+// Thread-safe via mutex.
+func (a *ANSITerminal) IsInAltScreen() bool {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return a.inAltScreen
 }
