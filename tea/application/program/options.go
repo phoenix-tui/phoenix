@@ -1,6 +1,10 @@
 package program
 
-import "io"
+import (
+	"io"
+
+	terminalapi "github.com/phoenix-tui/phoenix/terminal/api"
+)
 
 // Option configures a Program at creation time.
 // Uses the functional options pattern for clean, extensible API.
@@ -51,5 +55,20 @@ func WithAltScreen[T any]() Option[T] {
 func WithMouseAllMotion[T any]() Option[T] {
 	return func(p *Program[T]) {
 		p.mouseAllMotion = true
+	}
+}
+
+// WithTerminal sets a custom terminal instance (default: auto-detected).
+//
+// By default, Program auto-detects the best terminal implementation.
+// Use this option for testing with mock terminals.
+//
+// Example:
+//
+//	mockTerm := testing.NewMockTerminal()
+//	p := program.New(model, program.WithTerminal(mockTerm))
+func WithTerminal[T any](term terminalapi.Terminal) Option[T] {
+	return func(p *Program[T]) {
+		p.terminal = term
 	}
 }

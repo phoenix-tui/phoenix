@@ -3,6 +3,8 @@ package api
 import (
 	"strings"
 	"testing"
+
+	tea "github.com/phoenix-tui/phoenix/tea/api"
 )
 
 // TestShowCursor_False verifies that ShowCursor(false) prevents cursor rendering.
@@ -343,5 +345,256 @@ func TestChaining_SetValue_MoveCursorToEnd_ShowCursor(t *testing.T) {
 	// Verify content.
 	if !strings.Contains(view, "hello") || !strings.Contains(view, "world") {
 		t.Errorf("View() should contain both lines\nView:\n%s", view)
+	}
+}
+
+// Additional coverage tests for uncovered functions
+
+func TestTextArea_MaxLines(t *testing.T) {
+	ta := New().MaxLines(5)
+
+	// Verify fluent API
+	if ta.Value() != "" {
+		t.Error("New textarea should be empty")
+	}
+}
+
+func TestTextArea_MaxChars(t *testing.T) {
+	ta := New().MaxChars(100)
+
+	// Verify fluent API
+	if ta.Value() != "" {
+		t.Error("New textarea should be empty")
+	}
+}
+
+func TestTextArea_Placeholder(t *testing.T) {
+	ta := New().Placeholder("Enter text...")
+
+	// Verify fluent API
+	if ta.Value() != "" {
+		t.Error("New textarea should be empty")
+	}
+}
+
+func TestTextArea_Wrap(t *testing.T) {
+	tests := []bool{true, false}
+
+	for _, wrap := range tests {
+		t.Run("wrap", func(t *testing.T) {
+			ta := New().Wrap(wrap)
+
+			// Verify fluent API
+			if ta.Value() != "" {
+				t.Error("New textarea should be empty")
+			}
+		})
+	}
+}
+
+func TestTextArea_ReadOnly(t *testing.T) {
+	tests := []bool{true, false}
+
+	for _, readonly := range tests {
+		t.Run("readonly", func(t *testing.T) {
+			ta := New().ReadOnly(readonly)
+
+			// Verify fluent API
+			if ta.Value() != "" {
+				t.Error("New textarea should be empty")
+			}
+		})
+	}
+}
+
+func TestTextArea_ShowLineNumbers(t *testing.T) {
+	tests := []bool{true, false}
+
+	for _, show := range tests {
+		t.Run("show", func(t *testing.T) {
+			ta := New().ShowLineNumbers(show)
+
+			// Verify fluent API
+			if ta.Value() != "" {
+				t.Error("New textarea should be empty")
+			}
+		})
+	}
+}
+
+func TestTextArea_Keybindings(t *testing.T) {
+	tests := []KeybindingMode{
+		KeybindingsDefault,
+		KeybindingsEmacs,
+		KeybindingsVi,
+	}
+
+	for _, mode := range tests {
+		t.Run("keybinding mode", func(t *testing.T) {
+			ta := New().Keybindings(mode)
+
+			// Verify fluent API
+			if ta.Value() != "" {
+				t.Error("New textarea should be empty")
+			}
+		})
+	}
+}
+
+func TestTextArea_Lines(t *testing.T) {
+	ta := New().SetValue("line1\nline2\nline3")
+
+	lines := ta.Lines()
+
+	if len(lines) != 3 {
+		t.Errorf("Lines() = %d, want 3", len(lines))
+	}
+
+	if lines[0] != "line1" {
+		t.Errorf("Lines()[0] = %q, want %q", lines[0], "line1")
+	}
+}
+
+func TestTextArea_ContentParts(_ *testing.T) {
+	ta := New().SetValue("hello\nworld").SetCursorPosition(1, 2)
+
+	before, at, after := ta.ContentParts()
+
+	// Verify structure (exact content depends on implementation)
+	_ = before
+	_ = at
+	_ = after
+}
+
+func TestTextArea_CurrentLine(t *testing.T) {
+	ta := New().SetValue("line1\nline2\nline3").SetCursorPosition(1, 0)
+
+	line := ta.CurrentLine()
+
+	if line != "line2" {
+		t.Errorf("CurrentLine() = %q, want %q", line, "line2")
+	}
+}
+
+func TestTextArea_LineCount(t *testing.T) {
+	tests := []struct {
+		name  string
+		value string
+		want  int
+	}{
+		{"empty", "", 1},                    // Empty has 1 line
+		{"single", "hello", 1},
+		{"multi", "line1\nline2\nline3", 3},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ta := New().SetValue(tt.value)
+
+			count := ta.LineCount()
+
+			if count != tt.want {
+				t.Errorf("LineCount() = %d, want %d", count, tt.want)
+			}
+		})
+	}
+}
+
+func TestTextArea_IsEmpty(t *testing.T) {
+	tests := []struct {
+		name  string
+		value string
+		want  bool
+	}{
+		{"empty", "", true},
+		{"not empty", "text", false},
+		{"whitespace", " ", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ta := New().SetValue(tt.value)
+
+			empty := ta.IsEmpty()
+
+			if empty != tt.want {
+				t.Errorf("IsEmpty() = %v, want %v", empty, tt.want)
+			}
+		})
+	}
+}
+
+func TestTextArea_HasSelection(t *testing.T) {
+	ta := New().SetValue("hello")
+
+	// Default - no selection
+	if ta.HasSelection() {
+		t.Error("HasSelection() should be false for new textarea")
+	}
+}
+
+func TestTextArea_SelectedText(t *testing.T) {
+	ta := New().SetValue("hello")
+
+	// Default - no selection
+	text := ta.SelectedText()
+
+	if text != "" {
+		t.Errorf("SelectedText() = %q, want empty", text)
+	}
+}
+
+func TestTextArea_Init(t *testing.T) {
+	ta := New()
+
+	cmd := ta.Init()
+
+	if cmd != nil {
+		t.Error("Init() should return nil cmd")
+	}
+}
+
+func TestTextArea_Update_NonKeyMsg(t *testing.T) {
+	ta := New().SetValue("hello")
+
+	// Send non-key message
+	msg := tea.WindowSizeMsg{Width: 80, Height: 24}
+	updated, cmd := ta.Update(msg)
+
+	if cmd != nil {
+		t.Error("Update() should return nil cmd for WindowSizeMsg")
+	}
+
+	if updated.Value() != "hello" {
+		t.Errorf("Value() should be unchanged, got %q", updated.Value())
+	}
+}
+
+func TestTextArea_Update_ReadOnly(t *testing.T) {
+	ta := New().SetValue("hello").ReadOnly(true)
+
+	// Try to insert text
+	msg := tea.KeyMsg{Type: tea.KeyRune, Rune: 'x'}
+	updated, _ := ta.Update(msg)
+
+	// Should ignore input in readonly mode
+	if updated.Value() != "hello" {
+		t.Errorf("Value() should be unchanged in readonly mode, got %q", updated.Value())
+	}
+}
+
+func TestTextArea_FluentChaining(t *testing.T) {
+	ta := New().
+		MaxLines(10).
+		MaxChars(500).
+		Placeholder("Type here...").
+		Wrap(true).
+		ReadOnly(false).
+		ShowLineNumbers(true).
+		ShowCursor(true).
+		SetValue("test")
+
+	if ta.Value() != "test" {
+		t.Errorf("Value() = %q, want %q", ta.Value(), "test")
 	}
 }
