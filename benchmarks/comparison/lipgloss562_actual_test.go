@@ -1,15 +1,16 @@
-package service
+package comparison_test
 
 import (
 	"testing"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/mattn/go-runewidth"
+	"github.com/phoenix-tui/phoenix/core/domain/service"
 )
 
 // TestLipgloss562_ActualBrokenCases tests the EXACT strings from issue #562
 func TestLipgloss562_ActualBrokenCases(t *testing.T) {
-	us := NewUnicodeService()
+	us := service.NewUnicodeService()
 
 	testCases := []struct {
 		name     string
@@ -93,7 +94,7 @@ func statusEmoji(correct bool) string {
 
 // TestLipgloss562_VariationSelectors tests emoji with variation selectors (U+FE0F)
 func TestLipgloss562_VariationSelectors(t *testing.T) {
-	us := NewUnicodeService()
+	us := service.NewUnicodeService()
 
 	testCases := []struct {
 		name     string

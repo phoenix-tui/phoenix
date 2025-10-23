@@ -34,7 +34,7 @@ func (tc TerminalCapability) String() string {
 	case TrueColor:
 		return "TrueColor"
 	default:
-		return "Unknown"
+		return unknownString
 	}
 }
 

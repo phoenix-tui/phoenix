@@ -408,3 +408,266 @@ func TestInput_CompleteWorkflow(t *testing.T) {
 		t.Errorf("View() should show placeholder, got %q", view)
 	}
 }
+
+// Additional coverage tests
+
+func TestInput_ShowCursor(t *testing.T) {
+	tests := []struct {
+		name string
+		show bool
+	}{
+		{"enabled", true},
+		{"disabled", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			input := New(40).ShowCursor(tt.show).Focused(true).Content("test")
+
+			// Verify fluent API works
+			view := input.View()
+
+			// Should render (cursor visibility is internal detail)
+			if len(view) == 0 {
+				t.Error("View() should not be empty")
+			}
+		})
+	}
+}
+
+func TestInput_KeyBindings(t *testing.T) {
+	// Create custom key bindings handler
+	customHandler := func(domain model.TextInput, msg tea.KeyMsg) model.TextInput {
+		// Custom handler that uppercases on Ctrl-U
+		if msg.Ctrl && (msg.Rune == 'u' || msg.Rune == 'U') {
+			return domain.WithContent(strings.ToUpper(domain.Content()))
+		}
+		return domain
+	}
+
+	input := New(40).
+		Content("hello").
+		Focused(true).
+		KeyBindings(CustomKeyBindings(customHandler))
+
+	// Send Ctrl-U
+	msg := tea.KeyMsg{Ctrl: true, Rune: 'u'}
+	input, _ = input.Update(msg)
+
+	if input.Value() != "HELLO" {
+		t.Errorf("Value() = %q, want %q after custom Ctrl-U", input.Value(), "HELLO")
+	}
+}
+
+func TestInput_RenderContent_Unicode(t *testing.T) {
+	tests := []struct {
+		name    string
+		content string
+	}{
+		{"simple ascii", "hello"},
+		{"unicode chinese", "你好"},
+		{"unicode emoji", "👋🌍"},
+		{"mixed", "hello 世界 👋"},
+		{"long emoji", "👨‍👩‍👧‍👦"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			input := New(40).Content(tt.content).Focused(false)
+
+			view := input.View()
+
+			if !strings.Contains(view, tt.content) {
+				t.Errorf("View() should contain %q, got %q", tt.content, view)
+			}
+		})
+	}
+}
+
+func TestInput_RenderContent_Scrolling(t *testing.T) {
+	// Test content longer than width
+	longContent := "this is a very long string that exceeds the input width and should scroll"
+
+	input := New(20).SetContent(longContent, 50).Focused(true)
+
+	view := input.View()
+
+	// Should render something (scrolling logic tested)
+	if len(view) == 0 {
+		t.Error("View() should not be empty for long content")
+	}
+}
+
+func TestInput_RenderCursor_Positions(t *testing.T) {
+	tests := []struct {
+		name     string
+		content  string
+		position int
+	}{
+		{"beginning", "hello", 0},
+		{"middle", "hello", 2},
+		{"end", "hello", 5},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			input := New(40).
+				SetContent(tt.content, tt.position).
+				Focused(true)
+
+			view := input.View()
+
+			// Should render cursor at position
+			if len(view) == 0 {
+				t.Error("View() should not be empty with cursor")
+			}
+		})
+	}
+}
+
+func TestInput_RenderCursor_UnicodeContent(t *testing.T) {
+	tests := []struct {
+		name     string
+		content  string
+		position int
+	}{
+		{"emoji middle", "👋hello👋", 1},
+		{"chinese middle", "你好世界", 2},
+		{"mixed", "hello世界", 5},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			input := New(40).
+				SetContent(tt.content, tt.position).
+				Focused(true)
+
+			view := input.View()
+
+			// Should handle Unicode cursor positioning
+			if len(view) == 0 {
+				t.Error("View() should not be empty")
+			}
+		})
+	}
+}
+
+func TestInput_Update_SpecialKeys(t *testing.T) {
+	tests := []struct {
+		name       string
+		initial    string
+		initialPos int
+		key        tea.KeyMsg
+		wantValue  string
+		checkPos   bool
+		wantPos    int
+	}{
+		{
+			name:       "Home key",
+			initial:    "hello",
+			initialPos: 3,
+			key:        tea.KeyMsg{Type: tea.KeyHome},
+			wantValue:  "hello",
+			checkPos:   true,
+			wantPos:    0,
+		},
+		{
+			name:       "End key",
+			initial:    "hello",
+			initialPos: 2,
+			key:        tea.KeyMsg{Type: tea.KeyEnd},
+			wantValue:  "hello",
+			checkPos:   true,
+			wantPos:    5,
+		},
+		{
+			name:       "Delete key",
+			initial:    "hello",
+			initialPos: 2,
+			key:        tea.KeyMsg{Type: tea.KeyDelete},
+			wantValue:  "helo",
+			checkPos:   false,
+		},
+		{
+			name:       "Right arrow",
+			initial:    "hello",
+			initialPos: 2,
+			key:        tea.KeyMsg{Type: tea.KeyRight},
+			wantValue:  "hello",
+			checkPos:   true,
+			wantPos:    3,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			input := New(40).
+				SetContent(tt.initial, tt.initialPos).
+				Focused(true)
+
+			input, _ = input.Update(tt.key)
+
+			if input.Value() != tt.wantValue {
+				t.Errorf("Value() = %q, want %q", input.Value(), tt.wantValue)
+			}
+
+			if tt.checkPos && input.CursorPosition() != tt.wantPos {
+				t.Errorf("CursorPosition() = %d, want %d", input.CursorPosition(), tt.wantPos)
+			}
+		})
+	}
+}
+
+func TestInput_View_CursorHidden(t *testing.T) {
+	input := New(40).
+		Content("hello").
+		Focused(true).
+		ShowCursor(false)
+
+	view := input.View()
+
+	// Should still render content even without cursor
+	if !strings.Contains(view, "hello") {
+		t.Errorf("View() should contain content, got %q", view)
+	}
+}
+
+func TestInput_View_EmptyWithCursor(t *testing.T) {
+	input := New(40).
+		Content("").
+		Focused(true).
+		ShowCursor(true)
+
+	view := input.View()
+
+	// Should render cursor even with empty content
+	if len(view) == 0 {
+		t.Error("View() should not be empty (cursor visible)")
+	}
+}
+
+func TestInput_ContentParts_EmptyContent(t *testing.T) {
+	input := New(40).SetContent("", 0)
+
+	before, at, after := input.ContentParts()
+
+	if before != "" || at != "" || after != "" {
+		t.Errorf("ContentParts() for empty should be all empty, got %q, %q, %q", before, at, after)
+	}
+}
+
+func TestInput_ContentParts_Unicode(t *testing.T) {
+	input := New(40).SetContent("你好世界", 2)
+
+	before, at, after := input.ContentParts()
+
+	if before != "你好" {
+		t.Errorf("before = %q, want %q", before, "你好")
+	}
+	if at != "世" {
+		t.Errorf("at = %q, want %q", at, "世")
+	}
+	if after != "界" {
+		t.Errorf("after = %q, want %q", after, "界")
+	}
+}

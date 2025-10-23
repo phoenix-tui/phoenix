@@ -1,4 +1,4 @@
-package service
+package comparison_test
 
 import (
 	"strings"
@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/mattn/go-runewidth"
+	"github.com/phoenix-tui/phoenix/core/domain/service"
 )
 
 // ========================================
@@ -27,7 +28,7 @@ var (
 // ========================================
 
 func BenchmarkComparison_ASCII_Phoenix(b *testing.B) {
-	us := NewUnicodeService()
+	us := service.NewUnicodeService()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = us.StringWidth(compASCII)
@@ -53,7 +54,7 @@ func BenchmarkComparison_ASCII_Runewidth(b *testing.B) {
 // ========================================
 
 func BenchmarkComparison_Emoji_Phoenix(b *testing.B) {
-	us := NewUnicodeService()
+	us := service.NewUnicodeService()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = us.StringWidth(compEmoji)
@@ -79,7 +80,7 @@ func BenchmarkComparison_Emoji_Runewidth(b *testing.B) {
 // ========================================
 
 func BenchmarkComparison_CJK_Phoenix(b *testing.B) {
-	us := NewUnicodeService()
+	us := service.NewUnicodeService()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = us.StringWidth(compCJK)
@@ -105,7 +106,7 @@ func BenchmarkComparison_CJK_Runewidth(b *testing.B) {
 // ========================================
 
 func BenchmarkComparison_Mixed_Phoenix(b *testing.B) {
-	us := NewUnicodeService()
+	us := service.NewUnicodeService()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = us.StringWidth(compMixed)
@@ -131,7 +132,7 @@ func BenchmarkComparison_Mixed_Runewidth(b *testing.B) {
 // ========================================
 
 func BenchmarkComparison_Long_Phoenix(b *testing.B) {
-	us := NewUnicodeService()
+	us := service.NewUnicodeService()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = us.StringWidth(compLong)
@@ -157,7 +158,7 @@ func BenchmarkComparison_Long_Runewidth(b *testing.B) {
 // ========================================
 
 func BenchmarkComparison_BugCase_Phoenix(b *testing.B) {
-	us := NewUnicodeService()
+	us := service.NewUnicodeService()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = us.StringWidth(compBuggy)
@@ -183,7 +184,7 @@ func BenchmarkComparison_BugCase_Runewidth(b *testing.B) {
 // ========================================
 
 func BenchmarkComparison_Memory_Phoenix(b *testing.B) {
-	us := NewUnicodeService()
+	us := service.NewUnicodeService()
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {

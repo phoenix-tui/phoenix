@@ -1,3 +1,4 @@
+// Package main demonstrates Unicode string width calculation capabilities.
 package main
 
 import (
@@ -7,7 +8,8 @@ import (
 
 func main() {
 	fmt.Println("Phoenix Unicode Service Demo")
-	fmt.Println("================================\n")
+	fmt.Println("================================")
+	fmt.Println()
 
 	us := coreService.NewUnicodeService()
 

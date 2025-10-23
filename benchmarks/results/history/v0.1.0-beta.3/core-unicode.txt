@@ -1,0 +1,38 @@
+goos: windows
+goarch: amd64
+pkg: github.com/phoenix-tui/phoenix/core/domain/service
+cpu: 12th Gen Intel(R) Core(TM) i7-1255U
+BenchmarkStringWidth_ASCII_Short-12        	16927920	       133.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_ASCII_Med-12          	 3280176	       616.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_ASCII_Long-12         	  192729	     13438 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_Emoji_Short-12        	17151027	       150.2 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_Emoji_Med-12          	  885412	      2805 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_Emoji_Long-12         	   43597	     60035 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_CJK_Short-12          	13420798	       177.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_CJK_Med-12            	 3473101	       745.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_CJK_Long-12           	  128061	     17417 ns/op	    1280 B/op	       1 allocs/op
+BenchmarkStringWidth_Mixed_Short-12        	 7329210	       428.6 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_Mixed_Med-12          	 2127488	      1197 ns/op	     176 B/op	       1 allocs/op
+BenchmarkStringWidth_Mixed_Long-12         	  115976	     24886 ns/op	    3200 B/op	       1 allocs/op
+BenchmarkStringWidth_ComplexEmoji-12       	  999050	      2160 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_Combining-12          	 4247295	       699.1 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_RealWorld1-12         	 3668071	       663.9 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_RealWorld2-12         	 2740072	       905.3 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_RealWorld3-12         	 3066040	       661.5 ns/op	       0 B/op	       0 allocs/op
+BenchmarkGraphemeClusters_ASCII-12         	  379447	      7804 ns/op	    2160 B/op	       7 allocs/op
+BenchmarkGraphemeClusters_Emoji-12         	  941474	      2820 ns/op	     496 B/op	       5 allocs/op
+BenchmarkGraphemeClusters_CJK-12           	  574627	      4737 ns/op	     496 B/op	       5 allocs/op
+BenchmarkGraphemeClusters_Mixed-12         	  249028	     12817 ns/op	    2160 B/op	       7 allocs/op
+BenchmarkClusterWidth_ASCII-12             	283440318	         7.455 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClusterWidth_Emoji-12             	100000000	        23.92 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClusterWidth_CJK-12               	154656622	        17.91 ns/op	       0 B/op	       0 allocs/op
+BenchmarkClusterWidth_ComplexEmoji-12      	35455963	        76.16 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_Memory_ASCII-12       	 3465291	       855.4 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_Memory_Emoji-12       	  845683	      3433 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_Memory_Mixed-12       	 1790632	      1458 ns/op	     176 B/op	       1 allocs/op
+BenchmarkGraphemeClusters_Memory-12        	  306948	      7626 ns/op	    2160 B/op	       7 allocs/op
+BenchmarkNewUnicodeService-12              	1000000000	         0.2053 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_1000Chars_ASCII-12    	  188532	     14839 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStringWidth_1000Chars_Mixed-12    	  120799	     19801 ns/op	    2688 B/op	       1 allocs/op
+PASS
+ok  	github.com/phoenix-tui/phoenix/core/domain/service	99.025s
