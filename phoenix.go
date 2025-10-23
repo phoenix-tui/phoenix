@@ -163,7 +163,7 @@ func NewCapabilities(ansi bool, colorDepth coreapi.ColorDepth, mouse, altScreen,
 	return coreapi.NewCapabilities(ansi, colorDepth, mouse, altScreen, cursor)
 }
 
-// ColorDepth constants (re-exported from core)
+// ColorDepth constants (re-exported from core).
 const (
 	ColorDepthNone      = coreapi.ColorDepthNone
 	ColorDepth8         = coreapi.ColorDepth8

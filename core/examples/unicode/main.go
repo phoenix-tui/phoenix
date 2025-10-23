@@ -1,3 +1,4 @@
+// Package main demonstrates Unicode string width calculation capabilities.
 package main
 
 import (

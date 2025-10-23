@@ -186,6 +186,30 @@ linters:
           - cyclop       # Parser state machine
           - funlen       # Parser functions naturally longer
 
+      # Terminal Windows implementation - syscalls require unsafe/conversions
+      - path: terminal/infrastructure/windows/.*\.go
+        linters:
+          - gosec        # G103 (unsafe), G115 (int conversions) required for Windows API
+          - errcheck     # Some Windows API errors are non-fatal
+          - revive       # ALL_CAPS names match Windows API convention
+          - ineffassign  # Test file coordinate variables (SA4006)
+          - godot        # Windows syscall comments
+          - staticcheck  # SA9003 (empty branch), SA4006 (unused value) for non-fatal errors
+
+      # Tea ExecProcess - complex by nature (terminal mode management)
+      - path: tea/application/program/program\.go
+        linters:
+          - gocognit     # ExecProcess cognitive complexity acceptable
+          - gocyclo      # Run/Start/ExecProcess cyclomatic complexity
+          - cyclop       # Alternative complexity metric
+          - funlen       # Start/ExecProcess naturally longer (state management)
+          - nestif       # Alt screen/raw mode conditionals
+          - revive       # Empty blocks for non-fatal errors (documented)
+          - errorlint    # Multiple error wrapping in recovery paths
+          - gocritic     # elseif patterns in startup logic
+          - nolintlint   # gocognit directives (commented for documentation)
+          - staticcheck  # SA9003 (empty branch) for non-fatal cursor errors
+
       # Example applications - demos can be less strict
       - path: examples/.*\.go
         linters:

@@ -802,7 +802,7 @@ func TestButtonConstants(t *testing.T) {
 	}
 }
 
-func TestModifierConstants(t *testing.T) {
+func TestModifierConstants(_ *testing.T) {
 	// Verify all modifier constants are accessible from API
 	modifiers := []Modifiers{
 		ModifierNone,

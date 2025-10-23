@@ -348,7 +348,7 @@ func TestProvider_IsAvailable_TerminalVariants(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.term, func(t *testing.T) {
+		t.Run(tt.term, func(_ *testing.T) {
 			os.Setenv("TERM", tt.term)
 
 			provider := NewProvider(5 * time.Second)
@@ -362,11 +362,7 @@ func TestProvider_IsAvailable_TerminalVariants(t *testing.T) {
 			// But we can verify it doesn't panic
 			_ = available
 
-			if tt.want == "false" && available {
-				// Only assert false cases when TERM is clearly unsupported
-				// and no SSH vars are set
-				// This test is mostly to ensure no panic
-			}
+			// This test is mostly to ensure no panic with various TERM values
 		})
 	}
 }
@@ -393,7 +389,7 @@ func TestProvider_IsAvailable_NotTerminal(t *testing.T) {
 	}
 }
 
-func TestProvider_Write_EmptyContent(t *testing.T) {
+func TestProvider_Write_EmptyContent(_ *testing.T) {
 	provider := NewProvider(5 * time.Second)
 
 	// Empty content is rejected by domain model, so this should fail
@@ -475,7 +471,7 @@ func TestProvider_WithOutput_Chaining(t *testing.T) {
 	}
 }
 
-func TestProvider_IsAvailable_SSHIndicators_Priority(t *testing.T) {
+func TestProvider_IsAvailable_SSHIndicators_Priority(_ *testing.T) {
 	origSSHTTY := os.Getenv("SSH_TTY")
 	origTERM := os.Getenv("TERM")
 	defer func() {

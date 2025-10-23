@@ -10,20 +10,19 @@ import (
 	tea "github.com/phoenix-tui/phoenix/tea/api"
 )
 
-// Simple counter model implementing the tea.Model interface
+// Simple counter model implementing the tea.Model interface.
 type model struct {
 	count int
 }
 
-// Init initializes the model (called once at startup)
+// Init initializes the model (called once at startup).
 func (m model) Init() tea.Cmd {
 	return nil
 }
 
-// Update handles incoming messages and updates the model
+// Update handles incoming messages and updates the model.
 func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
+	if msg, ok := msg.(tea.KeyMsg); ok {
 		switch msg.String() {
 		case "q", "ctrl+c":
 			return m, phoenix.Quit()
@@ -38,7 +37,7 @@ func (m model) Update(msg tea.Msg) (model, tea.Cmd) {
 	return m, nil
 }
 
-// View renders the current state of the model
+// View renders the current state of the model.
 func (m model) View() string {
 	// For this simple demo, we'll use plain text
 	// The full Style API is available through phoenix/style package
@@ -52,7 +51,8 @@ func (m model) View() string {
 
 func main() {
 	fmt.Println("Phoenix TUI Framework - Umbrella Module Example")
-	fmt.Println("=================================================\n")
+	fmt.Println("=================================================")
+	fmt.Println()
 
 	// Demonstrate terminal detection
 	term := phoenix.AutoDetectTerminal()
@@ -87,7 +87,7 @@ func main() {
 	fmt.Println("\nThank you for using Phoenix! 🔥")
 }
 
-// testClipboard demonstrates clipboard operations (may not work in all environments)
+// testClipboard demonstrates clipboard operations (may not work in all environments).
 func testClipboard() {
 	testText := "Phoenix TUI Framework - Umbrella Module Test"
 
