@@ -788,10 +788,10 @@ func (c *Console) EnterRawMode() error {
 	// - Remove ENABLE_PROCESSED_INPUT (0x0001) - disable Ctrl+C processing.
 	// - Add ENABLE_VIRTUAL_TERMINAL_INPUT (0x0200) - enable VT sequences.
 	const (
-		ENABLE_LINE_INPUT              = 0x0002
-		ENABLE_ECHO_INPUT              = 0x0004
-		ENABLE_PROCESSED_INPUT         = 0x0001
-		ENABLE_VIRTUAL_TERMINAL_INPUT  = 0x0200
+		ENABLE_LINE_INPUT             = 0x0002
+		ENABLE_ECHO_INPUT             = 0x0004
+		ENABLE_PROCESSED_INPUT        = 0x0001
+		ENABLE_VIRTUAL_TERMINAL_INPUT = 0x0200
 	)
 
 	rawMode := mode

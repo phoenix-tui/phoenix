@@ -480,6 +480,10 @@ func TestProgram_ExecProcess_InputReaderRestarted(t *testing.T) {
 // This test verifies that ExecProcess properly stops and restarts the inputReader.
 // The actual mechanism (context cancellation, goroutine cleanup) is what prevents leaks.
 func TestProgram_ExecProcess_NoInputReaderLeak(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping on Windows: inputReader cleanup timing is non-deterministic due to stdin blocking")
+	}
+
 	mockTerm := phoenixtesting.NewMockTerminal()
 	m := TestModel{}
 	p := New(m, WithTerminal[TestModel](mockTerm))

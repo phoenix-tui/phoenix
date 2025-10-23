@@ -417,10 +417,10 @@ func TestProvider_Write_SpecialCharacters(t *testing.T) {
 	provider.WithOutput(tmpFile)
 
 	tests := []string{
-		"\x00\x01\x02",           // Control characters
-		"\033[1m",                // ANSI escape
+		"\x00\x01\x02",             // Control characters
+		"\033[1m",                  // ANSI escape
 		"<script>alert()</script>", // HTML/JS
-		"'; DROP TABLE--",        // SQL injection attempt
+		"'; DROP TABLE--",          // SQL injection attempt
 	}
 
 	for _, content := range tests {

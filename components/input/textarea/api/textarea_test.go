@@ -482,7 +482,7 @@ func TestTextArea_LineCount(t *testing.T) {
 		value string
 		want  int
 	}{
-		{"empty", "", 1},                    // Empty has 1 line
+		{"empty", "", 1}, // Empty has 1 line
 		{"single", "hello", 1},
 		{"multi", "line1\nline2\nline3", 3},
 	}
