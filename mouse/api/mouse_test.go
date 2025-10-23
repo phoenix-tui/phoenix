@@ -397,12 +397,12 @@ func TestPosition_IsWithinTolerance(t *testing.T) {
 
 func TestNewModifiers(t *testing.T) {
 	testCases := []struct {
-		name               string
-		shift, ctrl, alt   bool
-		expectedString     string
-		expectedHasShift   bool
-		expectedHasCtrl    bool
-		expectedHasAlt     bool
+		name             string
+		shift, ctrl, alt bool
+		expectedString   string
+		expectedHasShift bool
+		expectedHasCtrl  bool
+		expectedHasAlt   bool
 	}{
 		{"none", false, false, false, "None", false, false, false},
 		{"shift_only", true, false, false, "Shift", true, false, false},
