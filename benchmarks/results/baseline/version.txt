@@ -1,0 +1,6 @@
+v0.1.0-beta.3 (develop after race fix)
+Branch: develop
+Commit: 5b403dc
+Date:   2025-10-23
+Notes:  Baseline after ExecProcess + umbrella module + race condition fix
+        30% render performance improvement, 0 allocations maintained

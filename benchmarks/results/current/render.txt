@@ -1,0 +1,28 @@
+goos: windows
+goarch: amd64
+pkg: github.com/phoenix-tui/phoenix/render/benchmarks
+cpu: 12th Gen Intel(R) Core(TM) i7-1255U
+BenchmarkFullScreen_60FPS-12               	   88596	     29764 ns/op	     33598 fps	       6 B/op	       0 allocs/op
+BenchmarkDifferential_SmallChange-12       	   69769	     35762 ns/op	       1 B/op	       0 allocs/op
+BenchmarkDifferential_10Percent-12         	   54189	     43739 ns/op	       1 B/op	       0 allocs/op
+BenchmarkLargeScreen_200x50-12             	   13930	    162411 ns/op	     283 B/op	       0 allocs/op
+BenchmarkUnicode_Emoji-12                  	   64839	     47786 ns/op	       1 B/op	       0 allocs/op
+BenchmarkUnicode_CJK-12                    	   69204	     37552 ns/op	       1 B/op	       0 allocs/op
+BenchmarkStyled_MultiColor-12              	   68734	     33782 ns/op	       1 B/op	       0 allocs/op
+BenchmarkBuffer_SetString_ASCII-12         	 1000000	      2017 ns/op	       0 B/op	       0 allocs/op
+BenchmarkBuffer_SetString_Unicode-12       	 1730217	      1393 ns/op	       0 B/op	       0 allocs/op
+BenchmarkBuffer_Fill-12                    	  634058	      3565 ns/op	       0 B/op	       0 allocs/op
+BenchmarkBuffer_Clear-12                   	  140491	     16936 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStyle_Creation-12                 	1000000000	         0.3251 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStyle_Chaining-12                 	83211693	        29.24 ns/op	       0 B/op	       0 allocs/op
+BenchmarkMemory_BufferPooling-12           	   49189	     48494 ns/op	       3 B/op	       0 allocs/op
+BenchmarkRealWorld_ScrollingTerminal-12    	   26294	     92363 ns/op	      14 B/op	       0 allocs/op
+BenchmarkRealWorld_CodeEditor-12           	   19795	    119509 ns/op	      20 B/op	       0 allocs/op
+BenchmarkWorstCase_FullScreenChange-12     	    7201	    312425 ns/op	  596401 B/op	      64 allocs/op
+BenchmarkBestCase_NoChanges-12             	   75356	     33787 ns/op	       0 B/op	       0 allocs/op
+BenchmarkScreenSizes/Small_40x12-12        	  290200	      8086 ns/op	       0 B/op	       0 allocs/op
+BenchmarkScreenSizes/Standard_80x24-12     	   70910	     37745 ns/op	       8 B/op	       0 allocs/op
+BenchmarkScreenSizes/Large_120x40-12       	   27553	    103808 ns/op	      61 B/op	       0 allocs/op
+BenchmarkScreenSizes/XLarge_200x60-12      	    9326	    255713 ns/op	     543 B/op	       0 allocs/op
+PASS
+ok  	github.com/phoenix-tui/phoenix/render/benchmarks	65.912s
