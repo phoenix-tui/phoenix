@@ -894,7 +894,7 @@ func TestClipboard_Write_ProviderError(t *testing.T) {
 	mockProvider := &MockProvider{
 		name:      "mock",
 		available: true,
-		writeFunc: func(content *model.ClipboardContent) error {
+		writeFunc: func(_ *model.ClipboardContent) error {
 			return fmt.Errorf("provider write error")
 		},
 	}

@@ -1,9 +1,5 @@
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/phoenix-tui/phoenix/terminal v0.1.0-beta.2 h1:KQbKe6PhFCNnvGhtvrrNvrOffM+BIlJu6NlntDqeRYA=
-github.com/phoenix-tui/phoenix/terminal v0.1.0-beta.2/go.mod h1:ytKcbxPCVidcDjgbr8tQasvv77XxQizUV43/PgaNkNY=
-github.com/phoenix-tui/phoenix/testing v0.1.0-beta.2 h1:ZxjiltCzPVq68UvOY5OTv965F5eXho+fA3+x/vmtV38=
-github.com/phoenix-tui/phoenix/testing v0.1.0-beta.2/go.mod h1:NMx5KB/18hJUnjmBhogTydMGKLnSg18zIjDWViyT2Gg=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/rivo/uniseg v0.4.7 h1:WUdvkW8uEhrYfLC4ZzdpI2ztxP1I582+49Oc5Mq64VQ=

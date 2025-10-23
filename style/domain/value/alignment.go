@@ -3,6 +3,8 @@ package value
 
 import "fmt"
 
+const unknownString = "Unknown"
+
 // HorizontalAlignment represents horizontal text alignment.
 type HorizontalAlignment int
 
@@ -23,8 +25,7 @@ func (h HorizontalAlignment) String() string {
 	case AlignRight:
 		return "Right"
 	default:
-		//nolint:goconst // "Unknown" string literal used in switch defaults - constant not beneficial
-		return "Unknown"
+		return unknownString
 	}
 }
 
@@ -48,7 +49,7 @@ func (v VerticalAlignment) String() string {
 	case AlignBottom:
 		return "Bottom"
 	default:
-		return "Unknown"
+		return unknownString
 	}
 }
 

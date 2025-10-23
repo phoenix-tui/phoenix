@@ -3,8 +3,8 @@ module github.com/phoenix-tui/phoenix/tea
 go 1.25.1
 
 require (
-	github.com/phoenix-tui/phoenix/terminal v0.1.0-beta.2
-	github.com/phoenix-tui/phoenix/testing v0.1.0-beta.2
+	github.com/phoenix-tui/phoenix/terminal v0.1.0-beta.3
+	github.com/phoenix-tui/phoenix/testing v0.1.0-beta.3
 	github.com/stretchr/testify v1.11.1
 )
 
@@ -16,8 +16,8 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-// Local development: use terminal from feature/tea-exec-process branch
+// Local development
 replace github.com/phoenix-tui/phoenix/terminal => ../terminal
 
-// Local development: use testing from feature/tea-exec-process branch
+// Local development
 replace github.com/phoenix-tui/phoenix/testing => ../testing

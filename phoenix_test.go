@@ -108,14 +108,14 @@ func TestColorDepthConstants(t *testing.T) {
 // │ Style Tests                                                 │
 // └─────────────────────────────────────────────────────────────┘
 
-func TestNewStyle(t *testing.T) {
+func TestNewStyle(_ *testing.T) {
 	s := phoenix.NewStyle()
 	// Style is a value type, not a pointer
 	// Just verify we can create it
 	_ = s
 }
 
-func TestStyleAPI(t *testing.T) {
+func TestStyleAPI(_ *testing.T) {
 	// Simple test to verify the Style API is accessible through umbrella module
 	// Don't test Style functionality itself - that's tested in style package
 	s := phoenix.NewStyle()
@@ -133,7 +133,7 @@ type testModel struct {
 
 func (m testModel) Init() tea.Cmd { return nil }
 
-func (m testModel) Update(msg tea.Msg) (testModel, tea.Cmd) {
+func (m testModel) Update(_ tea.Msg) (testModel, tea.Cmd) {
 	return m, nil
 }
 

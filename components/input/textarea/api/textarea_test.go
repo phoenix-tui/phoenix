@@ -455,7 +455,7 @@ func TestTextArea_Lines(t *testing.T) {
 	}
 }
 
-func TestTextArea_ContentParts(t *testing.T) {
+func TestTextArea_ContentParts(_ *testing.T) {
 	ta := New().SetValue("hello\nworld").SetCursorPosition(1, 2)
 
 	before, at, after := ta.ContentParts()

@@ -5,7 +5,7 @@ go 1.25.1
 require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/mattn/go-runewidth v0.0.19
-	github.com/phoenix-tui/phoenix/core v0.1.0-beta.2
+	github.com/phoenix-tui/phoenix/core v0.1.0-beta.3
 )
 
 require (
@@ -21,7 +21,7 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/unilibs/uniwidth v0.1.0-beta // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
-	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/sys v0.37.0 // indirect
 )
 
 replace github.com/phoenix-tui/phoenix/core => ../../core
