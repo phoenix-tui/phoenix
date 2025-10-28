@@ -103,6 +103,32 @@ if [ $VET_FAILED -eq 0 ]; then
 fi
 echo ""
 
+# 4b. Cross-compilation vet (Linux)
+# Catch build-tag-specific issues that only show on other platforms
+log_info "Running cross-compilation vet (GOOS=linux)..."
+CROSS_VET_FAILED=0
+for dir in $MODULES; do
+    echo "  • $dir (linux)..."
+    if [ "$dir" = "clipboard" ]; then
+        # Disable cgo for cross-compilation + unsafeptr for clipboard
+        CROSS_VET_OUTPUT=$(cd $dir && CGO_ENABLED=0 GOOS=linux GOWORK=off go vet -unsafeptr=false ./... 2>&1)
+    else
+        CROSS_VET_OUTPUT=$(cd $dir && CGO_ENABLED=0 GOOS=linux GOWORK=off go vet ./... 2>&1)
+    fi
+
+    # Check for actual errors (undefined functions, etc.)
+    if echo "$CROSS_VET_OUTPUT" | grep -E "undefined:|FAIL" > /dev/null; then
+        log_error "cross-compilation vet failed for $dir (linux)"
+        echo "$CROSS_VET_OUTPUT" | head -10
+        ERRORS=$((ERRORS + 1))
+        CROSS_VET_FAILED=1
+    fi
+done
+if [ $CROSS_VET_FAILED -eq 0 ]; then
+    log_success "cross-compilation vet passed"
+fi
+echo ""
+
 # 5. Build all packages
 log_info "Building all packages..."
 for dir in $MODULES; do
