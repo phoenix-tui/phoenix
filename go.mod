@@ -24,12 +24,11 @@ go 1.25.1
 // Require all Phoenix modules
 // This makes the umbrella module useful for users who want all libraries.
 require (
-	github.com/phoenix-tui/phoenix/clipboard v0.1.0-beta.2
-	github.com/phoenix-tui/phoenix/core v0.1.0-beta.2
-	github.com/phoenix-tui/phoenix/mouse v0.1.0-beta.2
-	github.com/phoenix-tui/phoenix/style v0.1.0-beta.2
-	github.com/phoenix-tui/phoenix/tea v0.1.0-beta.2
-	github.com/phoenix-tui/phoenix/terminal v0.1.0-beta.2
+	github.com/phoenix-tui/phoenix/clipboard v0.1.0-beta.3
+	github.com/phoenix-tui/phoenix/core v0.1.0-beta.3
+	github.com/phoenix-tui/phoenix/style v0.1.0-beta.3
+	github.com/phoenix-tui/phoenix/tea v0.1.0-beta.3
+	github.com/phoenix-tui/phoenix/terminal v0.1.0-beta.3
 )
 
 require (

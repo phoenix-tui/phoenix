@@ -17,6 +17,275 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.0-beta.3] - 2025-10-23 (ExecProcess + Performance Tracking)
+
+**Status**: 🚀 CRITICAL FIX + NEW FEATURES
+
+This release fixes critical bugs blocking GoSh shell interactive commands AND adds comprehensive performance tracking infrastructure.
+
+### Added
+
+**ExecProcess API** ⭐ CRITICAL FEATURE
+
+Phoenix Tea Program now supports running external interactive commands with full terminal control:
+
+1. **Program.ExecProcess(cmd)** - Execute interactive commands
+   - Runs external programs with full terminal control (vim, ssh, claude, python REPL)
+   - Automatic terminal mode management (raw → cooked → raw)
+   - Automatic alternate screen handling
+   - inputReader lifecycle management (stop → restart)
+   - Example: `p.ExecProcess(exec.Command("vim", "file.txt"))`
+
+2. **Terminal Raw Mode API**
+   - `Terminal.EnterRawMode()` - Enable character-by-character input
+   - `Terminal.ExitRawMode()` - Restore cooked mode for external commands
+   - `Terminal.IsInRawMode()` - Check current state
+   - Platform-specific: Unix (golang.org/x/term), Windows (SetConsoleMode)
+
+3. **Alternate Screen Buffer API**
+   - `Terminal.EnterAltScreen()` - Full-screen TUI mode
+   - `Terminal.ExitAltScreen()` - Return to normal terminal
+   - `Terminal.IsInAltScreen()` - Check current state
+   - Platform-specific implementations (ANSI escape sequences)
+
+**Benefits**:
+- ✅ Enables shell REPL commands (vim, nano, ssh, telnet)
+- ✅ Enables language REPLs (python, node, irb, psql)
+- ✅ Enables any interactive command execution
+- ✅ Proper terminal state restoration
+- ✅ No stdin stealing or deadlocks
+
+**Umbrella Module** 🎁 CONVENIENCE API
+
+New `github.com/phoenix-tui/phoenix` umbrella module with 21 convenience functions:
+
+```go
+import "github.com/phoenix-tui/phoenix"
+
+// Simplified API (no need to import individual modules)
+term := phoenix.AutoDetectTerminal()
+style := phoenix.NewStyle().Foreground("#00FF00").Bold()
+p := phoenix.NewProgram(model, phoenix.WithAltScreen[Model]())
+```
+
+**Convenience Functions**:
+- Terminal: `AutoDetectTerminal()`, `NewUnixTerminal()`, `NewWindowsTerminal()`
+- Style: `NewStyle()`, `StyleDefault()`
+- Program: `NewProgram()`, `WithAltScreen()`, `WithMouseAllMotion()`, `WithInput()`, `WithOutput()`
+- Components: `NewTextInput()`, `NewTextArea()`, `NewList()`, `NewViewport()`, `NewTable()`, `NewModal()`, `NewProgress()`
+- Values: `NewPosition()`, `NewSize()`, `NewColor()`
+
+**Benefits**:
+- ✅ Simpler imports for new users
+- ✅ Follows OpenTelemetry pattern (convenience functions, not type aliases)
+- ✅ 100% optional (can still import individual modules)
+- ✅ 100% test coverage (20 tests)
+
+**Performance Tracking System** 📊 INFRASTRUCTURE
+
+Complete benchmark tracking infrastructure for continuous performance monitoring:
+
+1. **Automated Benchmark Runner**
+   - `benchmarks/scripts/run_benchmarks.sh` - Run all critical benchmarks
+   - Saves results to `benchmarks/results/current/`
+   - Tracks render performance, Unicode operations, real-world scenarios
+
+2. **Statistical Comparison**
+   - `benchmarks/scripts/compare.sh` - Compare current vs baseline
+   - Uses `benchstat` format (Go standard)
+   - Detects regressions automatically
+   - Performance targets: ±5% acceptable, +10% requires justification
+
+3. **Historical Tracking**
+   - `benchmarks/results/baseline/` - Stable baseline for comparisons
+   - `benchmarks/results/history/v0.1.0-beta.3/` - Release milestones
+   - Git-friendly text format (easy diffs)
+   - Minimal repo growth (only milestones stored)
+
+**Current Performance (v0.1.0-beta.3)**:
+- **Render**: 37,818 FPS (630x faster than 60 FPS target) - **30% improvement!**
+- **Unicode ASCII**: 64 ns/op (29% faster than beta.2)
+- **Unicode Emoji**: 110 ns/op (34% faster than beta.2)
+- **Memory**: 4 B/op on critical path
+- **Allocations**: 0 allocs/op maintained
+
+**Test Coverage Improvements** ✅
+
+Added 250+ tests (~2,450 lines) across critical modules:
+
+- **mouse/api**: 0% → 100% (818 lines, 40+ tests)
+- **terminal/api**: 0% → 100% (143 lines, type tests)
+- **clipboard/api**: +656 lines comprehensive test suite
+- **clipboard/osc52**: +258 lines platform detection tests
+- **textarea/keybindings**: 17.1% → 100% (664 lines, 35+ tests for Emacs bindings)
+- **input/api**: 56.9% → 93.1% (+263 lines, cursor/keybindings tests)
+- **textarea/api**: 56.2% → 87.7% (+253 lines, fluent API tests)
+- **viewport/api**: +528 lines scroll/resize tests
+
+**New Files**:
+- `benchmarks/README.md` - Public benchmark documentation
+- `benchmarks/results/README.md` - Workflow documentation
+- `benchmarks/scripts/*.sh` - 3 automation scripts
+- `benchmarks/results/history/v0.1.0-beta.3/` - Baseline results
+- `examples/umbrella/main.go` - Umbrella module demo
+- `phoenix.go` - Umbrella module convenience API
+- `phoenix_test.go` - Umbrella module tests (100% coverage)
+
+### Fixed
+
+**CRITICAL: ExecProcess Race Condition** 🐛
+
+Fixed deadlock bug where inputReader goroutine would not restart after ExecProcess:
+
+**Problem**:
+- Old inputReader goroutine's defer would clear `inputReaderRunning` flag AFTER new goroutine started
+- Caused complete deadlock - program couldn't accept input after external command
+- Blocked 70% of shell functionality (vim, ssh, python, claude, etc.)
+
+**Solution**:
+- Added `inputReaderGeneration` counter (uint64)
+- Each goroutine captures its generation number
+- defer only clears flag if generation matches (prevents race)
+- stopInputReader increments generation before clearing flag
+
+**Impact**:
+- ✅ Zero performance overhead (generation counter check is instant)
+- ✅ No additional memory allocations
+- ✅ All 29 ExecProcess tests passing
+- ✅ GoSh shell confirmed fixed
+
+**Terminal Mode Management** 🔧
+
+Fixed stdin not working in external commands:
+
+**Problem**:
+- ExecProcess didn't manage raw mode transitions
+- External commands (vim, ssh) expect cooked mode
+- stdin wasn't readable in interactive commands
+
+**Solution**:
+- ExecProcess now: ExitRawMode → Run command → EnterRawMode
+- Added 10 comprehensive raw mode tests (Unix + Windows)
+- Platform-specific implementations with build tags
+
+**Keybindings Fixes** ⌨️
+
+Fixed Emacs keybindings for word deletion:
+
+**Problem**:
+- Ctrl+W and Alt+Backspace didn't delete word backward
+- Only forward deletion (Alt+d) was implemented
+
+**Solution**:
+- Added `EditingService.KillWordBackward()` method
+- Updated Emacs keybindings to use correct methods
+- All 35+ keybindings tests now passing
+
+**Core Module Cleanup** 🧹
+
+Removed Charm/Lipgloss dependency from core module:
+
+**Problem**:
+- `core/go.mod` contained `github.com/charmbracelet/lipgloss v1.1.0`
+- Violated "Zero Charm Dependencies" principle
+- Comparison tests inside core/domain/service caused `go mod tidy` to add lipgloss
+
+**Solution**:
+- Created separate `benchmarks/comparison/` module with own go.mod
+- Moved 3 comparison test files to new module
+- Removed lipgloss from core/go.mod
+- Phoenix core now truly has zero external TUI dependencies
+
+### Changed
+
+**Performance** 🚀
+
+v0.1.0-beta.3 shows significant performance improvements over beta.2:
+
+| Metric | beta.2 | beta.3 | Change |
+|--------|--------|--------|--------|
+| **Render FPS** | 29,155 | **37,818** | **+30% faster** |
+| **Unicode ASCII** | 90 ns | **64 ns** | **-29% faster** |
+| **Unicode Emoji** | 167 ns | **110 ns** | **-34% faster** |
+| **Scrolling Terminal** | 122 µs | **88 µs** | **-28% faster** |
+| **Code Editor** | 155 µs | **117 µs** | **-24% faster** |
+
+**Why faster?**
+- Better CPU cache locality after recent refactorings
+- Go compiler optimizations on frequently executed paths
+- No performance cost from race fix (generation counter is instant)
+
+**Module Structure**
+
+Improved multi-module organization:
+
+- `benchmarks/comparison/` - Separate module for Lipgloss comparisons
+- `benchmarks/results/` - Performance tracking data
+- `benchmarks/scripts/` - Automation tools
+- Root `go.mod` - Umbrella module with convenience API
+
+### Technical Details
+
+**Files Changed**: 49 files (+7,738, -85 lines)
+
+**ExecProcess Implementation**:
+- `tea/application/program/program.go` - ExecProcess + race fix
+- `terminal/api/terminal.go` - Raw mode + alt screen API
+- `terminal/infrastructure/unix/ansi.go` - Unix implementation
+- `terminal/infrastructure/windows/console.go` - Windows implementation
+- `testing/mock_terminal.go` - Mock terminal updates
+- `testing/null_terminal.go` - Null terminal updates
+
+**Test Files**:
+- `tea/api/tea_exec_test.go` - 251 lines, ExecProcess API tests
+- `tea/application/program/exec_process_test.go` - 631 lines, 20+ scenarios
+- `tea/application/program/exec_process_raw_mode_test.go` - 317 lines, raw mode tests
+- `terminal/infrastructure/unix/raw_mode_test.go` - 144 lines (with `//go:build unix`)
+- `terminal/infrastructure/windows/raw_mode_test.go` - 142 lines (with `//go:build windows`)
+- `terminal/infrastructure/unix/screen_buffer_test.go` - 253 lines
+- `terminal/infrastructure/windows/screen_buffer_test.go` - 318 lines
+
+**Platform Support**:
+- ✅ **Unix**: Raw mode via `golang.org/x/term`, Alt screen via ANSI escapes
+- ✅ **Windows**: Raw mode via `SetConsoleMode`, Alt screen via Console API
+- ✅ **Build tags**: Proper platform-specific compilation
+
+**Dependencies**:
+- No new external dependencies
+- Stdlib only for ExecProcess (os/exec, context)
+- Platform-specific: golang.org/x/term (Unix), golang.org/x/sys/windows (Windows)
+
+### Migration from beta.2 to beta.3
+
+**No breaking changes!** All existing code works unchanged.
+
+**New features (opt-in)**:
+```go
+// 1. ExecProcess (for shells/editors)
+cmd := exec.Command("vim", "file.txt")
+err := program.ExecProcess(cmd)
+
+// 2. Umbrella module (convenience)
+import "github.com/phoenix-tui/phoenix"
+p := phoenix.NewProgram(model, phoenix.WithAltScreen[Model]())
+
+// 3. Performance tracking (for contributors)
+bash benchmarks/scripts/run_benchmarks.sh
+bash benchmarks/scripts/compare.sh
+```
+
+**Recommended**: Upgrade immediately for critical bug fixes (race condition, terminal mode).
+
+### Acknowledgments
+
+Special thanks to **GoSh shell team** for:
+- Reporting PHOENIX_EXECPROCESS_DEADLOCK_BUG.md
+- Reporting PHOENIX_TERMINAL_MODE_BUG.md
+- Testing the fixes and confirming resolution
+- Driving ExecProcess feature development
+
+---
+
 ## [0.1.0-beta.2] - 2025-10-20 (Multi-Module + TextArea Cursor Control)
 
 **Status**: 🎉 FEATURE RELEASE

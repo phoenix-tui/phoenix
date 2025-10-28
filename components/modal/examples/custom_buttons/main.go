@@ -13,8 +13,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/phoenix-tui/phoenix/components/modal/api"
-	tea "github.com/phoenix-tui/phoenix/tea/api"
+	"github.com/phoenix-tui/phoenix/components/modal"
+	tea "github.com/phoenix-tui/phoenix/tea"
 )
 
 // Model represents the application state.
@@ -30,6 +30,8 @@ func (m Model) Init() tea.Cmd {
 }
 
 // Update handles messages.
+//
+//nolint:gocyclo,cyclop // Example code demonstrates multiple modal interactions and state handling
 func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -64,7 +66,7 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 			m.modal = m.modal.Hide()
 			return m, tea.Quit()
 		case "cancel":
-			m.result = "Operation cancelled. Continue editing."
+			m.result = "Operation canceled. Continue editing."
 			m.modal = m.modal.Hide()
 			return m, nil
 		}

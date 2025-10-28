@@ -312,8 +312,8 @@ go test -run Integration ./...
 
 ## Documentation
 
-- **[Value Objects](domain/value/README.md)** - Color, Border, Padding, Margin, Size, Alignment
-- **[Domain Model](domain/model/)** - Style domain model documentation
+- **[Value Objects](internal/domain/value/README.md)** - Color, Border, Padding, Margin, Size, Alignment
+- **[Domain Model](internal/domain/model/)** - Style domain model documentation
 - **Examples** - [examples/](examples/) directory
 
 ## Roadmap

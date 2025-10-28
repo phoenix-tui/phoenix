@@ -20,7 +20,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/phoenix-tui/phoenix/tea/api"
+	"github.com/phoenix-tui/phoenix/tea"
 )
 
 // TodoItem represents a single todo item.
@@ -38,18 +38,18 @@ type TodoModel struct {
 }
 
 // Init initializes the model with some sample todos.
-func (m TodoModel) Init() api.Cmd {
+func (m TodoModel) Init() tea.Cmd {
 	return nil
 }
 
 // Update handles incoming messages and updates the model.
 //
 //nolint:gocognit,gocyclo,cyclop // Example todo app logic is naturally complex for demonstration
-func (m TodoModel) Update(msg api.Msg) (TodoModel, api.Cmd) {
+func (m TodoModel) Update(msg tea.Msg) (TodoModel, tea.Cmd) {
 	// Single type switch is clear for examples (simple pattern)
 	//nolint:gocritic // singleCaseSwitch: Keep for example clarity
 	switch msg := msg.(type) {
-	case api.KeyMsg:
+	case tea.KeyMsg:
 		if m.addMode {
 			// Add mode - entering new todo text
 			return m.handleAddMode(msg)
@@ -58,7 +58,7 @@ func (m TodoModel) Update(msg api.Msg) (TodoModel, api.Cmd) {
 		// Normal mode - list navigation
 		switch msg.String() {
 		case "q", "ctrl+c":
-			return m, api.Quit()
+			return m, tea.Quit()
 
 		case "a":
 			// Enter add mode
@@ -103,7 +103,7 @@ func (m TodoModel) Update(msg api.Msg) (TodoModel, api.Cmd) {
 }
 
 // handleAddMode handles keyboard input while adding a new todo.
-func (m TodoModel) handleAddMode(msg api.KeyMsg) (TodoModel, api.Cmd) {
+func (m TodoModel) handleAddMode(msg tea.KeyMsg) (TodoModel, tea.Cmd) {
 	switch msg.String() {
 	case "enter":
 		// Add the todo
@@ -130,7 +130,7 @@ func (m TodoModel) handleAddMode(msg api.KeyMsg) (TodoModel, api.Cmd) {
 
 	default:
 		// Add character (if it's a rune)
-		if msg.Type == api.KeyRune {
+		if msg.Type == tea.KeyRune {
 			m.newText += string(msg.Rune)
 		}
 		return m, nil
@@ -217,7 +217,7 @@ func main() {
 	}
 
 	// Create program
-	p := api.New(initialModel, api.WithAltScreen[TodoModel]())
+	p := tea.New(initialModel, tea.WithAltScreen[TodoModel]())
 
 	// Run the program
 	if err := p.Run(); err != nil {

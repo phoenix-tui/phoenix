@@ -12,12 +12,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/phoenix-tui/phoenix/terminal/infrastructure"
+	"github.com/phoenix-tui/phoenix/terminal"
 )
 
 func main() {
 	// Create platform-optimized terminal with auto-detection.
-	term := infrastructure.NewTerminal()
+	term := terminal.New()
 
 	fmt.Println("=== Phoenix Terminal API Demo ===")
 

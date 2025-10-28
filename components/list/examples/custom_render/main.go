@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/phoenix-tui/phoenix/components/list/api"
-	"github.com/phoenix-tui/phoenix/components/list/domain/value"
-	tea "github.com/phoenix-tui/phoenix/tea/api"
+	"github.com/phoenix-tui/phoenix/components/list"
+	tea "github.com/phoenix-tui/phoenix/tea"
 )
 
 // Person represents a person with name and age.
@@ -28,9 +27,9 @@ func main() {
 	}
 	labels := []string{"Alice", "Bob", "Charlie", "Diana", "Eve"}
 
-	l := list.New(people, labels, value.SelectionModeSingle).
+	l := list.New(people, labels, list.SelectionModeSingle).
 		Height(10).
-		ItemRenderer(func(item interface{}, index int, selected, focused bool) string {
+		ItemRenderer(func(item interface{}, _ int, selected, focused bool) string {
 			p := item.(Person)
 
 			// Custom rendering with colors and formatting.

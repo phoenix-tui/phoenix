@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	progress "github.com/phoenix-tui/phoenix/components/progress/api"
+	"github.com/phoenix-tui/phoenix/components/progress"
 )
 
 // Styled progress bar example.

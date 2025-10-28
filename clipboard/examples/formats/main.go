@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/phoenix-tui/phoenix/clipboard/api"
-	"github.com/phoenix-tui/phoenix/clipboard/domain/model"
-	"github.com/phoenix-tui/phoenix/clipboard/domain/value"
+	"github.com/phoenix-tui/phoenix/clipboard"
+	"github.com/phoenix-tui/phoenix/clipboard/internal/domain/model"
+	value2 "github.com/phoenix-tui/phoenix/clipboard/internal/domain/value"
 )
 
 //nolint:gocyclo,cyclop // Example code demonstrates multiple format handling scenarios
@@ -17,16 +17,16 @@ func main() {
 	fmt.Println()
 
 	// Create clipboard instance
-	clipboard, err := api.New()
+	cb, err := clipboard.New()
 	if err != nil {
 		log.Fatalf("Failed to create clipboard: %v", err)
 	}
 
-	if !clipboard.IsAvailable() {
+	if !cb.IsAvailable() {
 		log.Fatal("Clipboard is not available")
 	}
 
-	fmt.Printf("Using provider: %s\n", clipboard.GetProviderName())
+	fmt.Printf("Using provider: %s\n", cb.GetProviderName())
 	fmt.Println()
 
 	// Example 1: Plain text
@@ -34,13 +34,13 @@ func main() {
 	fmt.Println("--------------------")
 
 	plainText := "Hello, World!"
-	err = clipboard.Write(plainText)
+	err = cb.Write(plainText)
 	if err != nil {
 		log.Fatalf("Failed to write plain text: %v", err)
 	}
 	fmt.Printf("✓ Written: %s\n", plainText)
 
-	readText, err := clipboard.Read()
+	readText, err := cb.Read()
 	if err != nil {
 		log.Fatalf("Failed to read: %v", err)
 	}
@@ -54,13 +54,13 @@ func main() {
 	multilineText := `Line 1
 Line 2
 Line 3`
-	err = clipboard.Write(multilineText)
+	err = cb.Write(multilineText)
 	if err != nil {
 		log.Fatalf("Failed to write multiline text: %v", err)
 	}
 	fmt.Printf("✓ Written %d lines\n", 3)
 
-	readMultiline, err := clipboard.Read()
+	readMultiline, err := cb.Read()
 	if err != nil {
 		log.Fatalf("Failed to read: %v", err)
 	}
@@ -72,13 +72,13 @@ Line 3`
 	fmt.Println("--------------------")
 
 	unicodeText := "Hello 世界! 🚀 Phoenix TUI 🎉"
-	err = clipboard.Write(unicodeText)
+	err = cb.Write(unicodeText)
 	if err != nil {
 		log.Fatalf("Failed to write unicode text: %v", err)
 	}
 	fmt.Printf("✓ Written: %s\n", unicodeText)
 
-	readUnicode, err := clipboard.Read()
+	readUnicode, err := cb.Read()
 	if err != nil {
 		log.Fatalf("Failed to read: %v", err)
 	}
@@ -129,11 +129,11 @@ Line 3`
 	fmt.Printf("Original MIME type: %s\n", originalContent.MIMEType())
 
 	// Transform to HTML
-	htmlContent := originalContent.WithMIMEType(value.MIMETypeHTML)
+	htmlContent := originalContent.WithMIMEType(value2.MIMETypeHTML)
 	fmt.Printf("Transformed MIME type: %s\n", htmlContent.MIMEType())
 
 	// Transform encoding
-	base64Content := htmlContent.WithEncoding(value.EncodingBase64)
+	base64Content := htmlContent.WithEncoding(value2.EncodingBase64)
 	fmt.Printf("Transformed encoding: %s\n", base64Content.Encoding())
 
 	// Original is unchanged (immutability)
@@ -149,13 +149,13 @@ Line 3`
 		largeText += fmt.Sprintf("Line %d\n", i+1)
 	}
 
-	err = clipboard.Write(largeText)
+	err = cb.Write(largeText)
 	if err != nil {
 		log.Fatalf("Failed to write large content: %v", err)
 	}
 	fmt.Printf("✓ Written large content: %d bytes\n", len(largeText))
 
-	readLarge, err := clipboard.Read()
+	readLarge, err := cb.Read()
 	if err != nil {
 		log.Fatalf("Failed to read large content: %v", err)
 	}

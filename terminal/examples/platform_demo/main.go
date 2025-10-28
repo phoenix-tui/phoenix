@@ -6,8 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/phoenix-tui/phoenix/terminal/api"
-	"github.com/phoenix-tui/phoenix/terminal/infrastructure"
+	"github.com/phoenix-tui/phoenix/terminal"
 )
 
 func main() {
@@ -16,12 +15,12 @@ func main() {
 	fmt.Println()
 
 	// Auto-detect platform.
-	platform := infrastructure.DetectPlatform()
+	platform := terminal.DetectPlatform()
 	fmt.Printf("Detected Platform: %s\n", platform)
 	fmt.Println()
 
 	// Create terminal with auto-detection.
-	term := infrastructure.NewTerminal()
+	term := terminal.New()
 
 	// Display capabilities.
 	fmt.Println("Terminal Capabilities:")
@@ -53,7 +52,7 @@ func main() {
 }
 
 //nolint:gocognit,cyclop // Demo function with multiple test scenarios
-func runPerformanceDemo(term api.Terminal, platform api.Platform) {
+func runPerformanceDemo(term terminal.Terminal, platform terminal.Platform) {
 	fmt.Println("\n" + strings.Repeat("=", 60))
 	fmt.Println("Performance Demonstration")
 	fmt.Println(strings.Repeat("=", 60))
@@ -105,7 +104,7 @@ func runPerformanceDemo(term api.Terminal, platform api.Platform) {
 	duration = time.Since(start)
 	fmt.Printf("   Completed in: %v (avg: %v per operation)\n", duration, duration/100)
 
-	if platform == api.PlatformWindowsConsole {
+	if platform == terminal.PlatformWindowsConsole {
 		fmt.Println("   ✓ Using Windows Console API (10x faster than ANSI!)")
 	} else {
 		fmt.Println("   ℹ Using ANSI escape codes (universal compatibility)")
@@ -166,7 +165,7 @@ func runPerformanceDemo(term api.Terminal, platform api.Platform) {
 	fmt.Printf("Platform Type: %s\n", platform)
 
 	switch platform {
-	case api.PlatformWindowsConsole:
+	case terminal.PlatformWindowsConsole:
 		fmt.Println("\n✓ OPTIMAL PERFORMANCE")
 		fmt.Println("  • Using native Windows Console API")
 		fmt.Println("  • 10x faster than ANSI for cursor operations")
@@ -174,7 +173,7 @@ func runPerformanceDemo(term api.Terminal, platform api.Platform) {
 		fmt.Println("  • Cursor and buffer readback supported")
 		fmt.Println("  • Perfect for GoSh multiline shell rendering")
 
-	case api.PlatformWindowsANSI:
+	case terminal.PlatformWindowsANSI:
 		fmt.Println("\nℹ GOOD PERFORMANCE (ANSI Fallback)")
 		fmt.Println("  • Using ANSI escape codes")
 		fmt.Println("  • Detected Git Bash / MinTTY environment")
@@ -182,7 +181,7 @@ func runPerformanceDemo(term api.Terminal, platform api.Platform) {
 		fmt.Println("  • Cursor readback not available")
 		fmt.Println("  • Still perfectly usable for GoSh")
 
-	case api.PlatformUnix:
+	case terminal.PlatformUnix:
 		fmt.Println("\nℹ GOOD PERFORMANCE (ANSI Standard)")
 		fmt.Println("  • Using ANSI escape codes")
 		fmt.Println("  • Universal Unix/Linux/macOS compatibility")

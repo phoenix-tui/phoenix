@@ -6,9 +6,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/phoenix-tui/phoenix/components/list/api"
-	"github.com/phoenix-tui/phoenix/components/list/domain/value"
-	tea "github.com/phoenix-tui/phoenix/tea/api"
+	"github.com/phoenix-tui/phoenix/components/list"
+	tea "github.com/phoenix-tui/phoenix/tea"
 )
 
 func main() {
@@ -35,7 +34,7 @@ func main() {
 	}
 
 	// Custom filter: show only Go files containing query.
-	l := list.New(files, labels, value.SelectionModeSingle).
+	l := list.New(files, labels, list.SelectionModeSingle).
 		Height(10).
 		Filter(func(item interface{}, query string) bool {
 			filename := item.(string)

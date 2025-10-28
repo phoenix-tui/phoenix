@@ -6,7 +6,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/mattn/go-runewidth"
-	"github.com/phoenix-tui/phoenix/core/domain/service"
+	"github.com/phoenix-tui/phoenix/core"
 )
 
 // ========================================
@@ -28,10 +28,9 @@ var (
 // ========================================
 
 func BenchmarkComparison_ASCII_Phoenix(b *testing.B) {
-	us := service.NewUnicodeService()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = us.StringWidth(compASCII)
+		_ = core.StringWidth(compASCII)
 	}
 }
 
@@ -54,10 +53,9 @@ func BenchmarkComparison_ASCII_Runewidth(b *testing.B) {
 // ========================================
 
 func BenchmarkComparison_Emoji_Phoenix(b *testing.B) {
-	us := service.NewUnicodeService()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = us.StringWidth(compEmoji)
+		_ = core.StringWidth(compEmoji)
 	}
 }
 
@@ -80,10 +78,9 @@ func BenchmarkComparison_Emoji_Runewidth(b *testing.B) {
 // ========================================
 
 func BenchmarkComparison_CJK_Phoenix(b *testing.B) {
-	us := service.NewUnicodeService()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = us.StringWidth(compCJK)
+		_ = core.StringWidth(compCJK)
 	}
 }
 
@@ -106,10 +103,9 @@ func BenchmarkComparison_CJK_Runewidth(b *testing.B) {
 // ========================================
 
 func BenchmarkComparison_Mixed_Phoenix(b *testing.B) {
-	us := service.NewUnicodeService()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = us.StringWidth(compMixed)
+		_ = core.StringWidth(compMixed)
 	}
 }
 
@@ -132,10 +128,9 @@ func BenchmarkComparison_Mixed_Runewidth(b *testing.B) {
 // ========================================
 
 func BenchmarkComparison_Long_Phoenix(b *testing.B) {
-	us := service.NewUnicodeService()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = us.StringWidth(compLong)
+		_ = core.StringWidth(compLong)
 	}
 }
 
@@ -158,10 +153,9 @@ func BenchmarkComparison_Long_Runewidth(b *testing.B) {
 // ========================================
 
 func BenchmarkComparison_BugCase_Phoenix(b *testing.B) {
-	us := service.NewUnicodeService()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = us.StringWidth(compBuggy)
+		_ = core.StringWidth(compBuggy)
 	}
 }
 
@@ -184,11 +178,10 @@ func BenchmarkComparison_BugCase_Runewidth(b *testing.B) {
 // ========================================
 
 func BenchmarkComparison_Memory_Phoenix(b *testing.B) {
-	us := service.NewUnicodeService()
 	b.ReportAllocs()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		_ = us.StringWidth(compMixed)
+		_ = core.StringWidth(compMixed)
 	}
 }
 

@@ -4,7 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/phoenix-tui/phoenix/style/api"
+	"github.com/phoenix-tui/phoenix/style"
+	value2 "github.com/phoenix-tui/phoenix/style/internal/domain/value"
 )
 
 // Integration tests for complete phoenix/style pipeline.
@@ -295,7 +296,7 @@ func TestIntegration_TerminalCapabilities(t *testing.T) {
 		t.Run(cap.String(), func(t *testing.T) {
 			s := style.New().
 				Foreground(style.RGB(255, 0, 0)).
-				TerminalCapability(cap)
+				TerminalCapability(value2.TerminalCapability(cap))
 
 			output := style.Render(s, "Test")
 

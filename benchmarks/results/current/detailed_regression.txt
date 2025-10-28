@@ -1,0 +1,16 @@
+goos: windows
+goarch: amd64
+pkg: github.com/phoenix-tui/phoenix/render/benchmarks
+cpu: 12th Gen Intel(R) Core(TM) i7-1255U
+BenchmarkLargeScreen_200x50-12    	   83896	    177192 ns/op	      47 B/op	       0 allocs/op
+BenchmarkLargeScreen_200x50-12    	   56688	    179158 ns/op	      69 B/op	       0 allocs/op
+BenchmarkLargeScreen_200x50-12    	   70546	    175533 ns/op	      56 B/op	       0 allocs/op
+BenchmarkLargeScreen_200x50-12    	   66448	    173404 ns/op	      59 B/op	       0 allocs/op
+BenchmarkLargeScreen_200x50-12    	   70162	    178953 ns/op	      56 B/op	       0 allocs/op
+BenchmarkStyled_MultiColor-12     	  355561	     39630 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStyled_MultiColor-12     	  317402	     34524 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStyled_MultiColor-12     	  327184	     34111 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStyled_MultiColor-12     	  307429	     41371 ns/op	       0 B/op	       0 allocs/op
+BenchmarkStyled_MultiColor-12     	  346497	     37080 ns/op	       0 B/op	       0 allocs/op
+PASS
+ok  	github.com/phoenix-tui/phoenix/render/benchmarks	142.682s

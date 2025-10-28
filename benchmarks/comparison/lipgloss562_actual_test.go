@@ -5,12 +5,11 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/mattn/go-runewidth"
-	"github.com/phoenix-tui/phoenix/core/domain/service"
+	"github.com/phoenix-tui/phoenix/core"
 )
 
 // TestLipgloss562_ActualBrokenCases tests the EXACT strings from issue #562
 func TestLipgloss562_ActualBrokenCases(t *testing.T) {
-	us := service.NewUnicodeService()
 
 	testCases := []struct {
 		name     string
@@ -55,7 +54,7 @@ func TestLipgloss562_ActualBrokenCases(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			phoenixWidth := us.StringWidth(tc.input)
+			phoenixWidth := core.StringWidth(tc.input)
 			lipglossWidth := lipgloss.Width(tc.input)
 			runewidthWidth := runewidth.StringWidth(tc.input)
 
@@ -94,7 +93,6 @@ func statusEmoji(correct bool) string {
 
 // TestLipgloss562_VariationSelectors tests emoji with variation selectors (U+FE0F)
 func TestLipgloss562_VariationSelectors(t *testing.T) {
-	us := service.NewUnicodeService()
 
 	testCases := []struct {
 		name     string
@@ -129,7 +127,7 @@ func TestLipgloss562_VariationSelectors(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			phoenixWidth := us.StringWidth(tc.input)
+			phoenixWidth := core.StringWidth(tc.input)
 			lipglossWidth := lipgloss.Width(tc.input)
 			runewidthWidth := runewidth.StringWidth(tc.input)
 

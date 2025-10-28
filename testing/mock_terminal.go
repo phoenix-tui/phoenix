@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/phoenix-tui/phoenix/terminal/api"
+	"github.com/phoenix-tui/phoenix/terminal"
 )
 
 // MockTerminal is a recording implementation of the Terminal interface.
@@ -142,7 +142,7 @@ func (m *MockTerminal) ShowCursor() error {
 }
 
 // SetCursorStyle sets the cursor style (mock implementation).
-func (m *MockTerminal) SetCursorStyle(style api.CursorStyle) error {
+func (m *MockTerminal) SetCursorStyle(style terminal.CursorStyle) error {
 	m.record(fmt.Sprintf("SetCursorStyle(%s)", style))
 	return nil
 }
@@ -239,9 +239,9 @@ func (m *MockTerminal) SupportsTrueColor() bool {
 }
 
 // Platform returns the platform type (mock implementation).
-func (m *MockTerminal) Platform() api.Platform {
+func (m *MockTerminal) Platform() terminal.Platform {
 	m.record("Platform")
-	return api.PlatformUnknown
+	return terminal.PlatformUnknown
 }
 
 // ┌─────────────────────────────────────────────────────────────┐

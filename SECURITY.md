@@ -131,8 +131,9 @@ OSC 52 sequences can write to clipboard without user interaction in some termina
 
 Phoenix has minimal dependencies. We monitor security advisories for:
 
-- `github.com/unilibs/uniwidth` - Unicode width calculation
+- `github.com/rivo/uniseg` - Unicode grapheme cluster segmentation
 - `golang.org/x/sys` - Platform-specific terminal operations
+- `golang.org/x/term` - Terminal raw mode management (Unix)
 
 **Monitoring**:
 - Dependabot enabled (when public)

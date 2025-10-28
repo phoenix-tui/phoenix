@@ -1,0 +1,73 @@
+# CODEOWNERS for Phoenix TUI Framework
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# This file defines individuals or teams responsible for code in this repository.
+# Code owners are automatically requested for review when someone opens a pull request
+# that modifies code they own.
+
+# Default owner for everything in the repo
+* @kolkov
+
+# Core libraries - Foundation of Phoenix TUI
+/core/ @kolkov
+/style/ @kolkov
+/layout/ @kolkov
+/tea/ @kolkov
+/render/ @kolkov
+/terminal/ @kolkov
+/mouse/ @kolkov
+/clipboard/ @kolkov
+
+# Components - UI building blocks
+/components/ @kolkov
+
+# Internal implementations - Critical for DDD architecture
+/*/internal/ @kolkov
+
+# Public API files - Breaking changes require careful review
+/core/core.go @kolkov
+/style/style.go @kolkov
+/layout/layout.go @kolkov
+/tea/tea.go @kolkov
+/render/render.go @kolkov
+/terminal/terminal.go @kolkov
+/components/input/input.go @kolkov
+/components/input/textarea.go @kolkov
+/components/list/list.go @kolkov
+/components/table/table.go @kolkov
+/components/viewport/viewport.go @kolkov
+/components/modal/modal.go @kolkov
+/components/progress/progress.go @kolkov
+
+# Documentation - Keep up to date with code changes
+*.md @kolkov
+/docs/ @kolkov
+
+# GitHub configuration and CI/CD
+/.github/ @kolkov
+
+# Code quality and linting configuration
+/.golangci.yml @kolkov
+
+# Tests - Ensure coverage and reliability
+*_test.go @kolkov
+/testing/ @kolkov
+/benchmarks/ @kolkov
+
+# Scripts - Build and release automation
+/scripts/ @kolkov
+
+# Release management - Version control and changelog
+/CHANGELOG.md @kolkov
+/.claude/RELEASE_PROCESS.md @kolkov
+/.claude/LESSONS_LEARNED.md @kolkov
+
+# Contributing guidelines
+/CONTRIBUTING.md @kolkov
+/CODE_OF_CONDUCT.md @kolkov
+
+# Security policy
+/SECURITY.md @kolkov
+
+# Examples - Reference implementations
+/*/examples/ @kolkov

@@ -4,7 +4,7 @@ package main
 import (
 	"fmt"
 
-	layout "github.com/phoenix-tui/phoenix/layout/api"
+	"github.com/phoenix-tui/phoenix/layout"
 )
 
 func main() {

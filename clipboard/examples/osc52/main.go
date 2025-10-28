@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/phoenix-tui/phoenix/clipboard/api"
+	"github.com/phoenix-tui/phoenix/clipboard"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 	fmt.Println()
 
 	// Create clipboard with explicit OSC 52 configuration
-	clipboard, err := api.NewBuilder().
+	cb, err := clipboard.NewBuilder().
 		WithOSC52(true).
 		WithOSC52Timeout(5 * time.Second).
 		Build()
@@ -34,19 +34,19 @@ func main() {
 	}
 
 	// Check availability
-	if !clipboard.IsAvailable() {
+	if !cb.IsAvailable() {
 		log.Fatal("Clipboard is not available")
 	}
 
-	fmt.Printf("Using provider: %s\n", clipboard.GetProviderName())
-	fmt.Printf("SSH session: %v\n", clipboard.IsSSH())
+	fmt.Printf("Using provider: %s\n", cb.GetProviderName())
+	fmt.Printf("SSH session: %v\n", cb.IsSSH())
 	fmt.Println()
 
 	// Write text to clipboard using OSC 52
 	textToWrite := "Phoenix TUI clipboard via OSC 52! 🎉"
 	fmt.Printf("Writing to clipboard: %s\n", textToWrite)
 
-	err = clipboard.Write(textToWrite)
+	err = cb.Write(textToWrite)
 	if err != nil {
 		log.Fatalf("Failed to write to clipboard: %v", err)
 	}
@@ -69,7 +69,7 @@ func main() {
 
 	// Try to read (will likely fail as OSC 52 read is not widely supported)
 	fmt.Println("Attempting to read (OSC 52 read not widely supported)...")
-	text, err := clipboard.Read()
+	text, err := cb.Read()
 	if err != nil {
 		fmt.Printf("✗ Read failed (expected): %v\n", err)
 		fmt.Println()
@@ -83,7 +83,7 @@ func main() {
 	fmt.Println("OSC 52 Only Mode:")
 	fmt.Println("-----------------")
 
-	osc52Only, err := api.NewBuilder().
+	osc52Only, err := clipboard.NewBuilder().
 		WithOSC52(true).
 		WithNative(false).
 		Build()
