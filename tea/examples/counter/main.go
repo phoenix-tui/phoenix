@@ -16,7 +16,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/phoenix-tui/phoenix/tea/api"
+	"github.com/phoenix-tui/phoenix/tea"
 )
 
 // CounterModel represents the application state.
@@ -25,16 +25,16 @@ type CounterModel struct {
 }
 
 // Init initializes the model. No commands needed for this simple example.
-func (m CounterModel) Init() api.Cmd {
+func (m CounterModel) Init() tea.Cmd {
 	return nil
 }
 
 // Update handles incoming messages and updates the model.
-func (m CounterModel) Update(msg api.Msg) (CounterModel, api.Cmd) {
+func (m CounterModel) Update(msg tea.Msg) (CounterModel, tea.Cmd) {
 	// Single type switch is clear for examples (simple pattern)
 	//nolint:gocritic // singleCaseSwitch: Keep for example clarity
 	switch msg := msg.(type) {
-	case api.KeyMsg:
+	case tea.KeyMsg:
 		switch msg.String() {
 		case "+", "=":
 			// Increment
@@ -48,7 +48,7 @@ func (m CounterModel) Update(msg api.Msg) (CounterModel, api.Cmd) {
 
 		case "q", "ctrl+c":
 			// Quit
-			return m, api.Quit()
+			return m, tea.Quit()
 		}
 	}
 
@@ -78,7 +78,7 @@ func main() {
 	initialModel := CounterModel{count: 0}
 
 	// Create program with alt screen (takes over terminal)
-	p := api.New(initialModel, api.WithAltScreen[CounterModel]())
+	p := tea.New(initialModel, tea.WithAltScreen[CounterModel]())
 
 	// Run the program
 	if err := p.Run(); err != nil {

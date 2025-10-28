@@ -12,8 +12,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/phoenix-tui/phoenix/components/modal/api"
-	tea "github.com/phoenix-tui/phoenix/tea/api"
+	"github.com/phoenix-tui/phoenix/components/modal"
+	tea "github.com/phoenix-tui/phoenix/tea"
 )
 
 // Model represents the application state.

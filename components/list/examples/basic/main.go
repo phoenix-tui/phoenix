@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/phoenix-tui/phoenix/components/list/api"
-	"github.com/phoenix-tui/phoenix/components/list/domain/value"
-	tea "github.com/phoenix-tui/phoenix/tea/api"
+	"github.com/phoenix-tui/phoenix/components/list"
+	tea "github.com/phoenix-tui/phoenix/tea"
 )
 
 func main() {
@@ -15,7 +14,7 @@ func main() {
 	files := []interface{}{"file1.txt", "file2.go", "file3.md", "README.md", "main.go"}
 	labels := []string{"file1.txt", "file2.go", "file3.md", "README.md", "main.go"}
 
-	l := list.New(files, labels, value.SelectionModeSingle).
+	l := list.New(files, labels, list.SelectionModeSingle).
 		Height(10)
 
 	p := tea.New(l)

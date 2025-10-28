@@ -19,8 +19,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/phoenix-tui/phoenix/tea/api"
-	"github.com/phoenix-tui/phoenix/tea/domain/service"
+	"github.com/phoenix-tui/phoenix/tea"
 )
 
 // TimerState represents the timer's current state.
@@ -40,19 +39,19 @@ type TimerModel struct {
 }
 
 // Init initializes the model.
-func (m TimerModel) Init() api.Cmd {
+func (m TimerModel) Init() tea.Cmd {
 	return nil
 }
 
 // Update handles incoming messages and updates the model.
 //
 //nolint:gocognit,gocyclo,cyclop // Example timer logic is naturally complex for demonstration
-func (m TimerModel) Update(msg api.Msg) (TimerModel, api.Cmd) {
+func (m TimerModel) Update(msg tea.Msg) (TimerModel, tea.Cmd) {
 	switch msg := msg.(type) {
-	case api.KeyMsg:
+	case tea.KeyMsg:
 		switch msg.String() {
 		case "q", "ctrl+c":
-			return m, api.Quit()
+			return m, tea.Quit()
 
 		case " ":
 			// Start/Pause toggle
@@ -64,7 +63,7 @@ func (m TimerModel) Update(msg api.Msg) (TimerModel, api.Cmd) {
 			if m.remaining > 0 {
 				m.state = StateRunning
 				// Start ticking
-				return m, service.Tick(1 * time.Second)
+				return m, tea.Tick(1 * time.Second)
 			}
 			return m, nil
 
@@ -93,7 +92,7 @@ func (m TimerModel) Update(msg api.Msg) (TimerModel, api.Cmd) {
 			return m, nil
 		}
 
-	case service.TickMsg:
+	case tea.TickMsg:
 		// Timer tick
 		if m.state == StateRunning {
 			m.remaining -= 1 * time.Second
@@ -106,7 +105,7 @@ func (m TimerModel) Update(msg api.Msg) (TimerModel, api.Cmd) {
 			}
 
 			// Continue ticking
-			return m, service.Tick(1 * time.Second)
+			return m, tea.Tick(1 * time.Second)
 		}
 	}
 
@@ -176,7 +175,7 @@ func main() {
 	}
 
 	// Create program
-	p := api.New(initialModel, api.WithAltScreen[TimerModel]())
+	p := tea.New(initialModel, tea.WithAltScreen[TimerModel]())
 
 	// Run the program
 	if err := p.Run(); err != nil {

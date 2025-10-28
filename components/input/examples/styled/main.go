@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/phoenix-tui/phoenix/components/input/api"
-	tea "github.com/phoenix-tui/phoenix/tea/api"
+	"github.com/phoenix-tui/phoenix/components/input"
+	"github.com/phoenix-tui/phoenix/tea"
 )
 
 // styledModel demonstrates styled inputs.

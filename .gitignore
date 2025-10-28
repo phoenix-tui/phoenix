@@ -51,7 +51,7 @@ nul
 .goda/
 
 # Local dev docs (internal, not for public)
-docs/dev
+docs/dev/
 INDEX.md
 
 # Development/test artifacts

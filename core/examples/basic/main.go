@@ -4,7 +4,7 @@ package main
 import (
 	"fmt"
 
-	core "github.com/phoenix-tui/phoenix/core/api"
+	"github.com/phoenix-tui/phoenix/core"
 )
 
 func main() {

@@ -12,7 +12,7 @@ import (
 	"bytes"
 	"testing"
 
-	render "github.com/phoenix-tui/phoenix/render/api"
+	"github.com/phoenix-tui/phoenix/render"
 )
 
 // Benchmark 60 FPS target: Full screen render < 16.67ms

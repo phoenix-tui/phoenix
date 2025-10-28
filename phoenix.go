@@ -94,12 +94,11 @@
 package phoenix
 
 import (
-	clipboardapi "github.com/phoenix-tui/phoenix/clipboard/api"
-	coreapi "github.com/phoenix-tui/phoenix/core/api"
-	styleapi "github.com/phoenix-tui/phoenix/style/api"
-	teaapi "github.com/phoenix-tui/phoenix/tea/api"
-	terminalapi "github.com/phoenix-tui/phoenix/terminal/api"
-	terminalinfra "github.com/phoenix-tui/phoenix/terminal/infrastructure"
+	clipboardapi "github.com/phoenix-tui/phoenix/clipboard"
+	coreapi "github.com/phoenix-tui/phoenix/core"
+	styleapi "github.com/phoenix-tui/phoenix/style"
+	teaapi "github.com/phoenix-tui/phoenix/tea"
+	terminalapi "github.com/phoenix-tui/phoenix/terminal"
 )
 
 // ┌─────────────────────────────────────────────────────────────┐
@@ -163,7 +162,7 @@ func NewCapabilities(ansi bool, colorDepth coreapi.ColorDepth, mouse, altScreen,
 	return coreapi.NewCapabilities(ansi, colorDepth, mouse, altScreen, cursor)
 }
 
-// ColorDepth constants (re-exported from core)
+// ColorDepth constants (re-exported from core).
 const (
 	ColorDepthNone      = coreapi.ColorDepthNone
 	ColorDepth8         = coreapi.ColorDepth8
@@ -288,8 +287,8 @@ func WriteClipboard(text string) error {
 //   - Windows Console API (fastest on Windows cmd.exe/PowerShell)
 //   - ANSI fallback (for Git Bash, MinTTY, Unix)
 //
-// Note: This is from the terminal/infrastructure package, providing lower-level
-// operations compared to core/api Terminal which focuses on capabilities detection.
+// Note: This is from the terminal package, providing platform-optimized
+// terminal operations. Different from core package which focuses on capabilities detection.
 //
 // Example:
 //
@@ -297,7 +296,7 @@ func WriteClipboard(text string) error {
 //	term.HideCursor()
 //	defer term.ShowCursor()
 func NewPlatformTerminal() terminalapi.Terminal {
-	return terminalinfra.NewTerminal()
+	return terminalapi.New()
 }
 
 // NewANSITerminal creates a new ANSI-based Terminal.
@@ -308,5 +307,5 @@ func NewPlatformTerminal() terminalapi.Terminal {
 //	term := phoenix.NewANSITerminal()
 //	term.Clear()
 func NewANSITerminal() terminalapi.Terminal {
-	return terminalinfra.NewANSITerminal()
+	return terminalapi.NewANSI()
 }

@@ -4,7 +4,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/phoenix-tui/phoenix/terminal/api"
+	"github.com/phoenix-tui/phoenix/terminal"
 )
 
 // ┌─────────────────────────────────────────────────────────────┐
@@ -12,7 +12,7 @@ import (
 // └─────────────────────────────────────────────────────────────┘
 
 func TestNullTerminal_ImplementsTerminalInterface(_ *testing.T) {
-	var _ api.Terminal = (*NullTerminal)(nil)
+	var _ terminal.Terminal = (*NullTerminal)(nil)
 }
 
 func TestNullTerminal_AllMethodsReturnNil(t *testing.T) {
@@ -51,7 +51,7 @@ func TestNullTerminal_AllMethodsReturnNil(t *testing.T) {
 	if err := term.ShowCursor(); err != nil {
 		t.Errorf("ShowCursor() = %v, want nil", err)
 	}
-	if err := term.SetCursorStyle(api.CursorBlock); err != nil {
+	if err := term.SetCursorStyle(terminal.CursorBlock); err != nil {
 		t.Errorf("SetCursorStyle() = %v, want nil", err)
 	}
 
@@ -86,6 +86,28 @@ func TestNullTerminal_AllMethodsReturnNil(t *testing.T) {
 	if _, _, err := term.Size(); err != nil {
 		t.Errorf("Size() = %v, want nil", err)
 	}
+
+	// Alternate screen buffer
+	if err := term.EnterAltScreen(); err != nil {
+		t.Errorf("EnterAltScreen() = %v, want nil", err)
+	}
+	if err := term.ExitAltScreen(); err != nil {
+		t.Errorf("ExitAltScreen() = %v, want nil", err)
+	}
+	if term.IsInAltScreen() {
+		t.Error("IsInAltScreen() = true, want false")
+	}
+
+	// Raw mode
+	if err := term.EnterRawMode(); err != nil {
+		t.Errorf("EnterRawMode() = %v, want nil", err)
+	}
+	if err := term.ExitRawMode(); err != nil {
+		t.Errorf("ExitRawMode() = %v, want nil", err)
+	}
+	if term.IsInRawMode() {
+		t.Error("IsInRawMode() = true, want false")
+	}
 }
 
 func TestNullTerminal_ReasonableDefaults(t *testing.T) {
@@ -118,7 +140,7 @@ func TestNullTerminal_ReasonableDefaults(t *testing.T) {
 	}
 
 	// Platform should be unknown
-	if platform := term.Platform(); platform != api.PlatformUnknown {
+	if platform := term.Platform(); platform != terminal.PlatformUnknown {
 		t.Errorf("Platform() = %v, want PlatformUnknown", platform)
 	}
 }
@@ -128,7 +150,7 @@ func TestNullTerminal_ReasonableDefaults(t *testing.T) {
 // └─────────────────────────────────────────────────────────────┘
 
 func TestMockTerminal_ImplementsTerminalInterface(_ *testing.T) {
-	var _ api.Terminal = (*MockTerminal)(nil)
+	var _ terminal.Terminal = (*MockTerminal)(nil)
 }
 
 func TestMockTerminal_RecordsCalls(t *testing.T) {
@@ -273,7 +295,7 @@ func TestMockTerminal_AllMethodsRecord(t *testing.T) {
 		{"RestoreCursorPosition", func() { _ = mock.RestoreCursorPosition() }, "RestoreCursorPosition"},
 		{"HideCursor", func() { _ = mock.HideCursor() }, "HideCursor"},
 		{"ShowCursor", func() { _ = mock.ShowCursor() }, "ShowCursor"},
-		{"SetCursorStyle", func() { _ = mock.SetCursorStyle(api.CursorBlock) }, "SetCursorStyle(Block)"},
+		{"SetCursorStyle", func() { _ = mock.SetCursorStyle(terminal.CursorBlock) }, "SetCursorStyle(Block)"},
 		{"Clear", func() { _ = mock.Clear() }, "Clear"},
 		{"ClearLine", func() { _ = mock.ClearLine() }, "ClearLine"},
 		{"ClearFromCursor", func() { _ = mock.ClearFromCursor() }, "ClearFromCursor"},
@@ -312,7 +334,7 @@ func TestMockTerminal_AllMethodsRecord(t *testing.T) {
 // TestNullTerminal_InRealModel demonstrates using NullTerminal in a model test.
 func TestNullTerminal_InRealModel(_ *testing.T) {
 	type Model struct {
-		terminal api.Terminal
+		terminal terminal.Terminal
 	}
 
 	render := func(m *Model) {
@@ -330,7 +352,7 @@ func TestNullTerminal_InRealModel(_ *testing.T) {
 // TestMockTerminal_InRealModel demonstrates using MockTerminal to verify calls.
 func TestMockTerminal_InRealModel(t *testing.T) {
 	type Model struct {
-		terminal api.Terminal
+		terminal terminal.Terminal
 	}
 
 	render := func(m *Model) {

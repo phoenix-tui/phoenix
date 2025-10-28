@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/phoenix-tui/phoenix/components/list/api"
-	"github.com/phoenix-tui/phoenix/components/list/domain/value"
-	tea "github.com/phoenix-tui/phoenix/tea/api"
+	"github.com/phoenix-tui/phoenix/components/list"
+	tea "github.com/phoenix-tui/phoenix/tea"
 )
 
 func main() {
@@ -27,7 +26,7 @@ func main() {
 		"Implement layout system",
 	}
 
-	l := list.New(todos, labels, value.SelectionModeMulti).
+	l := list.New(todos, labels, list.SelectionModeMulti).
 		Height(8)
 
 	fmt.Println("Todo List (Multi-Select)")

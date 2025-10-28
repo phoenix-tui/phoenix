@@ -12,8 +12,8 @@
 
 > Next-generation Terminal User Interface framework for Go
 
-**Status**: ✅ v0.1.0-beta.2 READY - TextArea Cursor Control + Multi-Module
-**Progress**: 80% complete (16/20 weeks) 🎉
+**Status**: ✅ v0.1.0-beta.3 READY - ExecProcess + Performance Tracking
+**Progress**: 85% complete (17/20 weeks) 🎉
 **Organization**: [github.com/phoenix-tui](https://github.com/phoenix-tui)
 **Go Version**: 1.25+
 **Test Coverage**: **93.5-96.4%** (Excellent across all modules)

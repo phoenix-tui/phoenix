@@ -5,12 +5,11 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/mattn/go-runewidth"
-	"github.com/phoenix-tui/phoenix/core/domain/service"
+	"github.com/phoenix-tui/phoenix/core"
 )
 
 // TestCorrectness_Lipgloss562Bug verifies if Lipgloss #562 is still broken
 func TestCorrectness_Lipgloss562Bug(t *testing.T) {
-	us := service.NewUnicodeService()
 
 	testCases := []struct {
 		name     string
@@ -51,7 +50,7 @@ func TestCorrectness_Lipgloss562Bug(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			phoenixWidth := us.StringWidth(tc.input)
+			phoenixWidth := core.StringWidth(tc.input)
 			lipglossWidth := lipgloss.Width(tc.input)
 			runewidthWidth := runewidth.StringWidth(tc.input)
 

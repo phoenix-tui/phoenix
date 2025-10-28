@@ -13,8 +13,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/phoenix-tui/phoenix/components/modal/api"
-	tea "github.com/phoenix-tui/phoenix/tea/api"
+	"github.com/phoenix-tui/phoenix/components/modal"
+	tea "github.com/phoenix-tui/phoenix/tea"
 )
 
 // Model represents the application state.
@@ -46,12 +46,13 @@ func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 
 	case modal.ButtonPressedMsg:
 		// Handle button press.
+		//nolint:staticcheck // Using if-else instead of switch is clearer for binary choice (confirm/cancel)
 		if msg.Action == "confirm" {
 			m.result = "You clicked YES! File will be deleted."
 			m.modal = m.modal.Hide()
 			return m, nil
 		} else if msg.Action == "cancel" {
-			m.result = "You clicked NO. Operation cancelled."
+			m.result = "You clicked NO. Operation canceled."
 			m.modal = m.modal.Hide()
 			return m, nil
 		}

@@ -8,26 +8,26 @@ import (
 	"strings"
 	"time"
 
-	progress "github.com/phoenix-tui/phoenix/components/progress/api"
-	tea "github.com/phoenix-tui/phoenix/tea/api"
+	progress2 "github.com/phoenix-tui/phoenix/components/progress"
+	"github.com/phoenix-tui/phoenix/tea"
 )
 
 // Multi-progress example.
 // Demonstrates multiple progress bars and a spinner.
 type model struct {
-	spinner progress.Spinner
-	bars    []progress.Bar
+	spinner progress2.Spinner
+	bars    []progress2.Bar
 	speeds  []int // Progress increment per tick
 	count   int
 }
 
 func initialModel() model {
 	return model{
-		spinner: progress.NewSpinner("dots").Label("Overall progress"),
-		bars: []progress.Bar{
-			progress.NewBar(40).Label("Task 1").ShowPercent(true),
-			progress.NewBar(40).Label("Task 2").ShowPercent(true),
-			progress.NewBar(40).Label("Task 3").ShowPercent(true),
+		spinner: progress2.NewSpinner("dots").Label("Overall progress"),
+		bars: []progress2.Bar{
+			progress2.NewBar(40).Label("Task 1").ShowPercent(true),
+			progress2.NewBar(40).Label("Task 2").ShowPercent(true),
+			progress2.NewBar(40).Label("Task 3").ShowPercent(true),
 		},
 		speeds: []int{3, 2, 1}, // Different speeds
 		count:  0,

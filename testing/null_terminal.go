@@ -1,7 +1,7 @@
 package testing
 
 import (
-	"github.com/phoenix-tui/phoenix/terminal/api"
+	"github.com/phoenix-tui/phoenix/terminal"
 )
 
 // NullTerminal is a no-op implementation of the Terminal interface.
@@ -18,7 +18,7 @@ import (
 type NullTerminal struct{}
 
 // NewNullTerminal creates a new no-op terminal.
-func NewNullTerminal() api.Terminal {
+func NewNullTerminal() terminal.Terminal {
 	return &NullTerminal{}
 }
 
@@ -81,7 +81,7 @@ func (n *NullTerminal) ShowCursor() error {
 }
 
 // SetCursorStyle does nothing (null implementation).
-func (n *NullTerminal) SetCursorStyle(_ api.CursorStyle) error {
+func (n *NullTerminal) SetCursorStyle(_ terminal.CursorStyle) error {
 	return nil
 }
 
@@ -165,8 +165,8 @@ func (n *NullTerminal) SupportsTrueColor() bool {
 }
 
 // Platform returns null platform (null implementation).
-func (n *NullTerminal) Platform() api.Platform {
-	return api.PlatformUnknown
+func (n *NullTerminal) Platform() terminal.Platform {
+	return terminal.PlatformUnknown
 }
 
 // ┌─────────────────────────────────────────────────────────────┐

@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	progress "github.com/phoenix-tui/phoenix/components/progress/api"
-	tea "github.com/phoenix-tui/phoenix/tea/api"
+	"github.com/phoenix-tui/phoenix/components/progress"
+	"github.com/phoenix-tui/phoenix/tea"
 )
 
 // Simple spinner example.

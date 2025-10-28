@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/phoenix-tui/phoenix/clipboard/api"
+	"github.com/phoenix-tui/phoenix/clipboard"
 )
 
 func main() {
@@ -14,24 +14,24 @@ func main() {
 	fmt.Println()
 
 	// Create clipboard instance
-	clipboard, err := api.New()
+	cb, err := clipboard.New()
 	if err != nil {
 		log.Fatalf("Failed to create clipboard: %v", err)
 	}
 
 	// Check if clipboard is available
-	if !clipboard.IsAvailable() {
+	if !cb.IsAvailable() {
 		log.Fatal("Clipboard is not available on this system")
 	}
 
-	fmt.Printf("Using provider: %s\n", clipboard.GetProviderName())
+	fmt.Printf("Using provider: %s\n", cb.GetProviderName())
 	fmt.Println()
 
 	// Write to clipboard
 	textToWrite := "Hello from Phoenix TUI Framework! 🚀"
 	fmt.Printf("Writing to clipboard: %s\n", textToWrite)
 
-	err = clipboard.Write(textToWrite)
+	err = cb.Write(textToWrite)
 	if err != nil {
 		log.Fatalf("Failed to write to clipboard: %v", err)
 	}
@@ -42,7 +42,7 @@ func main() {
 	// Read from clipboard
 	fmt.Println("Reading from clipboard...")
 
-	textRead, err := clipboard.Read()
+	textRead, err := cb.Read()
 	if err != nil {
 		log.Fatalf("Failed to read from clipboard: %v", err)
 	}
@@ -62,12 +62,12 @@ func main() {
 	fmt.Println("Using global convenience functions:")
 	fmt.Println("-----------------------------------")
 
-	err = api.Write("Global function test")
+	err = clipboard.Write("Global function test")
 	if err != nil {
 		log.Fatalf("Failed to write: %v", err)
 	}
 
-	text, err := api.Read()
+	text, err := clipboard.Read()
 	if err != nil {
 		log.Fatalf("Failed to read: %v", err)
 	}
