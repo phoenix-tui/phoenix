@@ -12,13 +12,13 @@
 
 > Next-generation Terminal User Interface framework for Go
 
-**Status**: ✅ v0.1.0-beta.3 READY - ExecProcess + Performance Tracking
+**Status**: ✅ v0.1.0-beta.4 READY - API Modernization + Quality Improvements
 **Progress**: 85% complete (17/20 weeks) 🎉
 **Organization**: [github.com/phoenix-tui](https://github.com/phoenix-tui)
 **Go Version**: 1.25+
 **Test Coverage**: **93.5-96.4%** (Excellent across all modules)
 **Performance**: 29,000 FPS (489x faster than 60 FPS target)
-**Latest**: Advanced cursor control API + Multi-module monorepo structure 🚀
+**Latest**: Industry-standard API patterns (Relica-style) + Cross-platform reliability 🚀
 
 ## Why Phoenix?
 
