@@ -150,22 +150,71 @@ done
 log_success "All go.mod files are valid"
 echo ""
 
-# 7. Run tests (with race detector if GCC available)
+# 7. Run tests (with race detector if GCC available or via WSL)
+USE_WSL=0
+WSL_DISTRO=""
+
+# Helper function to find WSL distro with Go installed
+find_wsl_distro() {
+    if ! command -v wsl &> /dev/null; then
+        return 1
+    fi
+
+    # Get list of running WSL distros
+    local distros=$(wsl --list --quiet 2>/dev/null | tr -d '\r' | grep -v "^$")
+
+    for distro in $distros; do
+        # Skip docker-desktop (not for development)
+        if [[ "$distro" == *"docker-desktop"* ]]; then
+            continue
+        fi
+
+        # Check if Go is installed in this distro
+        if wsl -d "$distro" bash -c "command -v go &> /dev/null" 2>/dev/null; then
+            echo "$distro"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
 if command -v gcc &> /dev/null; then
     log_info "Running tests with race detector..."
     RACE_FLAG="-race"
 else
-    log_warning "GCC not found, running tests without race detector"
-    log_info "Install GCC (mingw-w64) for race detection on Windows"
-    WARNINGS=$((WARNINGS + 1))
-    log_info "Running tests..."
-    RACE_FLAG=""
+    # Try to find WSL distro with Go
+    WSL_DISTRO=$(find_wsl_distro)
+    if [ -n "$WSL_DISTRO" ]; then
+        log_info "GCC not found locally, but WSL2 ($WSL_DISTRO) detected!"
+        log_info "Running tests with race detector via WSL2 $WSL_DISTRO..."
+        USE_WSL=1
+        RACE_FLAG="-race"
+    else
+        log_warning "GCC not found, running tests without race detector"
+        log_info "Install GCC (mingw-w64) or setup WSL2 with Go for race detection"
+        WARNINGS=$((WARNINGS + 1))
+        log_info "Running tests..."
+        RACE_FLAG=""
+    fi
 fi
 
 TEST_FAILED=0
 for dir in $MODULES; do
     echo "  • Testing $dir..."
-    TEST_OUTPUT=$(cd $dir && GOWORK=off go test $RACE_FLAG ./... 2>&1)
+    if [ $USE_WSL -eq 1 ]; then
+        # Run tests in WSL2 (auto-detected distro with Go)
+        # Convert Windows path to WSL path (D:\ -> /mnt/d/)
+        CURRENT_DIR=$(pwd)
+        DRIVE_LETTER=$(echo "$CURRENT_DIR" | cut -d: -f1 | tr '[:upper:]' '[:lower:]')
+        WSL_BASE="/mnt/$DRIVE_LETTER${CURRENT_DIR#*:}"
+        WSL_PATH="$WSL_BASE/$dir"
+        TEST_OUTPUT=$(wsl -d "$WSL_DISTRO" bash -c "cd \"$WSL_PATH\" && GOWORK=off go test $RACE_FLAG ./... 2>&1")
+    else
+        # Run tests locally (Windows or Linux with GCC)
+        TEST_OUTPUT=$(cd $dir && GOWORK=off go test $RACE_FLAG ./... 2>&1)
+    fi
+
     if echo "$TEST_OUTPUT" | grep -q "FAIL"; then
         log_error "Tests failed for $dir"
         echo "$TEST_OUTPUT" | grep "FAIL" | head -3
@@ -175,8 +224,11 @@ for dir in $MODULES; do
         echo "    ✓ PASS"
     fi
 done
+
 if [ $TEST_FAILED -eq 0 ]; then
-    if [ -n "$RACE_FLAG" ]; then
+    if [ $USE_WSL -eq 1 ]; then
+        log_success "All tests passed with race detector (via WSL2 $WSL_DISTRO)"
+    elif [ -n "$RACE_FLAG" ]; then
         log_success "All tests passed with race detector"
     else
         log_success "All tests passed"
