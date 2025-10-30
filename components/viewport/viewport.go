@@ -12,8 +12,9 @@ import (
 // Viewport is the public API for the Viewport component.
 // It provides a fluent interface for configuration and implements tea.Model.
 type Viewport struct {
-	domain       *model.Viewport
-	mouseEnabled bool
+	domain         *model.Viewport
+	mouseEnabled   bool
+	linesPerScroll int // Lines to scroll per wheel tick (default: 3)
 	// Drag scrolling state
 	isDragging   bool
 	dragStartY   int
@@ -23,8 +24,9 @@ type Viewport struct {
 // New creates a new Viewport with the given dimensions.
 func New(width, height int) *Viewport {
 	return &Viewport{
-		domain:       model.NewViewport(width, height),
-		mouseEnabled: false,
+		domain:         model.NewViewport(width, height),
+		mouseEnabled:   false,
+		linesPerScroll: 3, // Default: 3 lines per wheel tick
 	}
 }
 
@@ -33,16 +35,18 @@ func New(width, height int) *Viewport {
 func NewWithContent(content string, width, height int) *Viewport {
 	lines := strings.Split(content, "\n")
 	return &Viewport{
-		domain:       model.NewViewportWithContent(lines, width, height),
-		mouseEnabled: false,
+		domain:         model.NewViewportWithContent(lines, width, height),
+		mouseEnabled:   false,
+		linesPerScroll: 3, // Default: 3 lines per wheel tick
 	}
 }
 
 // NewWithLines creates a new Viewport with initial content as separate lines.
 func NewWithLines(lines []string, width, height int) *Viewport {
 	return &Viewport{
-		domain:       model.NewViewportWithContent(lines, width, height),
-		mouseEnabled: false,
+		domain:         model.NewViewportWithContent(lines, width, height),
+		mouseEnabled:   false,
+		linesPerScroll: 3, // Default: 3 lines per wheel tick
 	}
 }
 
@@ -61,11 +65,29 @@ func (v *Viewport) WrapLines(enabled bool) *Viewport {
 // MouseEnabled enables or disables mouse wheel scrolling and drag scrolling.
 func (v *Viewport) MouseEnabled(enabled bool) *Viewport {
 	return &Viewport{
-		domain:       v.domain,
-		mouseEnabled: enabled,
-		isDragging:   v.isDragging,
-		dragStartY:   v.dragStartY,
-		scrollStartY: v.scrollStartY,
+		domain:         v.domain,
+		mouseEnabled:   enabled,
+		linesPerScroll: v.linesPerScroll,
+		isDragging:     v.isDragging,
+		dragStartY:     v.dragStartY,
+		scrollStartY:   v.scrollStartY,
+	}
+}
+
+// SetWheelScrollLines sets the number of lines to scroll per mouse wheel tick.
+// Default is 3 lines. Minimum is 1 line.
+// Returns a new Viewport with the updated configuration (immutable).
+func (v *Viewport) SetWheelScrollLines(lines int) *Viewport {
+	if lines < 1 {
+		lines = 1 // Minimum 1 line
+	}
+	return &Viewport{
+		domain:         v.domain,
+		mouseEnabled:   v.mouseEnabled,
+		linesPerScroll: lines,
+		isDragging:     v.isDragging,
+		dragStartY:     v.dragStartY,
+		scrollStartY:   v.scrollStartY,
 	}
 }
 
@@ -194,10 +216,10 @@ func (v *Viewport) handleMouseMsg(msg tea.MouseMsg) *Viewport {
 	// Mouse wheel scrolling
 	switch msg.Button {
 	case tea.MouseButtonWheelUp:
-		return v.withDomain(v.domain.ScrollUp(3)) // Scroll 3 lines per wheel tick
+		return v.withDomain(v.domain.ScrollUp(v.linesPerScroll))
 
 	case tea.MouseButtonWheelDown:
-		return v.withDomain(v.domain.ScrollDown(3)) // Scroll 3 lines per wheel tick
+		return v.withDomain(v.domain.ScrollDown(v.linesPerScroll))
 	}
 
 	// Drag scrolling
@@ -287,21 +309,23 @@ func (v *Viewport) Height() int {
 // This is a helper to maintain immutability and avoid repetitive field copying.
 func (v *Viewport) withDomain(domain *model.Viewport) *Viewport {
 	return &Viewport{
-		domain:       domain,
-		mouseEnabled: v.mouseEnabled,
-		isDragging:   v.isDragging,
-		dragStartY:   v.dragStartY,
-		scrollStartY: v.scrollStartY,
+		domain:         domain,
+		mouseEnabled:   v.mouseEnabled,
+		linesPerScroll: v.linesPerScroll,
+		isDragging:     v.isDragging,
+		dragStartY:     v.dragStartY,
+		scrollStartY:   v.scrollStartY,
 	}
 }
 
 // withDragState returns a new Viewport with updated drag state.
 func (v *Viewport) withDragState(isDragging bool, dragStartY, scrollStartY int) *Viewport {
 	return &Viewport{
-		domain:       v.domain,
-		mouseEnabled: v.mouseEnabled,
-		isDragging:   isDragging,
-		dragStartY:   dragStartY,
-		scrollStartY: scrollStartY,
+		domain:         v.domain,
+		mouseEnabled:   v.mouseEnabled,
+		linesPerScroll: v.linesPerScroll,
+		isDragging:     isDragging,
+		dragStartY:     dragStartY,
+		scrollStartY:   scrollStartY,
 	}
 }
