@@ -20,6 +20,12 @@ const (
 	EventMotion
 	// EventScroll represents scroll wheel action.
 	EventScroll
+	// EventHoverEnter represents mouse entering a component area.
+	EventHoverEnter
+	// EventHoverLeave represents mouse leaving a component area.
+	EventHoverLeave
+	// EventHoverMove represents mouse moving within a component area.
+	EventHoverMove
 )
 
 // String returns the string representation of the event type.
@@ -41,6 +47,12 @@ func (e EventType) String() string {
 		return "Motion"
 	case EventScroll:
 		return "Scroll"
+	case EventHoverEnter:
+		return "HoverEnter"
+	case EventHoverLeave:
+		return "HoverLeave"
+	case EventHoverMove:
+		return "HoverMove"
 	default:
 		return "Unknown"
 	}
@@ -59,4 +71,9 @@ func (e EventType) IsDrag() bool {
 // IsScroll returns true if the event is a scroll event.
 func (e EventType) IsScroll() bool {
 	return e == EventScroll
+}
+
+// IsHover returns true if the event is a hover-related event.
+func (e EventType) IsHover() bool {
+	return e == EventHoverEnter || e == EventHoverLeave || e == EventHoverMove
 }
