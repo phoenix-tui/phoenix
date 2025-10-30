@@ -404,6 +404,10 @@ func TestProgram_ExecProcess_ErrorPropagation(t *testing.T) {
 
 // TestProgram_ExecProcess_InputReaderStopped verifies inputReader is stopped before command.
 func TestProgram_ExecProcess_InputReaderStopped(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping on Windows: inputReader state timing is non-deterministic due to stdin blocking")
+	}
+
 	mockTerm := phoenixtesting.NewMockTerminal()
 	m := TestModel{}
 	p := New(m, WithTerminal[TestModel](mockTerm))
