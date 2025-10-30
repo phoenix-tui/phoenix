@@ -1,0 +1,271 @@
+═══════════════════════════════════════════════════════════════════════════════
+                    PHOENIX TUI - HOVER HIGHLIGHT DEMO
+                         Visual State Demonstration
+═══════════════════════════════════════════════════════════════════════════════
+
+SCENARIO 1: Initial State (No Hover, No Click)
+───────────────────────────────────────────────────────────────────────────────
+
+Phoenix TUI - Hover Highlight Demo
+═══════════════════════════════════
+
+  ╭────────────╮  ╭────────────╮  ╭────────────╮
+  │  Button 1  │  │  Button 2  │  │  Button 3  │
+  ╰────────────╯  ╰────────────╯  ╰────────────╯
+
+     ╭────────────╮  ╭────────────╮
+     │  Button 4  │  │  Button 5  │
+     ╰────────────╯  ╰────────────╯
+
+          ╭────────────╮
+          │  Button 6  │
+          ╰────────────╯
+
+Hovered: (none)
+Last clicked: (none)
+
+Move mouse to hover buttons • Click to select • Press 'r' to reset • Press 'q' to quit
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SCENARIO 2: Hovering Button 2
+───────────────────────────────────────────────────────────────────────────────
+
+Phoenix TUI - Hover Highlight Demo
+═══════════════════════════════════
+
+  ╭────────────╮  ╔════════════╗  ╭────────────╮
+  │  Button 1  │  ║  Button 2  ║  │  Button 3  │  ← Double-line border!
+  ╰────────────╯  ╚════════════╝  ╰────────────╯
+
+     ╭────────────╮  ╭────────────╮
+     │  Button 4  │  │  Button 5  │
+     ╰────────────╯  ╰────────────╯
+
+          ╭────────────╮
+          │  Button 6  │
+          ╰────────────╯
+
+Hovered: button2  ← Status updates!
+Last clicked: (none)
+
+Move mouse to hover buttons • Click to select • Press 'r' to reset • Press 'q' to quit
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SCENARIO 3: After Clicking Button 2 (Mouse Still Hovering)
+───────────────────────────────────────────────────────────────────────────────
+
+Phoenix TUI - Hover Highlight Demo
+═══════════════════════════════════
+
+  ╭────────────╮  ╔════════════╗  ╭────────────╮
+  │  Button 1  │  ║  Button 2  ║  │  Button 3  │  ← Still hovering
+  ╰────────────╯  ╚════════════╝  ╰────────────╯
+
+     ╭────────────╮  ╭────────────╮
+     │  Button 4  │  │  Button 5  │
+     ╰────────────╯  ╰────────────╯
+
+          ╭────────────╮
+          │  Button 6  │
+          ╰────────────╯
+
+Hovered: button2
+Last clicked: button2  ← Click tracked! (shown in green/bold)
+
+Move mouse to hover buttons • Click to select • Press 'r' to reset • Press 'q' to quit
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SCENARIO 4: Hovering Button 5 (Previously Clicked Button 2)
+───────────────────────────────────────────────────────────────────────────────
+
+Phoenix TUI - Hover Highlight Demo
+═══════════════════════════════════
+
+  ╭────────────╮  ╭────────────╮  ╭────────────╮
+  │  Button 1  │  │  Button 2  │  │  Button 3  │
+  ╰────────────╯  ╰────────────╯  ╰────────────╯
+
+     ╭────────────╮  ╔════════════╗  ← Now hovering Button 5
+     │  Button 4  │  ║  Button 5  ║     (double-line border)
+     ╰────────────╯  ╚════════════╝
+
+          ╭────────────╮
+          │  Button 6  │
+          ╰────────────╯
+
+Hovered: button5  ← Hover changes
+Last clicked: button2  ← Previous click remembered
+
+Move mouse to hover buttons • Click to select • Press 'r' to reset • Press 'q' to quit
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SCENARIO 5: Multiple Interactions (Clicked Button 5, Now Hovering Button 6)
+───────────────────────────────────────────────────────────────────────────────
+
+Phoenix TUI - Hover Highlight Demo
+═══════════════════════════════════
+
+  ╭────────────╮  ╭────────────╮  ╭────────────╮
+  │  Button 1  │  │  Button 2  │  │  Button 3  │
+  ╰────────────╯  ╰────────────╯  ╰────────────╯
+
+     ╭────────────╮  ╭────────────╮
+     │  Button 4  │  │  Button 5  │
+     ╰────────────╯  ╰────────────╯
+
+          ╔════════════╗  ← Now hovering Button 6
+          ║  Button 6  ║     (double-line border)
+          ╚════════════╝
+
+Hovered: button6
+Last clicked: button5  ← Updated after Button 5 click
+
+Move mouse to hover buttons • Click to select • Press 'r' to reset • Press 'q' to quit
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SCENARIO 6: After Pressing 'r' (Reset State)
+───────────────────────────────────────────────────────────────────────────────
+
+Phoenix TUI - Hover Highlight Demo
+═══════════════════════════════════
+
+  ╭────────────╮  ╭────────────╮  ╭────────────╮
+  │  Button 1  │  │  Button 2  │  │  Button 3  │  ← All back to normal
+  ╰────────────╯  ╰────────────╯  ╰────────────╯
+
+     ╭────────────╮  ╭────────────╮
+     │  Button 4  │  │  Button 5  │
+     ╰────────────╯  ╰────────────╯
+
+          ╭────────────╮
+          │  Button 6  │
+          ╰────────────╯
+
+Hovered: (none)  ← Cleared
+Last clicked: (none)  ← Cleared
+
+Move mouse to hover buttons • Click to select • Press 'r' to reset • Press 'q' to quit
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+VISUAL KEY
+───────────────────────────────────────────────────────────────────────────────
+
+NORMAL BUTTON (not hovered):
+  ╭────────────╮
+  │  Button X  │  ← Single-line border (─ │ ╭ ╮ ╰ ╯)
+  ╰────────────╯
+
+HOVERED BUTTON (mouse over):
+  ╔════════════╗
+  ║  Button X  ║  ← Double-line border (═ ║ ╔ ╗ ╚ ╝)
+  ╚════════════╝
+
+STATUS INDICATORS:
+- Hovered: (none)          → No button currently hovered
+- Hovered: buttonX         → ButtonX is currently hovered
+- Last clicked: (none)     → No button clicked yet
+- Last clicked: buttonX    → ButtonX was last clicked (shown in green/bold)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+INTERACTION FLOW DIAGRAM
+───────────────────────────────────────────────────────────────────────────────
+
+   Move Mouse → Hover Detection → Border Style Change → Status Update
+                      ↓
+              ProcessHover(pos, areas)
+                      ↓
+              EventHoverEnter/Leave
+                      ↓
+              Update hoveredID
+                      ↓
+              Re-render View()
+
+
+   Click Mouse → Click Detection → Update lastClickedID → Status Update
+                      ↓
+              MouseActionRelease + hoveredID
+                      ↓
+              Store lastClickedID
+                      ↓
+              Re-render View()
+
+═══════════════════════════════════════════════════════════════════════════════
+
+KEYBOARD SHORTCUTS
+───────────────────────────────────────────────────────────────────────────────
+
+Key    Action
+────   ──────────────────────────────────────────────────────────
+'r'    Reset state (clear hover and click)
+'q'    Quit application
+Ctrl+C Quit application (emergency exit)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TECHNICAL DETAILS
+───────────────────────────────────────────────────────────────────────────────
+
+Bounding Box System:
+- Each button has a BoundingBox defining its hover area
+- BoundingBox: (x, y, width, height) in terminal coordinates
+- Mouse position checked against all boxes each motion event
+
+Hover Detection:
+- ProcessHover(position, areas) returns EventType
+- EventHoverEnter → Mouse entered a component
+- EventHoverLeave → Mouse left all components
+- EventHoverMove → Mouse moved within same component
+- EventMotion → Mouse moved outside all components
+
+Visual Feedback:
+- Normal: ╭─╮│╰─╯ (U+256D, U+2500, U+256E, U+2502, U+2570, U+256F)
+- Hovered: ╔═╗║╚═╝ (U+2554, U+2550, U+2557, U+2551, U+255A, U+255D)
+- Works in all terminals (no color dependency)
+
+Performance:
+- O(n) hover detection where n = number of buttons
+- Efficient for typical UIs (even 100+ components)
+- No allocations in hot path
+
+═══════════════════════════════════════════════════════════════════════════════
+
+TERMINAL COMPATIBILITY NOTES
+───────────────────────────────────────────────────────────────────────────────
+
+✓ WORKS PERFECTLY:
+  - Windows Terminal
+  - iTerm2 (macOS)
+  - Alacritty
+  - GNOME Terminal
+  - Konsole
+  - xterm
+  - VS Code Terminal
+
+⚠ REQUIRES SETUP:
+  - SSH sessions (ensure mouse events forwarded)
+  - tmux/screen (enable mouse mode: set -g mouse on)
+
+✗ NOT SUPPORTED:
+  - Very old terminals without mouse support
+  - Text-only terminals (telnet, serial)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+This demonstration shows the progressive states as a user interacts with the
+hover-highlight example application, showcasing Phoenix TUI Framework's mouse
+hover detection capabilities.
+
+═══════════════════════════════════════════════════════════════════════════════
