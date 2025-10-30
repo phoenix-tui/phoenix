@@ -14,11 +14,11 @@ import (
 
 // button represents a clickable UI element with hover detection.
 type button struct {
-	id   string             // Unique identifier
-	text string             // Display text
-	x    int                // Column position (0-based)
-	y    int                // Row position (0-based)
-	area mouse.BoundingBox  // Hover detection area
+	id   string            // Unique identifier
+	text string            // Display text
+	x    int               // Column position (0-based)
+	y    int               // Row position (0-based)
+	area mouse.BoundingBox // Hover detection area
 }
 
 // model represents the application state following the Elm Architecture.
@@ -134,9 +134,9 @@ func (m model) layoutButtons() model {
 		return m
 	}
 
-	buttonWidth := 14  // Fixed button width
-	buttonHeight := 3  // Fixed button height
-	spacing := 2       // Horizontal spacing between buttons
+	buttonWidth := 14    // Fixed button width
+	buttonHeight := 3    // Fixed button height
+	spacing := 2         // Horizontal spacing between buttons
 	verticalSpacing := 1 // Vertical spacing between rows
 
 	// Row 1: 3 buttons centered
@@ -384,8 +384,8 @@ func initialModel() model {
 		buttons:       buttons,
 		hoveredID:     "",
 		lastClickedID: "",
-		width:         80,  // Default, will be updated by WindowSizeMsg
-		height:        24,  // Default, will be updated by WindowSizeMsg
+		width:         80, // Default, will be updated by WindowSizeMsg
+		height:        24, // Default, will be updated by WindowSizeMsg
 		ready:         false,
 	}
 }

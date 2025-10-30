@@ -837,6 +837,7 @@ func TestCustomConfiguration(t *testing.T) {
 		t.Error("11 cell motion should trigger drag with 10 cell threshold")
 	}
 }
+
 // TestProcessHover tests hover detection integration.
 func TestProcessHover(t *testing.T) {
 	processor := NewEventProcessor()

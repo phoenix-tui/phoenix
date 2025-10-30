@@ -310,8 +310,8 @@ func TestHoverStateReset(t *testing.T) {
 // TestHoverStateIsHovering tests the IsHovering method logic.
 func TestHoverStateIsHovering(t *testing.T) {
 	tests := []struct {
-		name       string
-		setup      func(*HoverState)
+		name        string
+		setup       func(*HoverState)
 		expectHover bool
 	}{
 		{
@@ -360,15 +360,15 @@ func TestHoverStateIsHovering(t *testing.T) {
 // TestHoverStateEquals tests the Equals method.
 func TestHoverStateEquals(t *testing.T) {
 	tests := []struct {
-		name       string
-		state1     *HoverState
-		state2     *HoverState
+		name        string
+		state1      *HoverState
+		state2      *HoverState
 		expectEqual bool
 	}{
 		{
-			name: "equal new states",
-			state1: NewHoverState(),
-			state2: NewHoverState(),
+			name:        "equal new states",
+			state1:      NewHoverState(),
+			state2:      NewHoverState(),
 			expectEqual: true,
 		},
 		{

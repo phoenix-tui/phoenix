@@ -9,10 +9,10 @@ import (
 // HoverState tracks the current hover state for mouse interactions.
 // This is an entity that maintains which component (if any) the mouse is currently hovering over.
 type HoverState struct {
-	componentID  string          // ID of the currently hovered component (empty if none)
-	position     value.Position  // Current mouse position
-	lastUpdate   time.Time       // When the hover state was last updated
-	isActive     bool            // Whether hover tracking is active
+	componentID string         // ID of the currently hovered component (empty if none)
+	position    value.Position // Current mouse position
+	lastUpdate  time.Time      // When the hover state was last updated
+	isActive    bool           // Whether hover tracking is active
 }
 
 // NewHoverState creates a new HoverState with no active hover.
