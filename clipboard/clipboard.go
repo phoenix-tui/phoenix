@@ -184,3 +184,64 @@ func GetProviderName() string {
 	}
 	return globalClipboard.GetProviderName()
 }
+
+// ReadImage reads image data from the clipboard.
+// Returns the image bytes, MIME type, and any error.
+// Note: Image clipboard support requires native provider implementation.
+func (c *Clipboard) ReadImage() ([]byte, string, error) {
+	return c.manager.ReadImage()
+}
+
+// WriteImage writes image data to the clipboard.
+// The data parameter should contain the image bytes in PNG, JPEG, or GIF format.
+// The mimeType parameter should be the MIME type (e.g., "image/png", "image/jpeg").
+// Note: Image clipboard support requires native provider implementation.
+func (c *Clipboard) WriteImage(data []byte, mimeType string) error {
+	return c.manager.WriteImage(data, mimeType)
+}
+
+// ReadImagePNG reads PNG image data from the clipboard (convenience method).
+func (c *Clipboard) ReadImagePNG() ([]byte, error) {
+	data, mimeType, err := c.ReadImage()
+	if err != nil {
+		return nil, err
+	}
+	if mimeType != "image/png" {
+		// Convert to PNG if needed
+		codec := service.NewImageCodec()
+		img, _, err := codec.Decode(data)
+		if err != nil {
+			return nil, err
+		}
+		return codec.EncodePNG(img)
+	}
+	return data, nil
+}
+
+// WriteImagePNG writes PNG image data to the clipboard (convenience method).
+func (c *Clipboard) WriteImagePNG(data []byte) error {
+	return c.WriteImage(data, "image/png")
+}
+
+// ReadImageJPEG reads JPEG image data from the clipboard (convenience method).
+func (c *Clipboard) ReadImageJPEG() ([]byte, error) {
+	data, mimeType, err := c.ReadImage()
+	if err != nil {
+		return nil, err
+	}
+	if mimeType != "image/jpeg" {
+		// Convert to JPEG if needed
+		codec := service.NewImageCodec()
+		img, _, err := codec.Decode(data)
+		if err != nil {
+			return nil, err
+		}
+		return codec.EncodeJPEG(img, 90)
+	}
+	return data, nil
+}
+
+// WriteImageJPEG writes JPEG image data to the clipboard (convenience method).
+func (c *Clipboard) WriteImageJPEG(data []byte) error {
+	return c.WriteImage(data, "image/jpeg")
+}
