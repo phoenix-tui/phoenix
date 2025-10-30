@@ -10,12 +10,17 @@ import (
 	"github.com/phoenix-tui/phoenix/mouse/internal/domain/value"
 )
 
+// ComponentArea represents a component's hover-detection area.
+// This is re-exported from the service layer for application layer use.
+type ComponentArea = service2.ComponentArea
+
 // EventProcessor processes raw mouse events and enriches them with
 // higher-level semantics (clicks, drags, etc.).
 type EventProcessor struct {
 	clickDetector    *service2.ClickDetector
 	dragTracker      *service2.DragTracker
 	scrollCalculator *service2.ScrollCalculator
+	hoverTracker     *service2.HoverTracker
 }
 
 // NewEventProcessor creates a new EventProcessor with default settings.
@@ -24,6 +29,7 @@ func NewEventProcessor() *EventProcessor {
 		clickDetector:    service2.NewClickDetector(500*1000000, 1), // 500ms, 1 cell tolerance
 		dragTracker:      service2.NewDragTracker(2),                // 2 cell threshold
 		scrollCalculator: service2.NewScrollCalculator(3),           // 3 lines per scroll
+		hoverTracker:     service2.NewHoverTracker(),
 	}
 }
 
@@ -38,6 +44,7 @@ func NewEventProcessorWithConfig(
 		clickDetector:    service2.NewClickDetector(clickTimeout, clickTolerance),
 		dragTracker:      service2.NewDragTracker(dragThreshold),
 		scrollCalculator: service2.NewScrollCalculator(linesPerScroll),
+		hoverTracker:     service2.NewHoverTracker(),
 	}
 }
 
@@ -90,6 +97,7 @@ func (p *EventProcessor) ProcessEvent(event model.MouseEvent) []model.MouseEvent
 func (p *EventProcessor) Reset() {
 	p.clickDetector.Reset()
 	p.dragTracker.Reset()
+	p.hoverTracker.Reset()
 }
 
 // ScrollDelta calculates the scroll delta for a scroll event.
@@ -115,4 +123,20 @@ func (p *EventProcessor) IsDragging() bool {
 // ClickCount returns the current click count (for debugging/testing).
 func (p *EventProcessor) ClickCount() int {
 	return p.clickDetector.ClickCount()
+}
+
+// ProcessHover processes mouse motion for hover detection.
+// Returns a hover event type (HoverEnter, HoverLeave, HoverMove, or Motion).
+func (p *EventProcessor) ProcessHover(position value.Position, areas []service2.ComponentArea) value.EventType {
+	return p.hoverTracker.Update(position, areas)
+}
+
+// IsHovering returns true if a component is currently being hovered.
+func (p *EventProcessor) IsHovering() bool {
+	return p.hoverTracker.IsHovering()
+}
+
+// CurrentHoverComponent returns the ID of the currently hovered component (empty if none).
+func (p *EventProcessor) CurrentHoverComponent() string {
+	return p.hoverTracker.CurrentComponentID()
 }
