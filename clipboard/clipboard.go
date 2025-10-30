@@ -245,3 +245,63 @@ func (c *Clipboard) ReadImageJPEG() ([]byte, error) {
 func (c *Clipboard) WriteImageJPEG(data []byte) error {
 	return c.WriteImage(data, "image/jpeg")
 }
+
+// ReadHTML reads HTML content from the clipboard.
+// Returns the HTML string.
+func (c *Clipboard) ReadHTML() (string, error) {
+	return c.manager.ReadHTML()
+}
+
+// WriteHTML writes HTML content to the clipboard.
+// The html parameter should contain valid HTML markup.
+func (c *Clipboard) WriteHTML(html string) error {
+	return c.manager.WriteHTML(html)
+}
+
+// ReadHTMLAsPlainText reads HTML from clipboard and strips all tags, returning plain text.
+// This is a convenience method for getting text content from HTML.
+func (c *Clipboard) ReadHTMLAsPlainText() (string, error) {
+	html, err := c.ReadHTML()
+	if err != nil {
+		return "", err
+	}
+
+	codec := service.NewRichTextCodec()
+	return codec.StripHTMLTags(html)
+}
+
+// ReadRTF reads RTF content from the clipboard.
+// Returns the RTF string.
+func (c *Clipboard) ReadRTF() (string, error) {
+	return c.manager.ReadRTF()
+}
+
+// WriteRTF writes RTF content to the clipboard.
+// The rtf parameter should contain valid RTF markup.
+func (c *Clipboard) WriteRTF(rtf string) error {
+	return c.manager.WriteRTF(rtf)
+}
+
+// ReadRTFAsPlainText reads RTF from clipboard and strips all formatting, returning plain text.
+// This is a convenience method for getting text content from RTF.
+func (c *Clipboard) ReadRTFAsPlainText() (string, error) {
+	rtf, err := c.ReadRTF()
+	if err != nil {
+		return "", err
+	}
+
+	codec := service.NewRichTextCodec()
+	return codec.StripRTFFormatting(rtf)
+}
+
+// ConvertHTMLToRTF converts HTML content to RTF format.
+// This is a convenience method that uses the rich text codec.
+func (c *Clipboard) ConvertHTMLToRTF(html string) (string, error) {
+	return c.manager.ConvertHTMLToRTF(html)
+}
+
+// ConvertRTFToHTML converts RTF content to HTML format.
+// This is a convenience method that uses the rich text codec.
+func (c *Clipboard) ConvertRTFToHTML(rtf string) (string, error) {
+	return c.manager.ConvertRTFToHTML(rtf)
+}
