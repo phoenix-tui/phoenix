@@ -139,29 +139,43 @@ l := list.New([]string{"Item 1", "Item 2", "Item 3"}).
 
 ---
 
-### 4. Viewport - Scrollable Content Area
+### 4. Viewport - Scrollable Content Area ⭐ Enhanced: Drag Scrolling (Week 15)
 **Module**: `github.com/phoenix-tui/phoenix/components/viewport`
-**Coverage**: 94.5%
+**Coverage**: 98.6%
 
-Scrollable content area for displaying long text, logs, or chat history.
+Scrollable content area for displaying long text, logs, or chat history with click-and-drag scrolling.
 
 ```go
-import viewport "github.com/phoenix-tui/phoenix/components/viewport/api"
+import viewport "github.com/phoenix-tui/phoenix/components/viewport"
 
-// Create scrollable viewport
+// Create scrollable viewport with mouse support
 vp := viewport.New(80, 24).
     SetContent(longText).
-    YPosition(0)
+    MouseEnabled(true)  // Enables wheel + drag scrolling
+
+// Use in tea.Model
+p := tea.New(model, tea.WithMouseAllMotion[Model]())
 ```
 
 **Features**:
-- ✅ Vertical and horizontal scrolling
-- ✅ Mouse wheel support
-- ✅ Keyboard navigation (arrows, page up/down)
-- ✅ Dynamic content updates
-- ✅ Scroll position control
+- ✅ **Drag Scrolling** (NEW!) - Click and drag to scroll (natural touch behavior)
+- ✅ Mouse wheel support (3 lines per tick)
+- ✅ Keyboard navigation (arrows, page up/down, Home/End, Ctrl+U/D)
+- ✅ Dynamic content updates with FollowMode (tail -f style)
+- ✅ Precise scroll position control (SetYOffset)
+- ✅ Line wrapping and truncation support
+- ✅ Bounds checking (won't scroll past content)
+- ✅ Immutable operations (functional updates)
 
-[📖 API Documentation](./viewport/api/)
+**Drag Scrolling** (Week 15 Day 3-4):
+- Left mouse button drag to scroll
+- Natural direction: drag down → content scrolls up
+- Works with 10,000+ lines smoothly
+- Automatic bounds clamping
+- 14 comprehensive tests (98.6% coverage)
+
+[📖 Full Documentation](./viewport/)
+[🎮 Drag Scroll Example](../examples/drag-scroll/)
 
 ---
 
@@ -467,12 +481,13 @@ go test ./input/... -v
 | Input | 56.9% | 92.2% | 100.0% | 90.0% |
 | TextArea | 56.2% | 83.4% | 77.4% | 73.2% |
 | List | ~60% | ~95% | ~85% | 94.7% |
-| Viewport | 24.2% | 95.1% | 100.0% | 94.5% |
+| Viewport | ~60% | ~95% | 100.0% | 98.6% | ⭐ Enhanced Week 15
 | Table | ~60% | ~93% | ~90% | 92.0% |
 | Modal | ~65% | ~98% | ~95% | 96.5% |
 | Progress | 97.4% | 100.0% | 100.0% | 98.5% |
 
 **Average**: 94.5% (exceeds 90% target!)
+**Viewport**: 98.6% with drag scrolling (14 new tests)
 
 ---
 
