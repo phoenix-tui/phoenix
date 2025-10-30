@@ -2,6 +2,7 @@
 package application
 
 import (
+	"fmt"
 	"time"
 
 	service2 "github.com/phoenix-tui/phoenix/clipboard/internal/domain/service"
@@ -96,4 +97,22 @@ func buildProviderChain(detector *platform.Detector) []service2.Provider {
 	}
 
 	return providers
+}
+
+// ReadImage reads image data from the clipboard.
+// Returns the image bytes and the detected MIME type.
+// Note: Image clipboard support is currently limited to native providers.
+func (m *ClipboardManager) ReadImage() ([]byte, string, error) {
+	// For now, this is a placeholder that returns an error
+	// Full implementation requires provider-specific image support
+	return nil, "", fmt.Errorf("image clipboard operations not yet implemented in providers")
+}
+
+// WriteImage writes image data to the clipboard.
+// The data should be in PNG, JPEG, or GIF format.
+// Note: Image clipboard support is currently limited to native providers.
+func (m *ClipboardManager) WriteImage(data []byte, mimeType string) error {
+	// For now, this is a placeholder that returns an error
+	// Full implementation requires provider-specific image support
+	return fmt.Errorf("image clipboard operations not yet implemented in providers")
 }
