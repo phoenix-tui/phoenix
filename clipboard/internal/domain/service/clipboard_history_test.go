@@ -151,12 +151,14 @@ func TestClipboardHistory_Get(t *testing.T) {
 
 		err := history.Add([]byte("content 1"), value.MIMETypePlainText)
 		require.NoError(t, err)
-
+		
+		time.Sleep(2 * time.Millisecond) // Ensure different timestamps for deterministic sort
 		err = history.Add([]byte("content 2"), value.MIMETypeHTML)
 		require.NoError(t, err)
-
+		
 		entries := history.GetAll()
-		targetID := entries[1].ID()
+        // GetAll() returns entries sorted by newest first: [0]=HTML (newest), [1]=PlainText (oldest)
+		targetID := entries[0].ID()
 
 		entry, err := history.Get(targetID)
 
