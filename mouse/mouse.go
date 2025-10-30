@@ -166,6 +166,38 @@ func (m *Mouse) CurrentHoverComponent() string {
 	return m.handler.Processor().CurrentHoverComponent()
 }
 
+// CalculateMenuPosition calculates the optimal position for a context menu.
+// Ensures the menu stays fully visible within screen bounds by adjusting position
+// when the menu would overflow screen edges.
+//
+// Parameters:
+//   - cursorPos: mouse cursor position where menu should ideally appear
+//   - menuWidth: width of the menu in terminal cells
+//   - menuHeight: height of the menu in terminal cells
+//   - screenWidth: terminal width in cells
+//   - screenHeight: terminal height in cells
+//
+// Returns:
+//   - adjusted position that keeps menu fully visible on screen
+//
+// Example usage:
+//
+//	// Right-click detected at cursor position
+//	cursorPos := mouse.NewPosition(70, 20)
+//	menuWidth, menuHeight := 25, 8
+//	screenWidth, screenHeight := 80, 24
+//
+//	// Calculate safe position (will shift left/up to keep menu visible)
+//	safePos := mouseHandler.CalculateMenuPosition(cursorPos, menuWidth, menuHeight, screenWidth, screenHeight)
+//	// safePos will be adjusted to (55, 16) to prevent overflow
+func (m *Mouse) CalculateMenuPosition(
+	cursorPos Position,
+	menuWidth, menuHeight int,
+	screenWidth, screenHeight int,
+) Position {
+	return m.handler.Processor().CalculateMenuPosition(cursorPos, menuWidth, menuHeight, screenWidth, screenHeight)
+}
+
 // ComponentArea represents a component's hover-detection area.
 type ComponentArea struct {
 	// ID is the unique identifier for the component.

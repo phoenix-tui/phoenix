@@ -21,6 +21,7 @@ type EventProcessor struct {
 	dragTracker      *service2.DragTracker
 	scrollCalculator *service2.ScrollCalculator
 	hoverTracker     *service2.HoverTracker
+	menuPositioner   *service2.MenuPositioner
 }
 
 // NewEventProcessor creates a new EventProcessor with default settings.
@@ -30,6 +31,7 @@ func NewEventProcessor() *EventProcessor {
 		dragTracker:      service2.NewDragTracker(2),                // 2 cell threshold
 		scrollCalculator: service2.NewScrollCalculator(3),           // 3 lines per scroll
 		hoverTracker:     service2.NewHoverTracker(),
+		menuPositioner:   service2.NewMenuPositioner(),
 	}
 }
 
@@ -45,6 +47,7 @@ func NewEventProcessorWithConfig(
 		dragTracker:      service2.NewDragTracker(dragThreshold),
 		scrollCalculator: service2.NewScrollCalculator(linesPerScroll),
 		hoverTracker:     service2.NewHoverTracker(),
+		menuPositioner:   service2.NewMenuPositioner(),
 	}
 }
 
@@ -139,4 +142,24 @@ func (p *EventProcessor) IsHovering() bool {
 // CurrentHoverComponent returns the ID of the currently hovered component (empty if none).
 func (p *EventProcessor) CurrentHoverComponent() string {
 	return p.hoverTracker.CurrentComponentID()
+}
+
+// CalculateMenuPosition calculates the optimal position for a context menu.
+// Ensures the menu stays fully visible within screen bounds.
+//
+// Parameters:
+//   - cursorPos: mouse cursor position where menu should ideally appear
+//   - menuWidth: width of the menu in terminal cells
+//   - menuHeight: height of the menu in terminal cells
+//   - screenWidth: terminal width in cells
+//   - screenHeight: terminal height in cells
+//
+// Returns:
+//   - adjusted position that keeps menu fully visible on screen
+func (p *EventProcessor) CalculateMenuPosition(
+	cursorPos value.Position,
+	menuWidth, menuHeight int,
+	screenWidth, screenHeight int,
+) value.Position {
+	return p.menuPositioner.CalculatePosition(cursorPos, menuWidth, menuHeight, screenWidth, screenHeight)
 }
