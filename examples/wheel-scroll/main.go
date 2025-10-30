@@ -11,13 +11,13 @@ import (
 // model represents the application state
 type model struct {
 	viewport        *viewport.Viewport
-	scrollSpeed     int    // Lines per wheel tick (1, 3, 5, 10)
-	ready           bool   // Window size received
-	width           int    // Terminal width
-	height          int    // Terminal height
-	showHelp        bool   // Show help overlay
-	totalScrolled   int    // Track total lines scrolled
-	wheelEventCount int    // Count wheel events
+	scrollSpeed     int  // Lines per wheel tick (1, 3, 5, 10)
+	ready           bool // Window size received
+	width           int  // Terminal width
+	height          int  // Terminal height
+	showHelp        bool // Show help overlay
+	totalScrolled   int  // Track total lines scrolled
+	wheelEventCount int  // Count wheel events
 }
 
 func initialModel() model {

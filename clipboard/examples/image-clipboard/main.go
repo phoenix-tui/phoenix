@@ -22,10 +22,10 @@ func main() {
 
 func demonstrateImageCodec() {
 	codec := service.NewImageCodec()
-	
+
 	fmt.Println("1. Creating Test Image (10x10 red square)...")
 	img := createTestImage()
-	fmt.Printf("   Created image with dimensions: %dx%d\n", 
+	fmt.Printf("   Created image with dimensions: %dx%d\n",
 		img.Bounds().Dx(), img.Bounds().Dy())
 	fmt.Println()
 
@@ -71,7 +71,7 @@ func demonstrateImageCodec() {
 		fmt.Printf("   Error decoding PNG: %v\n", err)
 		return
 	}
-	fmt.Printf("   Decoded image dimensions: %dx%d\n", 
+	fmt.Printf("   Decoded image dimensions: %dx%d\n",
 		decoded.Bounds().Dx(), decoded.Bounds().Dy())
 	fmt.Println()
 
@@ -92,7 +92,7 @@ func demonstrateImageCodec() {
 		value.MIMETypeImageBMP,
 	}
 	for _, mimeType := range supportedTypes {
-		fmt.Printf("   - %s: IsImage=%v, IsBinary=%v\n", 
+		fmt.Printf("   - %s: IsImage=%v, IsBinary=%v\n",
 			mimeType, mimeType.IsImage(), mimeType.IsBinary())
 	}
 	fmt.Println()

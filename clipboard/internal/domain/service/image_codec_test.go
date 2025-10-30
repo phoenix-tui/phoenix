@@ -169,7 +169,7 @@ func TestImageCodec_ConvertFormat(t *testing.T) {
 func TestImageCodec_RoundTrip(t *testing.T) {
 	codec := NewImageCodec()
 	original := createTestImage()
-	
+
 	encoded, _ := codec.EncodePNG(original)
 	decoded, format, err := codec.Decode(encoded)
 	if err != nil {
@@ -187,47 +187,47 @@ func TestImageCodec_RoundTrip(t *testing.T) {
 
 func TestImageCodec_ErrorCases(t *testing.T) {
 	codec := NewImageCodec()
-	
+
 	_, err := codec.EncodePNG(nil)
 	if err == nil {
 		t.Error("EncodePNG should fail with nil image")
 	}
-	
+
 	_, err = codec.EncodeJPEG(nil, 90)
 	if err == nil {
 		t.Error("EncodeJPEG should fail with nil image")
 	}
-	
+
 	_, err = codec.EncodeGIF(nil)
 	if err == nil {
 		t.Error("EncodeGIF should fail with nil image")
 	}
-	
+
 	_, err = codec.DecodePNG([]byte{})
 	if err == nil {
 		t.Error("DecodePNG should fail with empty data")
 	}
-	
+
 	_, err = codec.DecodeJPEG([]byte{})
 	if err == nil {
 		t.Error("DecodeJPEG should fail with empty data")
 	}
-	
+
 	_, err = codec.DecodeGIF([]byte{})
 	if err == nil {
 		t.Error("DecodeGIF should fail with empty data")
 	}
-	
+
 	_, _, err = codec.Decode([]byte{})
 	if err == nil {
 		t.Error("Decode should fail with empty data")
 	}
-	
+
 	_, err = codec.DetectFormat([]byte{})
 	if err == nil {
 		t.Error("DetectFormat should fail with empty data")
 	}
-	
+
 	_, err = codec.ConvertFormat([]byte{0x00}, value.MIMEType("image/webp"))
 	if err == nil {
 		t.Error("ConvertFormat should fail with unsupported format")

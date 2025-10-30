@@ -32,13 +32,13 @@ type contextMenu struct {
 
 // model represents the application state following the Elm Architecture.
 type model struct {
-	mouse         *mouse.Mouse  // Mouse handler
-	menu          contextMenu   // Context menu
+	mouse         *mouse.Mouse   // Mouse handler
+	menu          contextMenu    // Context menu
 	lastClick     mouse.Position // Last click position
-	statusMessage string        // Status message
-	width         int           // Terminal width
-	height        int           // Terminal height
-	ready         bool          // UI ready flag (after WindowSizeMsg)
+	statusMessage string         // Status message
+	width         int            // Terminal width
+	height        int            // Terminal height
+	ready         bool           // UI ready flag (after WindowSizeMsg)
 }
 
 // Init initializes the model (called once at startup).
@@ -212,7 +212,7 @@ func (m model) View() string {
 		Background(style.RGB(0, 0, 255))      // Blue
 
 	menuItemSelectedStyle := style.New().
-		Foreground(style.RGB(0, 0, 0)).    // Black
+		Foreground(style.RGB(0, 0, 0)).     // Black
 		Background(style.RGB(0, 255, 255)). // Cyan
 		Bold(true)
 
@@ -328,7 +328,7 @@ func main() {
 	// Create and run the program
 	p := tea.New(
 		initialModel,
-		tea.WithAltScreen[model](),     // Use alternate screen buffer
+		tea.WithAltScreen[model](),      // Use alternate screen buffer
 		tea.WithMouseAllMotion[model](), // Enable mouse motion tracking
 	)
 

@@ -114,7 +114,6 @@ func TestImageCodec_formatToMIMEType_AllFormats(t *testing.T) {
 	}
 }
 
-
 func TestImageCodec_AllErrorPaths(t *testing.T) {
 	codec := NewImageCodec()
 
