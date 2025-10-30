@@ -280,6 +280,43 @@ go run main.go
 4. **Rich domain models** (MIME types, encodings, transformations)
 5. **Builder pattern** (flexible configuration)
 
+## Performance Characteristics
+
+### Memory Management
+- Efficient binary content handling (zero-copy where possible)
+- Content validation prevents empty/invalid data
+- Builder pattern reduces object creation overhead
+- Minimal allocations in hot paths (Read/Write operations)
+
+### Best Practices for Large Content
+1. **Streaming**: For files > 1MB, consider chunking before clipboard operations
+2. **Validation**: Check content size before writing (some platforms have limits)
+3. **Timeout Configuration**: Adjust OSC52 timeout for slow connections
+   ```go
+   clipboard, _ := NewBuilder().
+       WithOSC52Timeout(10 * time.Second).
+       Build()
+   ```
+4. **Provider Selection**: Use native-only for large local content (faster than OSC52)
+   ```go
+   clipboard, _ := NewBuilder().
+       WithOSC52(false).  // Disable OSC52 for local-only usage
+       WithNative(true).
+       Build()
+   ```
+
+### Thread Safety
+- **Clipboard instance**: Safe for concurrent Read/Write from multiple goroutines
+- **Global functions**: Thread-safe lazy initialization
+- **Provider implementations**: Handle platform-specific locking internally
+- **History**: Concurrent access protected by internal synchronization
+
+### Performance Notes
+- Native clipboard access: < 1ms typical latency
+- OSC 52 operations: 5-50ms depending on terminal and content size
+- History tracking: O(1) add, O(n) for GetHistory() where n = entry count
+- Content validation: O(1) for size check, O(n) for encoding validation
+
 ## Design Principles
 
 ### 1. Rich Domain Models

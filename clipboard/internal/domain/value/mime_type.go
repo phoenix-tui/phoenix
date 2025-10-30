@@ -1,6 +1,9 @@
 package value
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // MIMEType represents a MIME type for clipboard content.
 type MIMEType string
@@ -15,11 +18,24 @@ const (
 	// MIMETypeRTF represents rich text format.
 	MIMETypeRTF MIMEType = "text/rtf"
 
-	// MIMETypeImage represents image content.
-	MIMETypeImage MIMEType = "image/png"
+	// MIMETypeImagePNG represents PNG image content.
+	MIMETypeImagePNG MIMEType = "image/png"
+
+	// MIMETypeImageJPEG represents JPEG image content.
+	MIMETypeImageJPEG MIMEType = "image/jpeg"
+
+	// MIMETypeImageGIF represents GIF image content.
+	MIMETypeImageGIF MIMEType = "image/gif"
+
+	// MIMETypeImageBMP represents BMP image content.
+	MIMETypeImageBMP MIMEType = "image/bmp"
 
 	// MIMETypeBinary represents binary content.
 	MIMETypeBinary MIMEType = "application/octet-stream"
+
+	// MIMETypeImage is deprecated. Use MIMETypeImagePNG instead.
+	// Kept for backwards compatibility.
+	MIMETypeImage MIMEType = MIMETypeImagePNG
 )
 
 // NewMIMEType creates a new MIME type value object.
@@ -45,9 +61,20 @@ func (m MIMEType) IsText() bool {
 	}
 }
 
+// IsImage returns true if the MIME type represents image content.
+func (m MIMEType) IsImage() bool {
+	switch m {
+	case MIMETypeImagePNG, MIMETypeImageJPEG, MIMETypeImageGIF, MIMETypeImageBMP:
+		return true
+	default:
+		// Also check for any image/* MIME type
+		return strings.HasPrefix(string(m), "image/")
+	}
+}
+
 // IsBinary returns true if the MIME type represents binary content.
 func (m MIMEType) IsBinary() bool {
-	return m == MIMETypeBinary || m == MIMETypeImage
+	return m.IsImage() || m == MIMETypeBinary
 }
 
 // Equals compares two MIME types for equality.

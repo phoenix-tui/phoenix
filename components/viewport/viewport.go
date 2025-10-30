@@ -12,15 +12,21 @@ import (
 // Viewport is the public API for the Viewport component.
 // It provides a fluent interface for configuration and implements tea.Model.
 type Viewport struct {
-	domain       *model.Viewport
-	mouseEnabled bool
+	domain         *model.Viewport
+	mouseEnabled   bool
+	linesPerScroll int // Lines to scroll per wheel tick (default: 3)
+	// Drag scrolling state
+	isDragging   bool
+	dragStartY   int
+	scrollStartY int
 }
 
 // New creates a new Viewport with the given dimensions.
 func New(width, height int) *Viewport {
 	return &Viewport{
-		domain:       model.NewViewport(width, height),
-		mouseEnabled: false,
+		domain:         model.NewViewport(width, height),
+		mouseEnabled:   false,
+		linesPerScroll: 3, // Default: 3 lines per wheel tick
 	}
 }
 
@@ -29,42 +35,59 @@ func New(width, height int) *Viewport {
 func NewWithContent(content string, width, height int) *Viewport {
 	lines := strings.Split(content, "\n")
 	return &Viewport{
-		domain:       model.NewViewportWithContent(lines, width, height),
-		mouseEnabled: false,
+		domain:         model.NewViewportWithContent(lines, width, height),
+		mouseEnabled:   false,
+		linesPerScroll: 3, // Default: 3 lines per wheel tick
 	}
 }
 
 // NewWithLines creates a new Viewport with initial content as separate lines.
 func NewWithLines(lines []string, width, height int) *Viewport {
 	return &Viewport{
-		domain:       model.NewViewportWithContent(lines, width, height),
-		mouseEnabled: false,
+		domain:         model.NewViewportWithContent(lines, width, height),
+		mouseEnabled:   false,
+		linesPerScroll: 3, // Default: 3 lines per wheel tick
 	}
 }
 
 // FollowMode enables or disables follow mode (tail -f style auto-scrolling).
 // When enabled, the viewport automatically scrolls to the bottom when content changes.
 func (v *Viewport) FollowMode(enabled bool) *Viewport {
-	return &Viewport{
-		domain:       v.domain.WithFollowMode(enabled),
-		mouseEnabled: v.mouseEnabled,
-	}
+	return v.withDomain(v.domain.WithFollowMode(enabled))
 }
 
 // WrapLines enables or disables line wrapping.
 // When enabled, lines wider than the viewport are wrapped to multiple lines.
 func (v *Viewport) WrapLines(enabled bool) *Viewport {
+	return v.withDomain(v.domain.WithWrapLines(enabled))
+}
+
+// MouseEnabled enables or disables mouse wheel scrolling and drag scrolling.
+func (v *Viewport) MouseEnabled(enabled bool) *Viewport {
 	return &Viewport{
-		domain:       v.domain.WithWrapLines(enabled),
-		mouseEnabled: v.mouseEnabled,
+		domain:         v.domain,
+		mouseEnabled:   enabled,
+		linesPerScroll: v.linesPerScroll,
+		isDragging:     v.isDragging,
+		dragStartY:     v.dragStartY,
+		scrollStartY:   v.scrollStartY,
 	}
 }
 
-// MouseEnabled enables or disables mouse wheel scrolling.
-func (v *Viewport) MouseEnabled(enabled bool) *Viewport {
+// SetWheelScrollLines sets the number of lines to scroll per mouse wheel tick.
+// Default is 3 lines. Minimum is 1 line.
+// Returns a new Viewport with the updated configuration (immutable).
+func (v *Viewport) SetWheelScrollLines(lines int) *Viewport {
+	if lines < 1 {
+		lines = 1 // Minimum 1 line
+	}
 	return &Viewport{
-		domain:       v.domain,
-		mouseEnabled: enabled,
+		domain:         v.domain,
+		mouseEnabled:   v.mouseEnabled,
+		linesPerScroll: lines,
+		isDragging:     v.isDragging,
+		dragStartY:     v.dragStartY,
+		scrollStartY:   v.scrollStartY,
 	}
 }
 
@@ -72,18 +95,12 @@ func (v *Viewport) MouseEnabled(enabled bool) *Viewport {
 // Content is split by newlines into individual lines.
 func (v *Viewport) SetContent(content string) *Viewport {
 	lines := strings.Split(content, "\n")
-	return &Viewport{
-		domain:       v.domain.WithContent(lines),
-		mouseEnabled: v.mouseEnabled,
-	}
+	return v.withDomain(v.domain.WithContent(lines))
 }
 
 // SetLines replaces the viewport content with the given lines.
 func (v *Viewport) SetLines(lines []string) *Viewport {
-	return &Viewport{
-		domain:       v.domain.WithContent(lines),
-		mouseEnabled: v.mouseEnabled,
-	}
+	return v.withDomain(v.domain.WithContent(lines))
 }
 
 // AppendLine appends a single line to the viewport content.
@@ -108,20 +125,14 @@ func (v *Viewport) AppendLines(lines []string) *Viewport {
 // This is a one-time scroll action, not continuous like FollowMode.
 // Useful for: user presses End key, jump to bottom on command, etc.
 func (v *Viewport) ScrollToBottom() *Viewport {
-	return &Viewport{
-		domain:       v.domain.ScrollToBottom(),
-		mouseEnabled: v.mouseEnabled,
-	}
+	return v.withDomain(v.domain.ScrollToBottom())
 }
 
 // ScrollToTop scrolls the viewport to the top (first line).
 // This is a one-time scroll action.
 // Useful for: user presses Home key, reset to top on command, etc.
 func (v *Viewport) ScrollToTop() *Viewport {
-	return &Viewport{
-		domain:       v.domain.ScrollToTop(),
-		mouseEnabled: v.mouseEnabled,
-	}
+	return v.withDomain(v.domain.ScrollToTop())
 }
 
 // SetYOffset sets the vertical scroll offset to a specific line number.
@@ -129,18 +140,12 @@ func (v *Viewport) ScrollToTop() *Viewport {
 // Offset is clamped to valid range [0, maxOffset].
 // Useful for: jumping to specific line, restoring scroll position, etc.
 func (v *Viewport) SetYOffset(offset int) *Viewport {
-	return &Viewport{
-		domain:       v.domain.WithScrollOffset(offset),
-		mouseEnabled: v.mouseEnabled,
-	}
+	return v.withDomain(v.domain.WithScrollOffset(offset))
 }
 
 // SetSize updates the viewport dimensions.
 func (v *Viewport) SetSize(width, height int) *Viewport {
-	return &Viewport{
-		domain:       v.domain.WithSize(width, height),
-		mouseEnabled: v.mouseEnabled,
-	}
+	return v.withDomain(v.domain.WithSize(width, height))
 }
 
 // Init initializes the viewport (implements Init() Cmd for tea.Model constraint).
@@ -170,79 +175,79 @@ func (v *Viewport) Update(msg tea.Msg) (*Viewport, tea.Cmd) {
 // handleKeyMsg processes keyboard input for scrolling.
 func (v *Viewport) handleKeyMsg(msg tea.KeyMsg) *Viewport {
 	if infrastructure.IsUpKey(msg) {
-		return &Viewport{
-			domain:       v.domain.ScrollUp(1),
-			mouseEnabled: v.mouseEnabled,
-		}
+		return v.withDomain(v.domain.ScrollUp(1))
 	}
 
 	if infrastructure.IsDownKey(msg) {
-		return &Viewport{
-			domain:       v.domain.ScrollDown(1),
-			mouseEnabled: v.mouseEnabled,
-		}
+		return v.withDomain(v.domain.ScrollDown(1))
 	}
 
 	if infrastructure.IsPageUpKey(msg) {
-		return &Viewport{
-			domain:       v.domain.PageUp(),
-			mouseEnabled: v.mouseEnabled,
-		}
+		return v.withDomain(v.domain.PageUp())
 	}
 
 	if infrastructure.IsPageDownKey(msg) {
-		return &Viewport{
-			domain:       v.domain.PageDown(),
-			mouseEnabled: v.mouseEnabled,
-		}
+		return v.withDomain(v.domain.PageDown())
 	}
 
 	if infrastructure.IsHomeKey(msg) {
-		return &Viewport{
-			domain:       v.domain.ScrollToTop(),
-			mouseEnabled: v.mouseEnabled,
-		}
+		return v.withDomain(v.domain.ScrollToTop())
 	}
 
 	if infrastructure.IsEndKey(msg) {
-		return &Viewport{
-			domain:       v.domain.ScrollToBottom(),
-			mouseEnabled: v.mouseEnabled,
-		}
+		return v.withDomain(v.domain.ScrollToBottom())
 	}
 
 	if infrastructure.IsHalfPageUpKey(msg) {
 		halfPage := v.domain.VisibleHeight() / 2
-		return &Viewport{
-			domain:       v.domain.ScrollUp(halfPage),
-			mouseEnabled: v.mouseEnabled,
-		}
+		return v.withDomain(v.domain.ScrollUp(halfPage))
 	}
 
 	if infrastructure.IsHalfPageDownKey(msg) {
 		halfPage := v.domain.VisibleHeight() / 2
-		return &Viewport{
-			domain:       v.domain.ScrollDown(halfPage),
-			mouseEnabled: v.mouseEnabled,
-		}
+		return v.withDomain(v.domain.ScrollDown(halfPage))
 	}
 
 	return v
 }
 
-// handleMouseMsg processes mouse input for scrolling.
+// handleMouseMsg processes mouse input for scrolling (wheel and drag).
 func (v *Viewport) handleMouseMsg(msg tea.MouseMsg) *Viewport {
+	// Mouse wheel scrolling
 	switch msg.Button {
 	case tea.MouseButtonWheelUp:
-		return &Viewport{
-			domain:       v.domain.ScrollUp(3), // Scroll 3 lines per wheel tick
-			mouseEnabled: v.mouseEnabled,
-		}
+		return v.withDomain(v.domain.ScrollUp(v.linesPerScroll))
 
 	case tea.MouseButtonWheelDown:
-		return &Viewport{
-			domain:       v.domain.ScrollDown(3), // Scroll 3 lines per wheel tick
-			mouseEnabled: v.mouseEnabled,
+		return v.withDomain(v.domain.ScrollDown(v.linesPerScroll))
+	}
+
+	// Drag scrolling
+	switch msg.Action {
+	case tea.MouseActionPress:
+		if msg.Button == tea.MouseButtonLeft {
+			// Start drag: record starting Y position and current scroll offset
+			return v.withDragState(true, msg.Y, v.domain.ScrollOffset())
+		}
+
+	case tea.MouseActionRelease:
+		if v.isDragging {
+			// End drag: clear drag state
+			return v.withDragState(false, 0, 0)
+		}
+
+	case tea.MouseActionMotion:
+		if v.isDragging {
+			// Calculate scroll delta from drag motion
+			deltaY := msg.Y - v.dragStartY
+
+			// Calculate new scroll offset
+			// When dragging down (+Y), content should scroll up (negative scroll)
+			// When dragging up (-Y), content should scroll down (positive scroll)
+			newScrollOffset := v.scrollStartY - deltaY
+
+			// Apply scroll with bounds checking (domain handles clamping)
+			return v.withDomain(v.domain.WithScrollOffset(newScrollOffset))
 		}
 	}
 
@@ -298,4 +303,29 @@ func (v *Viewport) TotalLines() int {
 // Height returns the viewport height.
 func (v *Viewport) Height() int {
 	return v.domain.VisibleHeight()
+}
+
+// withDomain returns a new Viewport with updated domain model.
+// This is a helper to maintain immutability and avoid repetitive field copying.
+func (v *Viewport) withDomain(domain *model.Viewport) *Viewport {
+	return &Viewport{
+		domain:         domain,
+		mouseEnabled:   v.mouseEnabled,
+		linesPerScroll: v.linesPerScroll,
+		isDragging:     v.isDragging,
+		dragStartY:     v.dragStartY,
+		scrollStartY:   v.scrollStartY,
+	}
+}
+
+// withDragState returns a new Viewport with updated drag state.
+func (v *Viewport) withDragState(isDragging bool, dragStartY, scrollStartY int) *Viewport {
+	return &Viewport{
+		domain:         v.domain,
+		mouseEnabled:   v.mouseEnabled,
+		linesPerScroll: v.linesPerScroll,
+		isDragging:     isDragging,
+		dragStartY:     dragStartY,
+		scrollStartY:   scrollStartY,
+	}
 }

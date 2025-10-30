@@ -837,3 +837,217 @@ func TestCustomConfiguration(t *testing.T) {
 		t.Error("11 cell motion should trigger drag with 10 cell threshold")
 	}
 }
+
+// TestProcessHover tests hover detection integration.
+func TestProcessHover(t *testing.T) {
+	processor := NewEventProcessor()
+
+	areas := []ComponentArea{
+		{ID: "button1", Area: value2.NewBoundingBox(5, 3, 20, 3)},
+		{ID: "button2", Area: value2.NewBoundingBox(5, 8, 20, 3)},
+	}
+
+	// Enter button1
+	eventType := processor.ProcessHover(value2.NewPosition(10, 4), areas)
+	if eventType != value2.EventHoverEnter {
+		t.Errorf("Expected HoverEnter, got %s", eventType)
+	}
+
+	if !processor.IsHovering() {
+		t.Error("Expected IsHovering() to be true")
+	}
+
+	if processor.CurrentHoverComponent() != "button1" {
+		t.Errorf("Expected button1, got %s", processor.CurrentHoverComponent())
+	}
+
+	// Move within button1
+	eventType = processor.ProcessHover(value2.NewPosition(15, 4), areas)
+	if eventType != value2.EventHoverMove {
+		t.Errorf("Expected HoverMove, got %s", eventType)
+	}
+
+	// Leave button1 to empty space
+	eventType = processor.ProcessHover(value2.NewPosition(0, 0), areas)
+	if eventType != value2.EventHoverLeave {
+		t.Errorf("Expected HoverLeave, got %s", eventType)
+	}
+
+	if processor.IsHovering() {
+		t.Error("Expected IsHovering() to be false after leaving")
+	}
+
+	// Enter button2
+	eventType = processor.ProcessHover(value2.NewPosition(10, 9), areas)
+	if eventType != value2.EventHoverEnter {
+		t.Errorf("Expected HoverEnter, got %s", eventType)
+	}
+
+	if processor.CurrentHoverComponent() != "button2" {
+		t.Errorf("Expected button2, got %s", processor.CurrentHoverComponent())
+	}
+}
+
+// TestIsHovering tests the IsHovering method.
+func TestIsHovering(t *testing.T) {
+	processor := NewEventProcessor()
+
+	// Initially not hovering
+	if processor.IsHovering() {
+		t.Error("Expected not hovering initially")
+	}
+
+	areas := []ComponentArea{
+		{ID: "button1", Area: value2.NewBoundingBox(5, 3, 20, 3)},
+	}
+
+	// Enter component
+	processor.ProcessHover(value2.NewPosition(10, 4), areas)
+
+	if !processor.IsHovering() {
+		t.Error("Expected hovering after entering component")
+	}
+
+	// Leave component
+	processor.ProcessHover(value2.NewPosition(50, 50), areas)
+
+	if processor.IsHovering() {
+		t.Error("Expected not hovering after leaving component")
+	}
+}
+
+// TestCurrentHoverComponent tests the CurrentHoverComponent method.
+func TestCurrentHoverComponent(t *testing.T) {
+	processor := NewEventProcessor()
+
+	// Initially no component
+	if processor.CurrentHoverComponent() != "" {
+		t.Errorf("Expected empty componentID, got %s", processor.CurrentHoverComponent())
+	}
+
+	areas := []ComponentArea{
+		{ID: "button1", Area: value2.NewBoundingBox(5, 3, 20, 3)},
+		{ID: "button2", Area: value2.NewBoundingBox(5, 8, 20, 3)},
+	}
+
+	// Enter button1
+	processor.ProcessHover(value2.NewPosition(10, 4), areas)
+	if processor.CurrentHoverComponent() != "button1" {
+		t.Errorf("Expected button1, got %s", processor.CurrentHoverComponent())
+	}
+
+	// Switch to button2
+	processor.ProcessHover(value2.NewPosition(10, 9), areas)
+	if processor.CurrentHoverComponent() != "button2" {
+		t.Errorf("Expected button2, got %s", processor.CurrentHoverComponent())
+	}
+
+	// Leave all components
+	processor.ProcessHover(value2.NewPosition(50, 50), areas)
+	if processor.CurrentHoverComponent() != "" {
+		t.Errorf("Expected empty componentID, got %s", processor.CurrentHoverComponent())
+	}
+}
+
+// TestReset_IncludesHover tests that Reset also resets hover state.
+func TestReset_IncludesHover(t *testing.T) {
+	processor := NewEventProcessor()
+
+	areas := []ComponentArea{
+		{ID: "button1", Area: value2.NewBoundingBox(5, 3, 20, 3)},
+	}
+
+	// Enter component
+	processor.ProcessHover(value2.NewPosition(10, 4), areas)
+
+	if !processor.IsHovering() {
+		t.Error("Expected hovering before reset")
+	}
+
+	// Reset
+	processor.Reset()
+
+	// Verify hover state is reset
+	if processor.IsHovering() {
+		t.Error("Expected not hovering after reset")
+	}
+
+	if processor.CurrentHoverComponent() != "" {
+		t.Errorf("Expected empty componentID after reset, got %s", processor.CurrentHoverComponent())
+	}
+}
+
+// Integration test: Hover sequence
+func TestIntegration_HoverSequence(t *testing.T) {
+	processor := NewEventProcessor()
+
+	areas := []ComponentArea{
+		{ID: "button1", Area: value2.NewBoundingBox(5, 3, 20, 3)},
+		{ID: "button2", Area: value2.NewBoundingBox(5, 8, 20, 3)},
+		{ID: "button3", Area: value2.NewBoundingBox(5, 13, 20, 3)},
+	}
+
+	// Start outside
+	eventType := processor.ProcessHover(value2.NewPosition(0, 0), areas)
+	if eventType != value2.EventMotion {
+		t.Errorf("Expected Motion, got %s", eventType)
+	}
+
+	// Enter button1
+	eventType = processor.ProcessHover(value2.NewPosition(10, 4), areas)
+	if eventType != value2.EventHoverEnter {
+		t.Errorf("Expected HoverEnter, got %s", eventType)
+	}
+	if processor.CurrentHoverComponent() != "button1" {
+		t.Errorf("Expected button1, got %s", processor.CurrentHoverComponent())
+	}
+
+	// Move within button1
+	eventType = processor.ProcessHover(value2.NewPosition(15, 4), areas)
+	if eventType != value2.EventHoverMove {
+		t.Errorf("Expected HoverMove, got %s", eventType)
+	}
+
+	// Switch to button2 directly
+	eventType = processor.ProcessHover(value2.NewPosition(10, 9), areas)
+	if eventType != value2.EventHoverEnter {
+		t.Errorf("Expected HoverEnter for button2, got %s", eventType)
+	}
+	if processor.CurrentHoverComponent() != "button2" {
+		t.Errorf("Expected button2, got %s", processor.CurrentHoverComponent())
+	}
+
+	// Switch to button3
+	eventType = processor.ProcessHover(value2.NewPosition(10, 14), areas)
+	if eventType != value2.EventHoverEnter {
+		t.Errorf("Expected HoverEnter for button3, got %s", eventType)
+	}
+	if processor.CurrentHoverComponent() != "button3" {
+		t.Errorf("Expected button3, got %s", processor.CurrentHoverComponent())
+	}
+
+	// Leave all
+	eventType = processor.ProcessHover(value2.NewPosition(50, 50), areas)
+	if eventType != value2.EventHoverLeave {
+		t.Errorf("Expected HoverLeave, got %s", eventType)
+	}
+	if processor.IsHovering() {
+		t.Error("Expected not hovering after leaving all")
+	}
+}
+
+// Integration test: Hover with empty areas
+func TestIntegration_HoverEmptyAreas(t *testing.T) {
+	processor := NewEventProcessor()
+
+	// ProcessHover with no areas
+	eventType := processor.ProcessHover(value2.NewPosition(10, 5), []ComponentArea{})
+
+	if eventType != value2.EventMotion {
+		t.Errorf("Expected Motion with no areas, got %s", eventType)
+	}
+
+	if processor.IsHovering() {
+		t.Error("Expected not hovering with no areas")
+	}
+}

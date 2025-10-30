@@ -588,10 +588,228 @@ func TestViewport_Update_MouseMsg_WheelDown(t *testing.T) {
 		t.Error("Update should return nil Cmd")
 	}
 
-	// Should scroll down by 3 lines
+	// Should scroll down by 3 lines (default)
 	expectedOffset := 10 + 3
 	if v2.ScrollOffset() != expectedOffset {
 		t.Errorf("After mouse wheel down: offset = %d, want %d", v2.ScrollOffset(), expectedOffset)
+	}
+}
+
+// ============================================================================
+// Wheel Scrolling Configuration Tests (Week 15 Day 5-6)
+// ============================================================================
+
+func TestViewport_SetWheelScrollLines_CustomValue(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true).SetWheelScrollLines(5)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	// Simulate mouse wheel up with custom scroll (5 lines)
+	msg := tea.MouseMsg{Button: tea.MouseButtonWheelUp}
+	v2, _ := v.Update(msg)
+
+	expectedOffset := 50 - 5
+	if v2.ScrollOffset() != expectedOffset {
+		t.Errorf("After wheel up (5 lines): offset = %d, want %d", v2.ScrollOffset(), expectedOffset)
+	}
+
+	// Simulate mouse wheel down with custom scroll (5 lines)
+	msg2 := tea.MouseMsg{Button: tea.MouseButtonWheelDown}
+	v3, _ := v2.Update(msg2)
+
+	expectedOffset2 := expectedOffset + 5
+	if v3.ScrollOffset() != expectedOffset2 {
+		t.Errorf("After wheel down (5 lines): offset = %d, want %d", v3.ScrollOffset(), expectedOffset2)
+	}
+}
+
+func TestViewport_SetWheelScrollLines_DefaultValue(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	// Should use default 3 lines
+	msg := tea.MouseMsg{Button: tea.MouseButtonWheelUp}
+	v2, _ := v.Update(msg)
+
+	expectedOffset := 50 - 3
+	if v2.ScrollOffset() != expectedOffset {
+		t.Errorf("Default wheel scroll: offset = %d, want %d (3 lines)", v2.ScrollOffset(), expectedOffset)
+	}
+}
+
+func TestViewport_SetWheelScrollLines_MinimumOne(t *testing.T) {
+	// Test that 0 is clamped to 1
+	v := New(80, 20).MouseEnabled(true).SetWheelScrollLines(0)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	msg := tea.MouseMsg{Button: tea.MouseButtonWheelUp}
+	v2, _ := v.Update(msg)
+
+	expectedOffset := 50 - 1 // Should scroll by 1 (clamped)
+	if v2.ScrollOffset() != expectedOffset {
+		t.Errorf("SetWheelScrollLines(0) should clamp to 1: offset = %d, want %d", v2.ScrollOffset(), expectedOffset)
+	}
+}
+
+func TestViewport_SetWheelScrollLines_NegativeValue(t *testing.T) {
+	// Test that negative values are clamped to 1
+	v := New(80, 20).MouseEnabled(true).SetWheelScrollLines(-5)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	msg := tea.MouseMsg{Button: tea.MouseButtonWheelUp}
+	v2, _ := v.Update(msg)
+
+	expectedOffset := 50 - 1 // Should scroll by 1 (clamped)
+	if v2.ScrollOffset() != expectedOffset {
+		t.Errorf("SetWheelScrollLines(-5) should clamp to 1: offset = %d, want %d", v2.ScrollOffset(), expectedOffset)
+	}
+}
+
+func TestViewport_SetWheelScrollLines_LargeValue(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true).SetWheelScrollLines(10)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	// Scroll up by 10 lines
+	msg := tea.MouseMsg{Button: tea.MouseButtonWheelUp}
+	v2, _ := v.Update(msg)
+
+	expectedOffset := 50 - 10
+	if v2.ScrollOffset() != expectedOffset {
+		t.Errorf("After wheel up (10 lines): offset = %d, want %d", v2.ScrollOffset(), expectedOffset)
+	}
+}
+
+func TestViewport_SetWheelScrollLines_BoundsTop(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true).SetWheelScrollLines(5)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(2) // Near top
+
+	// Scroll up by 5 (would go to -3, should clamp to 0)
+	msg := tea.MouseMsg{Button: tea.MouseButtonWheelUp}
+	v2, _ := v.Update(msg)
+
+	if v2.ScrollOffset() != 0 {
+		t.Errorf("Wheel scroll past top: offset = %d, want 0 (clamped)", v2.ScrollOffset())
+	}
+}
+
+func TestViewport_SetWheelScrollLines_BoundsBottom(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true).SetWheelScrollLines(5)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(77) // Near bottom (max is 80)
+
+	// Scroll down by 5 (would go to 82, should clamp to 80)
+	msg := tea.MouseMsg{Button: tea.MouseButtonWheelDown}
+	v2, _ := v.Update(msg)
+
+	maxOffset := 100 - 20 // totalLines - height
+	if v2.ScrollOffset() != maxOffset {
+		t.Errorf("Wheel scroll past bottom: offset = %d, want %d (clamped)", v2.ScrollOffset(), maxOffset)
+	}
+}
+
+func TestViewport_SetWheelScrollLines_SmallContent(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true).SetWheelScrollLines(5)
+	v = v.SetLines([]string{"Line 1", "Line 2", "Line 3"}) // Only 3 lines
+
+	// Try to scroll down (content fits entirely, should stay at 0)
+	msg := tea.MouseMsg{Button: tea.MouseButtonWheelDown}
+	v2, _ := v.Update(msg)
+
+	if v2.ScrollOffset() != 0 {
+		t.Errorf("Wheel scroll with small content: offset = %d, want 0", v2.ScrollOffset())
+	}
+
+	// Try to scroll up (already at top)
+	msg2 := tea.MouseMsg{Button: tea.MouseButtonWheelUp}
+	v3, _ := v2.Update(msg2)
+
+	if v3.ScrollOffset() != 0 {
+		t.Errorf("Wheel scroll up with small content: offset = %d, want 0", v3.ScrollOffset())
+	}
+}
+
+func TestViewport_SetWheelScrollLines_MultipleWheels(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true).SetWheelScrollLines(3)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	// First wheel up
+	v, _ = v.Update(tea.MouseMsg{Button: tea.MouseButtonWheelUp})
+	if v.ScrollOffset() != 47 {
+		t.Errorf("After 1st wheel: offset = %d, want 47", v.ScrollOffset())
+	}
+
+	// Second wheel up
+	v, _ = v.Update(tea.MouseMsg{Button: tea.MouseButtonWheelUp})
+	if v.ScrollOffset() != 44 {
+		t.Errorf("After 2nd wheel: offset = %d, want 44", v.ScrollOffset())
+	}
+
+	// Third wheel up
+	v, _ = v.Update(tea.MouseMsg{Button: tea.MouseButtonWheelUp})
+	if v.ScrollOffset() != 41 {
+		t.Errorf("After 3rd wheel: offset = %d, want 41", v.ScrollOffset())
+	}
+}
+
+func TestViewport_SetWheelScrollLines_Immutability(t *testing.T) {
+	v1 := New(80, 20).MouseEnabled(true)
+	v2 := v1.SetWheelScrollLines(5)
+
+	// Original should still use default (3 lines)
+	v1 = v1.SetLines(make([]string, 100)).SetYOffset(50)
+	v1, _ = v1.Update(tea.MouseMsg{Button: tea.MouseButtonWheelUp})
+
+	// v1 should scroll by 3 (default)
+	if v1.ScrollOffset() != 47 {
+		t.Errorf("Original viewport: offset = %d, want 47 (default 3 lines)", v1.ScrollOffset())
+	}
+
+	// v2 should scroll by 5 (custom)
+	v2 = v2.SetLines(make([]string, 100)).SetYOffset(50)
+	v2, _ = v2.Update(tea.MouseMsg{Button: tea.MouseButtonWheelUp})
+
+	if v2.ScrollOffset() != 45 {
+		t.Errorf("Modified viewport: offset = %d, want 45 (custom 5 lines)", v2.ScrollOffset())
+	}
+}
+
+func TestViewport_SetWheelScrollLines_FluentChaining(t *testing.T) {
+	v := New(80, 20).
+		MouseEnabled(true).
+		SetWheelScrollLines(7).
+		SetLines(make([]string, 100)).
+		SetYOffset(50)
+
+	// Should scroll by 7 lines
+	v, _ = v.Update(tea.MouseMsg{Button: tea.MouseButtonWheelUp})
+
+	expectedOffset := 50 - 7
+	if v.ScrollOffset() != expectedOffset {
+		t.Errorf("Fluent API chaining: offset = %d, want %d", v.ScrollOffset(), expectedOffset)
+	}
+}
+
+func TestViewport_SetWheelScrollLines_PreservedAfterOtherOperations(t *testing.T) {
+	v := New(80, 20).
+		MouseEnabled(true).
+		SetWheelScrollLines(5).
+		SetLines(make([]string, 100))
+
+	// Perform various operations
+	v = v.ScrollToBottom().ScrollToTop().SetYOffset(50)
+
+	// Wheel scroll should still use 5 lines
+	v, _ = v.Update(tea.MouseMsg{Button: tea.MouseButtonWheelUp})
+
+	expectedOffset := 50 - 5
+	if v.ScrollOffset() != expectedOffset {
+		t.Errorf("After operations: offset = %d, want %d (should preserve 5 lines)", v.ScrollOffset(), expectedOffset)
 	}
 }
 
@@ -742,5 +960,447 @@ func TestViewport_Height(t *testing.T) {
 	v2 := v.SetSize(80, 30)
 	if v2.Height() != 30 {
 		t.Errorf("Height() after SetSize = %d, want 30", v2.Height())
+	}
+}
+
+// ============================================================================
+// Drag Scrolling Tests (Week 15 Day 3-4)
+// ============================================================================
+
+func TestViewport_DragScroll_Start(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	// Simulate left mouse button press (start drag)
+	msg := tea.MouseMsg{
+		X:      10,
+		Y:      5,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionPress,
+	}
+	v2, cmd := v.Update(msg)
+
+	if cmd != nil {
+		t.Error("Update should return nil Cmd")
+	}
+
+	// Viewport should remain at same offset after press
+	if v2.ScrollOffset() != 50 {
+		t.Errorf("After drag start: offset = %d, want 50", v2.ScrollOffset())
+	}
+
+	// Drag state should be recorded (internal check via motion behavior)
+	// We'll verify this works by testing motion next
+}
+
+func TestViewport_DragScroll_MotionDown(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	// Start drag at Y=5
+	msg1 := tea.MouseMsg{
+		X:      10,
+		Y:      5,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionPress,
+	}
+	v, _ = v.Update(msg1)
+
+	// Drag down to Y=10 (delta = +5)
+	// Dragging down should scroll content UP (lower offset)
+	msg2 := tea.MouseMsg{
+		X:      10,
+		Y:      10,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionMotion,
+	}
+	v2, cmd := v.Update(msg2)
+
+	if cmd != nil {
+		t.Error("Update should return nil Cmd")
+	}
+
+	// Expected: scroll offset = 50 - 5 = 45
+	expectedOffset := 50 - 5
+	if v2.ScrollOffset() != expectedOffset {
+		t.Errorf("After drag down: offset = %d, want %d", v2.ScrollOffset(), expectedOffset)
+	}
+}
+
+func TestViewport_DragScroll_MotionUp(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	// Start drag at Y=10
+	msg1 := tea.MouseMsg{
+		X:      10,
+		Y:      10,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionPress,
+	}
+	v, _ = v.Update(msg1)
+
+	// Drag up to Y=5 (delta = -5)
+	// Dragging up should scroll content DOWN (higher offset)
+	msg2 := tea.MouseMsg{
+		X:      10,
+		Y:      5,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionMotion,
+	}
+	v2, cmd := v.Update(msg2)
+
+	if cmd != nil {
+		t.Error("Update should return nil Cmd")
+	}
+
+	// Expected: scroll offset = 50 - (-5) = 55
+	expectedOffset := 50 + 5
+	if v2.ScrollOffset() != expectedOffset {
+		t.Errorf("After drag up: offset = %d, want %d", v2.ScrollOffset(), expectedOffset)
+	}
+}
+
+func TestViewport_DragScroll_Release(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	// Start drag at Y=5
+	msg1 := tea.MouseMsg{
+		X:      10,
+		Y:      5,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionPress,
+	}
+	v, _ = v.Update(msg1)
+
+	// Drag down to Y=10
+	msg2 := tea.MouseMsg{
+		X:      10,
+		Y:      10,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionMotion,
+	}
+	v, _ = v.Update(msg2)
+
+	currentOffset := v.ScrollOffset()
+
+	// Release mouse button (end drag)
+	msg3 := tea.MouseMsg{
+		X:      10,
+		Y:      10,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionRelease,
+	}
+	v2, cmd := v.Update(msg3)
+
+	if cmd != nil {
+		t.Error("Update should return nil Cmd")
+	}
+
+	// Offset should remain at last drag position
+	if v2.ScrollOffset() != currentOffset {
+		t.Errorf("After drag release: offset = %d, want %d", v2.ScrollOffset(), currentOffset)
+	}
+
+	// Further motion without drag should NOT affect scroll
+	msg4 := tea.MouseMsg{
+		X:      10,
+		Y:      15,
+		Button: tea.MouseButtonNone,
+		Action: tea.MouseActionMotion,
+	}
+	v3, _ := v2.Update(msg4)
+
+	if v3.ScrollOffset() != currentOffset {
+		t.Error("Motion after drag release should not affect scroll")
+	}
+}
+
+func TestViewport_DragScroll_BoundsTop(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(5)
+
+	// Start drag at Y=10
+	msg1 := tea.MouseMsg{
+		X:      10,
+		Y:      10,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionPress,
+	}
+	v, _ = v.Update(msg1)
+
+	// Drag down by 20 (would result in offset = 5 - 20 = -15)
+	// Should be clamped to 0
+	msg2 := tea.MouseMsg{
+		X:      10,
+		Y:      30,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionMotion,
+	}
+	v2, _ := v.Update(msg2)
+
+	if v2.ScrollOffset() != 0 {
+		t.Errorf("Drag scroll past top: offset = %d, want 0 (clamped)", v2.ScrollOffset())
+	}
+}
+
+func TestViewport_DragScroll_BoundsBottom(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(75) // Near bottom (max is 80)
+
+	// Start drag at Y=10
+	msg1 := tea.MouseMsg{
+		X:      10,
+		Y:      10,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionPress,
+	}
+	v, _ = v.Update(msg1)
+
+	// Drag up by 20 (would result in offset = 75 + 20 = 95)
+	// Should be clamped to 80 (100 lines - 20 visible)
+	msg2 := tea.MouseMsg{
+		X:      10,
+		Y:      -10, // Negative Y (drag up a lot)
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionMotion,
+	}
+	v2, _ := v.Update(msg2)
+
+	maxOffset := 100 - 20 // totalLines - height
+	if v2.ScrollOffset() != maxOffset {
+		t.Errorf("Drag scroll past bottom: offset = %d, want %d (clamped)", v2.ScrollOffset(), maxOffset)
+	}
+}
+
+func TestViewport_DragScroll_SmallContent(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true)
+	v = v.SetLines([]string{"Line 1", "Line 2", "Line 3"}) // Only 3 lines
+
+	// Start drag
+	msg1 := tea.MouseMsg{
+		X:      10,
+		Y:      5,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionPress,
+	}
+	v, _ = v.Update(msg1)
+
+	// Try to drag down
+	msg2 := tea.MouseMsg{
+		X:      10,
+		Y:      10,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionMotion,
+	}
+	v2, _ := v.Update(msg2)
+
+	// Offset should remain 0 (content fits entirely in viewport)
+	if v2.ScrollOffset() != 0 {
+		t.Errorf("Drag scroll with small content: offset = %d, want 0", v2.ScrollOffset())
+	}
+}
+
+func TestViewport_DragScroll_EmptyContent(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true)
+
+	// Start drag
+	msg1 := tea.MouseMsg{
+		X:      10,
+		Y:      5,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionPress,
+	}
+	v, _ = v.Update(msg1)
+
+	// Try to drag
+	msg2 := tea.MouseMsg{
+		X:      10,
+		Y:      10,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionMotion,
+	}
+	v2, _ := v.Update(msg2)
+
+	// Should not panic, offset remains 0
+	if v2.ScrollOffset() != 0 {
+		t.Errorf("Drag scroll with empty content: offset = %d, want 0", v2.ScrollOffset())
+	}
+}
+
+func TestViewport_DragScroll_LargeContent(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true)
+	// Create 10,000 lines
+	lines := make([]string, 10000)
+	for i := range lines {
+		lines[i] = "Line content"
+	}
+	v = v.SetLines(lines)
+	v = v.SetYOffset(5000)
+
+	// Start drag at Y=10
+	msg1 := tea.MouseMsg{
+		X:      10,
+		Y:      10,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionPress,
+	}
+	v, _ = v.Update(msg1)
+
+	// Drag down by 100 cells
+	msg2 := tea.MouseMsg{
+		X:      10,
+		Y:      110,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionMotion,
+	}
+	v2, _ := v.Update(msg2)
+
+	// Expected: offset = 5000 - 100 = 4900
+	expectedOffset := 5000 - 100
+	if v2.ScrollOffset() != expectedOffset {
+		t.Errorf("Drag scroll large content: offset = %d, want %d", v2.ScrollOffset(), expectedOffset)
+	}
+}
+
+func TestViewport_DragScroll_Disabled(t *testing.T) {
+	v := New(80, 20).MouseEnabled(false) // Mouse disabled
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	// Try to start drag
+	msg1 := tea.MouseMsg{
+		X:      10,
+		Y:      5,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionPress,
+	}
+	v, _ = v.Update(msg1)
+
+	// Try to drag
+	msg2 := tea.MouseMsg{
+		X:      10,
+		Y:      10,
+		Button: tea.MouseButtonLeft,
+		Action: tea.MouseActionMotion,
+	}
+	v2, _ := v.Update(msg2)
+
+	// Offset should NOT change (mouse disabled)
+	if v2.ScrollOffset() != 50 {
+		t.Errorf("Drag scroll when disabled: offset = %d, want 50", v2.ScrollOffset())
+	}
+}
+
+func TestViewport_DragScroll_MultipleDrags(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	// First drag: Y=5 → Y=10 (scroll up by 5)
+	v, _ = v.Update(tea.MouseMsg{X: 10, Y: 5, Button: tea.MouseButtonLeft, Action: tea.MouseActionPress})
+	v, _ = v.Update(tea.MouseMsg{X: 10, Y: 10, Button: tea.MouseButtonLeft, Action: tea.MouseActionMotion})
+	v, _ = v.Update(tea.MouseMsg{X: 10, Y: 10, Button: tea.MouseButtonLeft, Action: tea.MouseActionRelease})
+
+	if v.ScrollOffset() != 45 {
+		t.Errorf("After first drag: offset = %d, want 45", v.ScrollOffset())
+	}
+
+	// Second drag: Y=15 → Y=10 (scroll down by 5)
+	v, _ = v.Update(tea.MouseMsg{X: 10, Y: 15, Button: tea.MouseButtonLeft, Action: tea.MouseActionPress})
+	v, _ = v.Update(tea.MouseMsg{X: 10, Y: 10, Button: tea.MouseButtonLeft, Action: tea.MouseActionMotion})
+	v, _ = v.Update(tea.MouseMsg{X: 10, Y: 10, Button: tea.MouseButtonLeft, Action: tea.MouseActionRelease})
+
+	if v.ScrollOffset() != 50 {
+		t.Errorf("After second drag: offset = %d, want 50", v.ScrollOffset())
+	}
+}
+
+func TestViewport_DragScroll_RightButton(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	// Try to drag with right button (should not work, only left button)
+	msg1 := tea.MouseMsg{
+		X:      10,
+		Y:      5,
+		Button: tea.MouseButtonRight,
+		Action: tea.MouseActionPress,
+	}
+	v, _ = v.Update(msg1)
+
+	msg2 := tea.MouseMsg{
+		X:      10,
+		Y:      10,
+		Button: tea.MouseButtonRight,
+		Action: tea.MouseActionMotion,
+	}
+	v2, _ := v.Update(msg2)
+
+	// Offset should NOT change (right button doesn't drag)
+	if v2.ScrollOffset() != 50 {
+		t.Errorf("Drag with right button: offset = %d, want 50", v2.ScrollOffset())
+	}
+}
+
+func TestViewport_DragScroll_MiddleButton(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	// Try to drag with middle button (should not work, only left button)
+	msg1 := tea.MouseMsg{
+		X:      10,
+		Y:      5,
+		Button: tea.MouseButtonMiddle,
+		Action: tea.MouseActionPress,
+	}
+	v, _ = v.Update(msg1)
+
+	msg2 := tea.MouseMsg{
+		X:      10,
+		Y:      10,
+		Button: tea.MouseButtonMiddle,
+		Action: tea.MouseActionMotion,
+	}
+	v2, _ := v.Update(msg2)
+
+	// Offset should NOT change (middle button doesn't drag)
+	if v2.ScrollOffset() != 50 {
+		t.Errorf("Drag with middle button: offset = %d, want 50", v2.ScrollOffset())
+	}
+}
+
+func TestViewport_DragScroll_Immutability(t *testing.T) {
+	v := New(80, 20).MouseEnabled(true)
+	v = v.SetLines(make([]string, 100))
+	v = v.SetYOffset(50)
+
+	originalOffset := v.ScrollOffset()
+
+	// Start drag on original
+	msg1 := tea.MouseMsg{X: 10, Y: 5, Button: tea.MouseButtonLeft, Action: tea.MouseActionPress}
+	v2, _ := v.Update(msg1)
+
+	// Drag on v2
+	msg2 := tea.MouseMsg{X: 10, Y: 10, Button: tea.MouseButtonLeft, Action: tea.MouseActionMotion}
+	v3, _ := v2.Update(msg2)
+
+	// Original should remain unchanged
+	if v.ScrollOffset() != originalOffset {
+		t.Error("Original viewport was mutated by drag operations")
+	}
+
+	// v3 should have changed offset
+	if v3.ScrollOffset() == originalOffset {
+		t.Error("Drag did not create new viewport with updated offset")
 	}
 }
