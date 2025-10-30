@@ -309,10 +309,19 @@ Like GoSh (currently v0.1.0-beta.7 after extensive use), Phoenix follows **cauti
 
 ## 🔮 Future Vision (Post v0.1.0)
 
-### v0.2.0 - Theme System (Q1 2026)
-- Theme system based on real-world usage feedback
-- Pre-built themes (dark, light, colorblind-friendly)
-- Custom theme creation tools
+### v0.2.0 - Theme System & Markdown (Q1 2026)
+- **Theme System**: Based on real-world usage feedback
+  - Pre-built themes (dark, light, colorblind-friendly)
+  - Custom theme creation tools
+- **Markdown Renderer**: Separate optional library
+  - Repository: `github.com/phoenix-tui/markdown`
+  - CommonMark support with goldmark parser
+  - Native Phoenix rendering (using phoenix/style + phoenix/layout)
+  - Headings, lists, code blocks, blockquotes, inline formatting, syntax highlighting
+  - Use cases: GitHub issue viewers, README viewers, help documentation
+  - Inspired by glamour, but Phoenix-native implementation
+  - **Architecture**: Separate library (opt-in dependency) for lean Phoenix core
+  - Installation: `go get github.com/phoenix-tui/markdown`
 
 ### v0.3.0 - Advanced Components (Q2 2026)
 - FileTree component (directory navigation)
