@@ -9,15 +9,29 @@ import (
 // Example demonstrates basic terminal capability detection.
 // This shows how to detect terminal features like color support,
 // ANSI capabilities, and terminal size.
+//
+// Note: This example uses explicit capabilities to ensure consistent
+// output across different environments (local dev, CI, etc.).
+// In real code, use core.AutoDetect() to detect from environment.
 func Example() {
-	// Auto-detect terminal capabilities from environment
-	term := core.AutoDetect()
-	caps := term.Capabilities()
+	// Create terminal with explicit capabilities (CI-safe)
+	caps := core.NewCapabilities(
+		true,                   // ANSI support
+		core.ColorDepth256,     // 256 color support (not true color)
+		true,                   // Mouse support
+		true,                   // Alt screen support
+		true,                   // Cursor control support
+	)
+	term := core.NewTerminalWithCapabilities(caps)
+
+	// Set size for consistent output (immutable API)
+	term = term.WithSize(core.NewSize(80, 24))
 
 	// Check color support
-	fmt.Printf("Color support: %t\n", caps.SupportsColor())
-	fmt.Printf("True color: %t\n", caps.SupportsTrueColor())
-	fmt.Printf("ANSI: %t\n", caps.SupportsANSI())
+	termCaps := term.Capabilities()
+	fmt.Printf("Color support: %t\n", termCaps.SupportsColor())
+	fmt.Printf("True color: %t\n", termCaps.SupportsTrueColor())
+	fmt.Printf("ANSI: %t\n", termCaps.SupportsANSI())
 
 	// Get terminal size
 	size := term.Size()
