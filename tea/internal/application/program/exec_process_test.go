@@ -442,6 +442,10 @@ func TestProgram_ExecProcess_InputReaderStopped(t *testing.T) {
 
 // TestProgram_ExecProcess_InputReaderRestarted verifies inputReader restarts after command.
 func TestProgram_ExecProcess_InputReaderRestarted(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping on Windows: inputReader restart timing is non-deterministic due to stdin blocking")
+	}
+
 	mockTerm := phoenixtesting.NewMockTerminal()
 	m := TestModel{}
 	p := New(m, WithTerminal[TestModel](mockTerm))

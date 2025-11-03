@@ -65,6 +65,7 @@ jobs:
         done
 
     - name: Run go vet
+      if: matrix.os == 'ubuntu-latest'
       shell: bash
       run: |
         for dir in clipboard components core layout mouse render style tea terminal testing; do

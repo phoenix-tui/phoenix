@@ -4,7 +4,7 @@
 [![Release](https://img.shields.io/github/v/release/phoenix-tui/phoenix?include_prereleases)](https://github.com/phoenix-tui/phoenix/releases)
 [![CI](https://github.com/phoenix-tui/phoenix/actions/workflows/test.yml/badge.svg)](https://github.com/phoenix-tui/phoenix/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/phoenix-tui/phoenix)](https://goreportcard.com/report/github.com/phoenix-tui/phoenix)
-[![Coverage](https://img.shields.io/badge/coverage-94.5%25-brightgreen)](https://github.com/phoenix-tui/phoenix)
+[![Coverage](https://img.shields.io/badge/coverage-91.8%25-brightgreen)](https://github.com/phoenix-tui/phoenix)
 [![License](https://img.shields.io/github/license/phoenix-tui/phoenix)](https://github.com/phoenix-tui/phoenix/blob/main/LICENSE)
 [![GoDoc](https://pkg.go.dev/badge/github.com/phoenix-tui/phoenix.svg)](https://pkg.go.dev/github.com/phoenix-tui/phoenix)
 
@@ -12,13 +12,13 @@
 
 > Next-generation Terminal User Interface framework for Go
 
-**Status**: ✅ v0.1.0-beta.4 READY - API Modernization + Quality Improvements
-**Progress**: 85% complete (17/20 weeks) 🎉
+**Status**: ✅ v0.1.0-beta.6 RELEASED - Documentation Sprint + CI Hardening 📚
+**Progress**: 95% complete (19/20 weeks) 🎉
 **Organization**: [github.com/phoenix-tui](https://github.com/phoenix-tui)
 **Go Version**: 1.25+
-**Test Coverage**: **93.5-96.4%** (Excellent across all modules)
+**Test Coverage**: **91.8%** (Excellent across all modules)
 **Performance**: 29,000 FPS (489x faster than 60 FPS target)
-**Latest**: Industry-standard API patterns (Relica-style) + Cross-platform reliability 🚀
+**Latest**: Professional documentation (10,568 lines), CI reliability improvements, Git-Flow best practices 🚀
 
 ## Why Phoenix?
 
@@ -29,6 +29,7 @@ Phoenix rises from the ashes of legacy TUI frameworks, solving critical problems
 - ✅ **DDD Architecture** - Clean, testable, extendable
 - ✅ **Rich Component Library** - Everything you need out of the box
 - ✅ **Public Cursor API** - Full control for shell applications
+- ✅ **Easy Migration from Charm** - [Comprehensive migration guide](docs/user/MIGRATION_GUIDE.md) included
 
 ## Libraries
 
@@ -181,24 +182,11 @@ func main() {
 
 ## Documentation
 
-### Public Documents
+- **[MIGRATION_GUIDE.md](docs/user/MIGRATION_GUIDE.md)** - Migrate from Charm ecosystem (Bubbletea/Lipgloss/Bubbles)
 - **[ROADMAP.md](ROADMAP.md)** - Public roadmap (milestones, progress, dates)
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and changes
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Development guide
-
-### Strategic
-- [Master Plan](docs/dev/MASTER_PLAN.md) - Strategic vision & success metrics
-- [Architecture](docs/dev/ARCHITECTURE.md) - DDD technical design
-- [API Design](docs/dev/API_DESIGN.md) - API principles & examples
-- [Technical Roadmap](docs/dev/ROADMAP.md) - Detailed 20-week plan
-
-### Quality & Readiness
-- **[v0.1.0 Readiness Report](docs/dev/FINAL_V0.1.0_READINESS_REPORT.md)** - 🔴 PRODUCTION READY assessment
-- [Mouse Coverage Report](docs/dev/MOUSE_COVERAGE_REPORT.md) - Comprehensive test coverage analysis
-- [GoSh Readiness](docs/dev/PHOENIX_GOSH_READINESS.md) - Migration readiness status
-
-### Research
-- [Charm Pain Points](docs/dev/research/CHARM_PAIN_POINTS.md) - Why we built Phoenix
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - Development guide
+- **[GoDoc](https://pkg.go.dev/github.com/phoenix-tui/phoenix)** - API reference for all modules
 
 ## Development Status
 
@@ -388,10 +376,7 @@ spinner := progress.NewSpinner(progress.SpinnerDots).
 
 ## Contributing
 
-Phoenix is part of an active development effort. See [docs/dev/](docs/dev/) for:
-- Architecture documentation
-- Development roadmap
-- Contribution guidelines
+Phoenix is part of an active development effort. See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [GoDoc](https://pkg.go.dev/github.com/phoenix-tui/phoenix) for API documentation.
 
 ## License
 
