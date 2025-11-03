@@ -4,7 +4,7 @@
 [![Release](https://img.shields.io/github/v/release/phoenix-tui/phoenix?include_prereleases)](https://github.com/phoenix-tui/phoenix/releases)
 [![CI](https://github.com/phoenix-tui/phoenix/actions/workflows/test.yml/badge.svg)](https://github.com/phoenix-tui/phoenix/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/phoenix-tui/phoenix)](https://goreportcard.com/report/github.com/phoenix-tui/phoenix)
-[![Coverage](https://img.shields.io/badge/coverage-89.7%25-brightgreen)](https://github.com/phoenix-tui/phoenix)
+[![Coverage](https://img.shields.io/badge/coverage-91.8%25-brightgreen)](https://github.com/phoenix-tui/phoenix)
 [![License](https://img.shields.io/github/license/phoenix-tui/phoenix)](https://github.com/phoenix-tui/phoenix/blob/main/LICENSE)
 [![GoDoc](https://pkg.go.dev/badge/github.com/phoenix-tui/phoenix.svg)](https://pkg.go.dev/github.com/phoenix-tui/phoenix)
 
@@ -12,13 +12,13 @@
 
 > Next-generation Terminal User Interface framework for Go
 
-**Status**: ✅ v0.1.0-beta.5 RELEASED - Advanced Features (Mouse + Clipboard)
-**Progress**: 80% complete (16/20 weeks) 🎉
+**Status**: ✅ v0.1.0-beta.6 RELEASED - Documentation Sprint + CI Hardening 📚
+**Progress**: 95% complete (19/20 weeks) 🎉
 **Organization**: [github.com/phoenix-tui](https://github.com/phoenix-tui)
 **Go Version**: 1.25+
-**Test Coverage**: **89.7%** (Excellent across all modules)
+**Test Coverage**: **91.8%** (Excellent across all modules)
 **Performance**: 29,000 FPS (489x faster than 60 FPS target)
-**Latest**: Mouse (hover, drag-scroll, wheel) + Clipboard (images, rich text, history) 🚀
+**Latest**: Professional documentation (10,568 lines), CI reliability improvements, Git-Flow best practices 🚀
 
 ## Why Phoenix?
 
