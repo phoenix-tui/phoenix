@@ -920,8 +920,7 @@ Average component coverage: **94.5%**
 
 - **Development**
   - CONTRIBUTING.md - Development guide (setup, tasks, workflow)
-  - INDEX.md (root) - Quick navigation
-  - docs/dev/INDEX.md - Complete documentation index (Kanban structure)
+  - pkg.go.dev - Complete API documentation
 
 - **Library-Specific**
   - mouse/README.md - Comprehensive mouse library guide (588 lines)
@@ -992,10 +991,11 @@ Phoenix follows semantic versioning with a cautious approach:
 
 ## Links
 
-- **GitHub**: https://github.com/phoenix-tui/phoenix (coming soon)
-- **Documentation**: [docs/dev/INDEX.md](docs/dev/INDEX.md)
-- **Issues**: https://github.com/phoenix-tui/phoenix/issues (coming soon)
-- **Discussions**: https://github.com/phoenix-tui/phoenix/discussions (coming soon)
+- **GitHub**: https://github.com/phoenix-tui/phoenix
+- **Documentation**: https://pkg.go.dev/github.com/phoenix-tui/phoenix
+- **Roadmap**: [ROADMAP.md](ROADMAP.md)
+- **Issues**: https://github.com/phoenix-tui/phoenix/issues
+- **Discussions**: https://github.com/phoenix-tui/phoenix/discussions
 
 ---
 

@@ -9,6 +9,19 @@ import (
 // All methods do nothing and return success. Perfect for tests that don't
 // care about terminal operations but need to avoid nil pointer panics.
 //
+// Zero value: NullTerminal with zero value is valid and fully functional.
+// NewNullTerminal() is a convenience function but zero value works identically.
+//
+//	var n testing.NullTerminal       // Zero value - valid, all methods no-op
+//	n2 := testing.NewNullTerminal()  // Convenience - same behavior
+//
+// Thread-safe: NullTerminal IS safe for concurrent use.
+// All methods are no-ops with no shared state, inherently thread-safe.
+//
+//	// SAFE - concurrent null terminal calls (for testing)
+//	go null.SetCursorPosition(0, 0)
+//	go null.Write("text")  // Both safe, both no-ops
+//
 // Example:
 //
 //	m := &MyModel{

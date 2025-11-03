@@ -1,44 +1,125 @@
-// Package tea Package api provides a simple and elegant way to build terminal user interfaces.
+// Package tea provides Elm Architecture (MVU pattern) event loop for Phoenix TUI framework.
 //
-// Phoenix TEA implements the Elm Architecture (Model-View-Update) pattern:
+// # Overview
 //
-//	Init → Update → View
-//	  ↑       ↓
-//	  └─ Cmd ─┘
+// Package tea implements the Model-View-Update pattern for building interactive terminal UIs:
+//   - Type-safe event loop with Go generics
+//   - Command system for side effects (async operations)
+//   - Keyboard and mouse event handling
+//   - Program lifecycle management (init, update, view, shutdown)
+//   - Composable commands (Batch for parallel, Sequence for sequential)
+//   - Zero external dependencies (pure Phoenix architecture)
 //
-// Example:
+// # Features
 //
-//	type MyModel struct {
+//   - Pure functional Model-Update-View pattern (predictable state management)
+//   - Type-safe models with Go 1.25+ generics (compile-time safety)
+//   - Command system for async operations (network, timers, file I/O)
+//   - Rich event types (KeyMsg, MouseMsg, WindowSizeMsg, custom messages)
+//   - Composable commands (Batch, Sequence, Every for timers)
+//   - Alternate screen support (full-screen TUI mode)
+//   - Raw mode management (character-by-character input)
+//   - High test coverage (domain/service 100%, application 80%, infrastructure 82-98%)
+//
+// # Quick Start
+//
+// Basic counter application:
+//
+//	import "github.com/phoenix-tui/phoenix/tea"
+//
+//	type Model struct {
 //		count int
 //	}
 //
-//	func (m MyModel) Init() tea.Cmd {
+//	func (m Model) Init() tea.Cmd {
 //		return nil
 //	}
 //
-//	func (m MyModel) Update(msg tea.Msg) (tea.Model[MyModel], tea.Cmd) {
+//	func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 //		switch msg := msg.(type) {
 //		case tea.KeyMsg:
 //			if msg.String() == "+" {
 //				m.count++
-//			}
-//			if msg.String() == "q" {
+//			} else if msg.String() == "q" {
 //				return m, tea.Quit
 //			}
 //		}
 //		return m, nil
 //	}
 //
-//	func (m MyModel) View() string {
+//	func (m Model) View() string {
 //		return fmt.Sprintf("Count: %d\nPress + to increment, q to quit", m.count)
 //	}
 //
 //	func main() {
-//		p := tea.New(MyModel{count: 0})
+//		p := tea.New(Model{})
 //		if err := p.Run(); err != nil {
 //			log.Fatal(err)
 //		}
 //	}
+//
+// Async operations with commands:
+//
+//	func LoadData() tea.Cmd {
+//		return func() tea.Msg {
+//			data := fetchFromAPI() // Runs in goroutine
+//			return DataLoadedMsg{Data: data}
+//		}
+//	}
+//
+//	func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
+//		switch msg := msg.(type) {
+//		case tea.KeyMsg:
+//			if msg.String() == "r" {
+//				return m, LoadData() // Trigger async load
+//			}
+//		case DataLoadedMsg:
+//			m.data = msg.Data // Handle result
+//		}
+//		return m, nil
+//	}
+//
+// Timer-based updates:
+//
+//	func (m Model) Init() tea.Cmd {
+//		return tea.Every(time.Second, func(t time.Time) tea.Msg {
+//			return TickMsg{Time: t}
+//		})
+//	}
+//
+// # Architecture
+//
+// Phoenix TEA implements the Elm Architecture pattern:
+//
+//	┌──────────────────────────────────┐
+//	│  Init() → Initial Model + Cmd    │
+//	└──────────────┬───────────────────┘
+//	               ↓
+//	┌──────────────────────────────────┐
+//	│  Event Loop (goroutine-based)    │
+//	├──────────────────────────────────┤
+//	│  1. Wait for Msg (key/mouse/cmd) │
+//	│  2. Update(msg) → new Model + Cmd│
+//	│  3. View() → string              │
+//	│  4. Render to terminal           │
+//	│  5. Execute Cmd (async)          │
+//	└──────────────┬───────────────────┘
+//	               ↓
+//	      (repeat until Quit)
+//
+// DDD structure:
+//   - internal/domain/model    - Model, Message, Command domain logic
+//   - internal/domain/service  - Event processing, input handling
+//   - internal/application     - Program orchestration, lifecycle
+//   - tea.go (this file)       - Public API (wrapper types)
+//
+// # Performance
+//
+// Event loop is optimized for responsiveness:
+//   - Non-blocking event processing (goroutine per command)
+//   - Zero allocations on hot paths (message handling)
+//   - Efficient terminal I/O (buffered rendering)
+//   - Production-ready (100% coverage in critical domain/service layers)
 package tea
 
 import (
@@ -446,6 +527,25 @@ func Sequence(cmds ...Cmd) Cmd {
 }
 
 // Program orchestrates the Elm Architecture event loop.
+//
+// Zero value: Program with zero value has nil internal state and will panic if used.
+// Always use New() to create a valid Program instance.
+//
+//	var p tea.Program[Model]      // Zero value - INVALID, will panic
+//	p2 := tea.New(Model{})        // Correct - use constructor
+//
+// Thread safety: Program is NOT safe for concurrent use.
+// Program manages event loop state and must be used from a single goroutine.
+// Use Send() method to send messages from other goroutines safely.
+//
+//	// UNSAFE - concurrent Program operations
+//	go p.Run()
+//	go p.Stop()  // Race condition!
+//
+//	// SAFE - Send from goroutines, Program runs in main
+//	p := tea.New(model)
+//	go func() { p.Send(MyMsg{}) }()  // Safe - Send is thread-safe
+//	p.Run()  // Event loop in main goroutine
 type Program[T any] struct {
 	p *program2.Program[T]
 }
