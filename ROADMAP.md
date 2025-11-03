@@ -382,10 +382,9 @@ Like GoSh (currently v0.1.0-beta.7 after extensive use), Phoenix follows **cauti
 
 ## 📚 Resources
 
-- **Documentation**: [docs/dev/INDEX.md](docs/dev/INDEX.md) - Complete documentation index
-- **Technical Roadmap**: [docs/dev/ROADMAP.md](docs/dev/ROADMAP.md) - Detailed 20-week plan
-- **Architecture**: [docs/dev/ARCHITECTURE.md](docs/dev/ARCHITECTURE.md) - Technical deep dive
-- **Status Report**: [docs/dev/FINAL_V0.1.0_READINESS_REPORT.md](docs/dev/FINAL_V0.1.0_READINESS_REPORT.md) - Latest status
+- **API Documentation**: [pkg.go.dev/github.com/phoenix-tui/phoenix](https://pkg.go.dev/github.com/phoenix-tui/phoenix)
+- **Changelog**: [CHANGELOG.md](CHANGELOG.md) - Version history and changes
+- **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md) - Development guide
 
 ---
 
@@ -408,9 +407,8 @@ Like GoSh (currently v0.1.0-beta.7 after extensive use), Phoenix follows **cauti
 
 ---
 
-*Last Updated: 2025-10-19*
-*Version: 1.0.0 (public roadmap)*
-*For detailed technical timeline, see [docs/dev/ROADMAP.md](docs/dev/ROADMAP.md)*
+*Last Updated: 2025-11-03*
+*Version: 1.1.0 (public roadmap)*
 
 ---
 

@@ -160,16 +160,8 @@ find_wsl_distro() {
         return 1
     fi
 
-    # Get list of running WSL distros
-    local distros=$(wsl --list --quiet 2>/dev/null | tr -d '\r' | grep -v "^$")
-
-    for distro in $distros; do
-        # Skip docker-desktop (not for development)
-        if [[ "$distro" == *"docker-desktop"* ]]; then
-            continue
-        fi
-
-        # Check if Go is installed in this distro
+    # Try common distros first (no need to parse wsl --list binary output)
+    for distro in "Gentoo" "Ubuntu" "Debian" "Alpine"; do
         if wsl -d "$distro" bash -c "command -v go &> /dev/null" 2>/dev/null; then
             echo "$distro"
             return 0
@@ -209,7 +201,7 @@ for dir in $MODULES; do
         DRIVE_LETTER=$(echo "$CURRENT_DIR" | cut -d: -f1 | tr '[:upper:]' '[:lower:]')
         WSL_BASE="/mnt/$DRIVE_LETTER${CURRENT_DIR#*:}"
         WSL_PATH="$WSL_BASE/$dir"
-        TEST_OUTPUT=$(wsl -d "$WSL_DISTRO" bash -c "cd \"$WSL_PATH\" && GOWORK=off go test $RACE_FLAG ./... 2>&1")
+        TEST_OUTPUT=$(wsl -d "$WSL_DISTRO" bash -c "cd \"$WSL_PATH\" && GOWORK=off go test -race -ldflags '-linkmode=external' ./... 2>&1")
     else
         # Run tests locally (Windows or Linux with GCC)
         TEST_OUTPUT=$(cd $dir && GOWORK=off go test $RACE_FLAG ./... 2>&1)

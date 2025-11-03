@@ -12,7 +12,18 @@ import (
 // All methods are no-ops but record the method name and arguments in the
 // Calls slice. Perfect for tests that need to verify terminal operations.
 //
-// Thread-safe: Can be called from multiple goroutines.
+// Zero value: MockTerminal with zero value is valid and can be used immediately.
+// NewMockTerminal() is preferred for clarity, but zero value works.
+//
+//	var m testing.MockTerminal        // Zero value - valid, empty Calls slice
+//	m2 := testing.NewMockTerminal()   // Recommended - explicit initialization
+//
+// Thread-safe: MockTerminal IS safe for concurrent use.
+// All state modifications are protected by internal mutex.
+//
+//	// SAFE - concurrent mock calls (for testing concurrent scenarios)
+//	go mock.SetCursorPosition(0, 0)
+//	go mock.Write("text")  // Thread-safe recording
 //
 // Example:
 //

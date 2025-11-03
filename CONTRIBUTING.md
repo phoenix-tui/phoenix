@@ -401,27 +401,11 @@ See `.gitignore` for full list.
 
 ## 🤝 Getting Help
 
-- **Documentation**: See [docs/dev/](docs/dev/) for architecture and design docs
+- **API Documentation**: [pkg.go.dev/github.com/phoenix-tui/phoenix](https://pkg.go.dev/github.com/phoenix-tui/phoenix)
+- **Roadmap**: See [ROADMAP.md](ROADMAP.md) for project timeline
 - **Issues**: [GitHub Issues](https://github.com/phoenix-tui/phoenix/issues) (when repo is public)
 - **Discussions**: [GitHub Discussions](https://github.com/phoenix-tui/phoenix/discussions) (when repo is public)
 
 ---
 
-## 📖 Additional Resources
-
-### Strategic Documents
-- [MASTER_PLAN.md](docs/dev/MASTER_PLAN.md) - Strategic vision
-- [ARCHITECTURE.md](docs/dev/ARCHITECTURE.md) - Technical architecture
-- [API_DESIGN.md](docs/dev/API_DESIGN.md) - API principles and examples
-- [ROADMAP.md](docs/dev/ROADMAP.md) - 20-week development timeline
-
-### Quality & Status
-- [FINAL_V0.1.0_READINESS_REPORT.md](docs/dev/FINAL_V0.1.0_READINESS_REPORT.md) - Production readiness (LATEST)
-- [MOUSE_COVERAGE_REPORT.md](docs/dev/MOUSE_COVERAGE_REPORT.md) - Test coverage analysis
-
-### Navigation
-- [INDEX.md](docs/dev/INDEX.md) - Complete documentation index (Kanban structure)
-
----
-
-*Last updated: 2025-10-19 | Status: PRODUCTION READY*
+*Last updated: 2025-11-03 | Status: PRODUCTION READY*
