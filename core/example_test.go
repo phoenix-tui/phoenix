@@ -16,11 +16,11 @@ import (
 func Example() {
 	// Create terminal with explicit capabilities (CI-safe)
 	caps := core.NewCapabilities(
-		true,                   // ANSI support
-		core.ColorDepth256,     // 256 color support (not true color)
-		true,                   // Mouse support
-		true,                   // Alt screen support
-		true,                   // Cursor control support
+		true,               // ANSI support
+		core.ColorDepth256, // 256 color support (not true color)
+		true,               // Mouse support
+		true,               // Alt screen support
+		true,               // Cursor control support
 	)
 	term := core.NewTerminalWithCapabilities(caps)
 
