@@ -739,6 +739,6 @@ After migration:
 ---
 
 *Migration Guide Version: 1.0*
-*Last Updated: 2025-10-19*
+*Last Updated: 2025-11-04*
 *Based on: GoSh production migration experience*
-*Target Phoenix Version: v0.1.0-beta.1+*
+*Target Phoenix Version: v0.1.0-beta.6+*

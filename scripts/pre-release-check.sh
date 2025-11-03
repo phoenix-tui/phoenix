@@ -197,7 +197,8 @@ for dir in $MODULES; do
     if [ $USE_WSL -eq 1 ]; then
         # Run tests in WSL2 (auto-detected distro with Go)
         # Convert Windows path to WSL path (D:\ -> /mnt/d/)
-        CURRENT_DIR=$(pwd)
+        # Use pwd -W to get Windows-style path (works in Git Bash and MSYS2)
+        CURRENT_DIR=$(pwd -W 2>/dev/null || pwd)
         DRIVE_LETTER=$(echo "$CURRENT_DIR" | cut -d: -f1 | tr '[:upper:]' '[:lower:]')
         WSL_BASE="/mnt/$DRIVE_LETTER${CURRENT_DIR#*:}"
         WSL_PATH="$WSL_BASE/$dir"
