@@ -2,7 +2,7 @@
 
 **Target Audience**: Developers encountering issues with Phoenix
 **Based On**: Real-world GoSh migration experience, user reports
-**Last Updated**: 2025-10-19
+**Last Updated**: 2025-11-04 (v0.1.0-beta.6)
 
 ---
 
