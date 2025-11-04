@@ -263,12 +263,40 @@ Build the **#1 Terminal User Interface framework for Go** by solving critical is
 
 Like GoSh (currently v0.1.0-beta.7 after extensive use), Phoenix follows **cautious versioning** - many betas before final release!
 
-**Planned Activities** (Week 20):
-- [ ] Final polish and bug fixes
-- [ ] Migration guide (Charm → Phoenix)
-- [ ] Community engagement (Reddit, HN, Twitter)
-- [ ] Release announcement blog post
-- [ ] pkg.go.dev optimization
+**Planned Activities** (Week 20, 7-day breakdown):
+
+#### Day 1-2: Final Bug Fixes
+- [ ] Review GitHub Issues for critical bugs
+- [ ] Fix any reported issues from beta.6
+- [ ] Address community feedback from announcements
+- [ ] Run full test suite on all platforms
+
+#### Day 3-4: Polish & Optimization
+- [ ] Code review final pass (all modules)
+- [ ] Performance profiling (ensure 29K FPS maintained)
+- [ ] Memory leak check (long-running apps)
+- [ ] Lint cleanup (address non-blocking warnings)
+
+#### Day 5: Migration Guide Completion
+- [ ] Finalize Charm → Phoenix migration guide
+- [ ] Add more real-world examples
+- [ ] Test migration steps with GoSh codebase
+- [ ] Create automated migration tool (stretch goal)
+
+#### Day 6: Release Preparation
+- [ ] Update CHANGELOG.md (v0.1.0 FINAL entry)
+- [ ] Update README.md (remove beta status)
+- [ ] Update ROADMAP.md (100% complete!)
+- [ ] Final documentation review
+
+#### Day 7: v0.1.0 FINAL Launch
+- [ ] Run pre-release-check.sh (all green)
+- [ ] Create release/v0.1.0 branch
+- [ ] Merge to main (--no-ff)
+- [ ] Create 11 tags (v0.1.0)
+- [ ] GitHub Release with announcement
+- [ ] Community posts (Reddit, HN, Twitter)
+- [ ] Celebrate! 🎉
 
 **Launch Criteria**:
 - ✅ 90%+ test coverage (achieved: 91.8%)
@@ -367,25 +395,91 @@ Like GoSh (currently v0.1.0-beta.7 after extensive use), Phoenix follows **cauti
 
 ## 🔮 Future Vision (Post v0.1.0)
 
-### v0.2.0 - Theme System & Markdown (Q1 2026)
-- **Theme System**: Based on real-world usage feedback
-  - Pre-built themes (dark, light, colorblind-friendly)
-  - Custom theme creation tools
-- **Markdown Renderer**: Separate optional library
-  - Repository: `github.com/phoenix-tui/markdown`
-  - CommonMark support with goldmark parser
-  - Native Phoenix rendering (using phoenix/style + phoenix/layout)
-  - Headings, lists, code blocks, blockquotes, inline formatting, syntax highlighting
-  - Use cases: GitHub issue viewers, README viewers, help documentation
-  - Inspired by glamour, but Phoenix-native implementation
-  - **Architecture**: Separate library (opt-in dependency) for lean Phoenix core
-  - Installation: `go get github.com/phoenix-tui/markdown`
+### v0.2.0 - Form Components & Theme System (Q1 2026)
+
+#### Form Components (Inspired by Huh, but Phoenix-native)
+Production-ready form components for CLI/TUI hybrid applications:
+
+- **Select Component** - Dropdown selection
+  - Single choice from list
+  - Keyboard navigation (↑↓, j/k vim-style)
+  - Search/filter support
+  - Customizable styling
+  - Use case: Choose environment (dev/staging/prod)
+
+- **MultiSelect Component** - Multiple choice selection
+  - Checkbox-style selection
+  - Select all/none shortcuts
+  - Visual indicators for selected items
+  - Use case: Select features to enable
+
+- **Confirm Dialog** - Yes/No prompts
+  - Boolean confirmation
+  - Customizable messages
+  - Default value support
+  - Use case: "Are you sure?" prompts
+
+- **Form Helper** - Grouped inputs with validation
+  - Combine multiple inputs
+  - Cross-field validation
+  - Error aggregation
+  - Submit/cancel handling
+  - Use case: User registration, configuration wizards
+
+**Why Phoenix over Huh**:
+- ✅ Perfect Unicode support (Huh uses broken Lipgloss)
+- ✅ 10x faster performance (29K FPS vs ~60 FPS)
+- ✅ DDD architecture (easier to customize)
+- ✅ 90%+ test coverage (production-ready)
+
+**Cobra Integration**:
+- Example: `examples/cobra-cli/` demonstrates CLI+TUI hybrid pattern
+- Documentation: Best practices for scriptable + interactive modes
+- Tutorial: Building production CLI tools with Cobra + Phoenix
+
+#### Theme System
+Based on real-world usage feedback:
+- Pre-built themes (dark, light, colorblind-friendly, high-contrast)
+- Custom theme creation tools
+- Runtime theme switching
+- Per-component theme overrides
+
+#### Markdown Renderer (Separate Library)
+- **Repository**: `github.com/phoenix-tui/markdown`
+- **Parser**: CommonMark support with goldmark
+- **Rendering**: Native Phoenix (phoenix/style + phoenix/layout)
+- **Features**: Headings, lists, code blocks, blockquotes, inline formatting, syntax highlighting
+- **Use cases**: GitHub issue viewers, README viewers, help documentation
+- **Architecture**: Separate optional library (lean Phoenix core)
+- **Installation**: `go get github.com/phoenix-tui/markdown`
 
 ### v0.3.0 - Advanced Components (Q2 2026)
-- FileTree component (directory navigation)
-- Chart components (bar, line, pie)
-- Form validation helpers
-- DatePicker/TimePicker
+- **FileTree Component** - Directory navigation
+  - Hierarchical file/folder display
+  - Expand/collapse folders
+  - File icons by type
+  - Search/filter functionality
+  - Use case: File managers, code browsers
+
+- **Chart Components** - Data visualization
+  - Bar charts (horizontal/vertical)
+  - Line charts (single/multi-series)
+  - Pie charts with labels
+  - Sparklines for inline metrics
+  - Use case: Monitoring dashboards, analytics
+
+- **DatePicker/TimePicker** - Temporal input
+  - Calendar view
+  - Keyboard navigation
+  - Date range selection
+  - Time input with validation
+  - Use case: Scheduling, logging, reporting
+
+- **Autocomplete Component** - Smart text input
+  - Suggestion dropdown
+  - Fuzzy matching
+  - Custom data sources
+  - Use case: Command completion, search
 
 ### v0.4.0 - Performance & Polish (Q3 2026)
 - SIMD optimizations for Unicode
