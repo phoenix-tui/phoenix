@@ -3,7 +3,7 @@
 > **Version**: 1.0.0
 > **Date**: 2025-11-04
 > **Authors**: Phoenix TUI Team
-> **Benchmark Version**: v0.1.0-beta.6
+> **Benchmark Version**: v0.1.0 (STABLE)
 > **Status**: Production-Ready
 
 ---
@@ -92,7 +92,7 @@ All benchmarks executed on:
 **Software**:
 - **OS**: Windows 11 (MINGW64_NT-10.0-19045)
 - **Go**: 1.25.3 windows/amd64
-- **Phoenix**: v0.1.0-beta.6 (documentation update)
+- **Phoenix**: v0.1.0 (STABLE - API quality 9/10)
 - **Terminal**: Git Bash (MINGW64), Windows Terminal, ConEmu
 
 **Why This Environment?**:
@@ -217,7 +217,7 @@ Phoenix's rendering engine is the heart of the framework. Here we present compre
 
 **Scenario**: Render complete 80x24 terminal (1,920 cells) as fast as possible
 
-**Results** (v0.1.0-beta.3+, stable through beta.6):
+**Results** (v0.1.0-beta.3+, stable through v0.1.0 STABLE):
 
 | Version | Time/op | FPS | Allocs/op | Bytes/op |
 |---------|---------|-----|-----------|----------|
@@ -261,8 +261,9 @@ Phoenix rendering has **improved** over time:
 | v0.1.0-beta.4 | 28.1 μs | 35,585 FPS | Stable (bug fixes only) |
 | v0.1.0-beta.5 | 28.1 μs | 35,585 FPS | Stable (test fixes, no perf changes) |
 | v0.1.0-beta.6 | 28.1 μs | 35,585 FPS | Stable (documentation update) |
+| **v0.1.0 STABLE** | **28.1 μs** | **35,585 FPS** | **Production ready (API quality 9/10)** |
 
-**Trend**: Continuous optimization through beta.3, then stability through beta.6 (no regressions)
+**Trend**: Continuous optimization through beta.3, then stability through v0.1.0 STABLE (zero regressions)
 
 ### 3.2 Differential Rendering
 

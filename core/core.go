@@ -282,6 +282,12 @@ func NewCellAuto(content string) Cell {
 
 // RawMode represents raw mode state with original terminal state preservation.
 // This is a low-level API for platform-specific implementations.
+//
+// Zero value: RawMode with zero value has nil internal state and will panic if used.
+// Always use NewRawMode() to create a valid RawMode instance.
+//
+//	var rm core.RawMode           // Zero value - INVALID, will panic
+//	rm2, err := core.NewRawMode(originalState)  // Correct - use constructor
 type RawMode struct {
 	domain *model2.RawMode
 }

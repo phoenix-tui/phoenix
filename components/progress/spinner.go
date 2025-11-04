@@ -12,6 +12,12 @@ import (
 // Spinner is the public API for spinner component.
 // It implements tea.Model and provides animated loading indicators.
 // Uses value semantics for immutable updates.
+//
+// Zero value: Spinner with zero value has invalid internal state and will panic if used.
+// Always use NewSpinner() or NewSpinnerCustom() to create a valid Spinner instance.
+//
+//	var s progress.Spinner           // Zero value - INVALID, will panic
+//	s2 := progress.NewSpinner("dots")  // Correct - use constructor with style
 type Spinner struct {
 	domain model.Spinner // VALUE, not pointer!
 }

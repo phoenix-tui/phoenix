@@ -13,6 +13,12 @@ import (
 // It wraps the domain model and provides a fluent interface for configuration.
 // Implements tea.Model for use in Elm Architecture applications.
 // Uses value semantics for immutable updates.
+//
+// Zero value: Input with zero value has invalid internal state and will panic if used.
+// Always use New() to create a valid Input instance.
+//
+//	var i input.Input           // Zero value - INVALID, will panic
+//	i2 := input.New(20)         // Correct - use constructor with width
 type Input struct {
 	domain      model.TextInput // VALUE, not pointer!
 	keyBindings KeyBindingHandler

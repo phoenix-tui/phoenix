@@ -47,6 +47,12 @@ const (
 
 // List is the public API for the List component.
 // It implements the tea.Model pattern (Init, Update, View).
+//
+// Zero value: List with zero value has nil internal state and will panic if used.
+// Always use New(), NewSingleSelect(), or NewMultiSelect() to create a valid List instance.
+//
+//	var l list.List           // Zero value - INVALID, will panic
+//	l2 := list.New(values, labels, list.SelectionModeSingle)  // Correct - use constructor
 type List struct {
 	domain     *model.List
 	keymap     infrastructure.KeyBindingMap
