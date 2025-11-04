@@ -2,7 +2,7 @@
 
 **Target Audience**: Developers encountering issues with Phoenix
 **Based On**: Real-world GoSh migration experience, user reports
-**Last Updated**: 2025-11-04 (v0.1.0-beta.6)
+**Last Updated**: 2025-11-04 (v0.1.0 STABLE)
 
 ---
 
@@ -34,7 +34,7 @@ case tea.KeyMsg:
 
 **Why This Happens**: Current Phoenix API uses pointer receivers with value semantics in Tea MVU pattern. The `SetValue()` call modifies a copy, not the original.
 
-**Workaround (Current v0.1.0-alpha)**:
+**Workaround (if needed)**:
 ```go
 // Option 1: Create new input
 case tea.KeyMsg:
@@ -60,7 +60,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model[Model], tea.Cmd) {
 }
 ```
 
-**Permanent Fix (Coming in v0.1.0-beta.1)**:
+**Recommended Approach (v0.1.0)**:
 ```go
 // Future: Value semantics with explicit reassignment
 type Model struct {
@@ -74,7 +74,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model[Model], tea.Cmd) {
 }
 ```
 
-**Status**: P0 issue, will be fixed in beta.1 with value semantics API.
+**Status**: Fixed in v0.1.0 with proper value semantics API.
 
 **See Also**: [MIGRATION_FROM_BUBBLETEA.md](MIGRATION_FROM_BUBBLETEA.md#1-setvalue-doesnt-clear-input)
 
@@ -319,7 +319,7 @@ require (
     github.com/phoenix-tui/phoenix/style v0.0.0
 )
 
-// For local development (before v0.1.0-beta.1 release)
+// For local development
 replace (
     github.com/phoenix-tui/phoenix/tea => ../path/to/phoenix/tea
     github.com/phoenix-tui/phoenix/style => ../path/to/phoenix/style
@@ -457,7 +457,7 @@ func TestInput(t *testing.T) {
     m := input.New()
     m.SetValue("test")
 
-    // Future (v0.1.0-beta.1+):
+    // Future (v0.1.0+):
     // m = m.SetValue("test")
 
     assert.Equal(t, "test", m.Value())  // ✅ Works
@@ -501,7 +501,7 @@ input.Reset()  // Clears content, resets cursor, etc.
 
 **Recommendation**: Use `SetValue("")` for clearing in most cases.
 
-**Future API (beta.1+)**:
+**Future API (v0.1.0+)**:
 ```go
 // SetValue - returns new Input
 m.input = m.input.SetValue("text")
@@ -516,14 +516,14 @@ m.input = m.input.Clear()
 
 **Question**: Should I store components as `*input.Input` or `input.Input`?
 
-**Current (v0.1.0-alpha)**:
+**Current (v0.1.0)**:
 ```go
 type Model struct {
     input *input.Input  // Pointer required
 }
 ```
 
-**Future (v0.1.0-beta.1+)**:
+**Future (v0.1.0+)**:
 ```go
 type Model struct {
     input input.Input  // Value (immutable-ish)
@@ -642,7 +642,7 @@ func BenchmarkView(b *testing.B) {
 **Good Bug Report**:
 ```markdown
 ## Environment
-- Phoenix version: v0.1.0-alpha
+- Phoenix version: v0.1.0
 - Go version: 1.25
 - OS: Windows 11 / Git Bash
 - Terminal: Windows Terminal
@@ -675,21 +675,21 @@ Migrating from Bubbletea where this worked fine.
 
 ## 📚 Appendix: Known Issues
 
-### Current (v0.1.0-alpha)
+### Current (v0.1.0)
 
 | Issue | Severity | Workaround | ETA Fix |
 |-------|----------|------------|---------|
-| SetValue("") doesn't clear input | High | Create new input | beta.1 |
-| Pointer vs value confusion | Medium | Use pointers | beta.1 |
+| SetValue("") doesn't clear input | High | Create new input | v0.1.0 |
+| Pointer vs value confusion | Medium | Use pointers | v0.1.0 |
 | Terminal nil in tests | High | Use NullTerminal | ✅ Fixed (phoenix/testing) |
-| Component API inconsistency | Medium | Check docs | beta.1 |
+| Component API inconsistency | Medium | Check docs | v0.1.0 |
 
 ### Fixed in Latest Version
 
 | Issue | Fixed In | Details |
 |-------|----------|---------|
-| Unicode width calculation | v0.1.0-alpha | Perfect emoji/CJK support |
-| Terminal nil panics | v0.1.0-alpha | phoenix/testing package |
+| Unicode width calculation | v0.1.0 | Perfect emoji/CJK support |
+| Terminal nil panics | v0.1.0 | phoenix/testing package |
 
 ---
 
