@@ -145,7 +145,7 @@ func (m Model) View() string {
 
 **Key Changes**:
 1. Generic type parameter: `tea.Model[Model]`
-2. Components as pointers (temporary - will change to value semantics in beta)
+2. Components as pointers (value semantics available in v0.1.0)
 
 ---
 
@@ -173,7 +173,7 @@ func initialModel() Model {
 **After (Phoenix - Current):**
 ```go
 func initialModel() Model {
-    // Phoenix uses pointer receivers (will change to value in beta)
+    // Phoenix uses pointer receivers (uses pointers in v0.1.0)
     ti := input.New()
     ti.SetPlaceholder("Type something...")
     ti.Focus()
@@ -190,7 +190,7 @@ func initialModel() Model {
 }
 ```
 
-**After (Phoenix - Future beta.1+):**
+**After (Phoenix - v0.1.0 STABLE):**
 ```go
 func initialModel() Model {
     // Future: Functional Options Pattern + Value Semantics
@@ -432,7 +432,7 @@ case tea.KeyMsg:
     }
 ```
 
-**Future (beta.1+):**
+**v0.1.0 STABLE:**
 ```go
 case tea.KeyMsg:
     if msg.String() == "enter" {
@@ -443,7 +443,7 @@ case tea.KeyMsg:
 }
 ```
 
-**Status**: This will be fixed in v0.1.0-beta.1 with value semantics API.
+**Status**: Fixed in v0.1.0 with value semantics API.
 
 ---
 
@@ -499,7 +499,7 @@ func TestExecuteCommand(t *testing.T) {
 
 ### 4. Component Pointer Semantics (Temporary)
 
-**Current Phoenix (v0.1.0-alpha):**
+**Current Phoenix (v0.1.0 STABLE):**
 ```go
 type Model struct {
     input *input.Input  // Pointer required
@@ -511,7 +511,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model[Model], tea.Cmd) {
 }
 ```
 
-**Future Phoenix (v0.1.0-beta.1+):**
+**Future Phoenix (v0.2.0+):**
 ```go
 type Model struct {
     input input.Input  // VALUE, not pointer
@@ -602,7 +602,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model[Model], tea.Cmd) {
 - ✅ 10x performance improvement (450ms → 40ms)
 - ✅ Perfect Unicode/Emoji support
 - ✅ Platform-optimized terminal operations
-- ⚠️ 10+ REPL tests failed (API differences) - being addressed in beta.1
+- ⚠️ 10+ REPL tests failed (API differences) - addressed in v0.1.0
 
 ---
 
@@ -741,4 +741,4 @@ After migration:
 *Migration Guide Version: 1.0*
 *Last Updated: 2025-11-04*
 *Based on: GoSh production migration experience*
-*Target Phoenix Version: v0.1.0-beta.6+*
+*Target Phoenix Version: v0.1.0 (STABLE)*

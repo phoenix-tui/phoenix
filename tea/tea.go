@@ -211,6 +211,12 @@ const (
 )
 
 // KeyMsg represents a keyboard event.
+//
+// Zero value: KeyMsg with Type=0, Rune=0, all modifiers false is valid (represents no key).
+// Construct using field literals for specific keys.
+//
+//	var k tea.KeyMsg                   // Zero value - valid, no key
+//	k2 := tea.KeyMsg{Type: tea.KeyEnter}  // Explicit - Enter key
 type KeyMsg struct {
 	Type  KeyType // Type of key pressed
 	Rune  rune    // The actual rune (for KeyRune type)
@@ -265,6 +271,12 @@ const (
 )
 
 // MouseMsg represents a mouse event.
+//
+// Zero value: MouseMsg at (0,0) with no button/action is valid (represents no mouse event).
+// Construct using field literals for specific mouse events.
+//
+//	var m tea.MouseMsg                  // Zero value - valid, no mouse event
+//	m2 := tea.MouseMsg{X: 10, Y: 5, Button: tea.MouseButtonLeft, Action: tea.MouseActionPress}
 type MouseMsg struct {
 	X      int         // Column (0-based)
 	Y      int         // Row (0-based)
@@ -297,6 +309,12 @@ func (m MouseMsg) String() string {
 }
 
 // WindowSizeMsg represents a terminal resize event.
+//
+// Zero value: WindowSizeMsg with Width=0, Height=0 is valid but invalid as a window size.
+// Use IsValid() to check if dimensions are positive.
+//
+//	var w tea.WindowSizeMsg             // Zero value - valid struct, but invalid size
+//	w2 := tea.WindowSizeMsg{Width: 80, Height: 24}  // Explicit - valid size
 type WindowSizeMsg struct {
 	Width  int // Terminal width in columns
 	Height int // Terminal height in rows

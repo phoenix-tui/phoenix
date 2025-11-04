@@ -3,7 +3,7 @@
 > **TL;DR**: Phoenix is a modern, DDD-architected TUI framework for Go that fixes Charm's critical Unicode bugs and delivers 489x better rendering performance (29,000 FPS vs 60 FPS). This guide helps you migrate from Bubbletea/Lipgloss/Bubbles with minimal friction.
 
 **Version**: 1.0.0
-**Target Phoenix Version**: v0.1.0-beta.6+
+**Target Phoenix Version**: v0.1.0 (STABLE)
 **Last Updated**: 2025-11-04
 **Audience**: Go developers using Bubbletea/Lipgloss/Bubbles
 

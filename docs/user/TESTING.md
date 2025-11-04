@@ -847,5 +847,5 @@ func TestDebug_TerminalCalls(t *testing.T) {
 ---
 
 *Testing Guide Version: 1.0*
-*Last Updated: 2025-10-19*
+*Last Updated: 2025-11-04 (v0.1.0 STABLE)*
 *Based on: GoSh test suite (130+ tests) and Phoenix internal testing*
