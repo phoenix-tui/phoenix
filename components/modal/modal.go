@@ -25,6 +25,12 @@ import (
 )
 
 // Button defines a modal action button.
+//
+// Zero value: Button with zero value (empty strings) is valid but not useful.
+// Set all fields explicitly when creating buttons.
+//
+//	var b modal.Button                          // Zero value - valid but useless (empty strings)
+//	b2 := modal.Button{Label: "OK", Key: "y", Action: "confirm"}  // Correct - set all fields
 type Button struct {
 	Label  string // Button text (e.g., "Yes", "No", "OK")
 	Key    string // Keyboard shortcut (e.g., "y", "n")
@@ -33,6 +39,12 @@ type Button struct {
 
 // Modal is the public API for the modal component.
 // It implements tea.Model for integration with Phoenix Tea event loop.
+//
+// Zero value: Modal with zero value has nil internal state and will panic if used.
+// Always use New() or NewWithTitle() to create a valid Modal instance.
+//
+//	var m modal.Modal           // Zero value - INVALID, will panic
+//	m2 := modal.New("content")  // Correct - use constructor
 type Modal struct {
 	domain         *model2.Modal
 	layoutService  *service.LayoutService

@@ -10,6 +10,11 @@ import (
 
 // CursorPos represents a cursor position in the text buffer.
 // This is used for cursor movement validation and observation.
+//
+// Zero value: CursorPos{Row: 0, Col: 0} is valid and represents top-left position.
+//
+//	var pos input.CursorPos           // Zero value - valid, (0,0) position
+//	pos2 := input.CursorPos{Row: 5, Col: 10}  // Explicit position
 type CursorPos struct {
 	Row int // Line number (0-based)
 	Col int // Column number (0-based, rune offset)
@@ -28,6 +33,12 @@ type BoundaryHitHandler func(attemptedPos CursorPos, reason string)
 
 // TextArea is the public API for multiline text editing.
 // This implements the Elm Architecture (Model-View-Update) pattern.
+//
+// Zero value: TextArea with zero value has nil internal state and will panic if used.
+// Always use NewTextArea() to create a valid TextArea instance.
+//
+//	var ta input.TextArea         // Zero value - INVALID, will panic
+//	ta2 := input.NewTextArea()    // Correct - use constructor
 type TextArea struct {
 	model       *model.TextArea
 	keybindings KeybindingMode

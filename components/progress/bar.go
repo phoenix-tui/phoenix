@@ -10,6 +10,12 @@ import (
 // Bar is the public API for progress bar component.
 // It implements tea.Model and provides a fluent interface for configuration.
 // Uses value semantics for immutable updates.
+//
+// Zero value: Bar with zero value has nil service and will panic if used.
+// Always use NewBar() or NewBarWithProgress() to create a valid Bar instance.
+//
+//	var b progress.Bar           // Zero value - INVALID, will panic
+//	b2 := progress.NewBar(50)    // Correct - use constructor with width
 type Bar struct {
 	domain  model.Bar // VALUE, not pointer!
 	service *service.RenderService

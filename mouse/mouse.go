@@ -389,6 +389,12 @@ func (m *Mouse) CalculateMenuPosition(
 }
 
 // ComponentArea represents a component's hover-detection area.
+//
+// Zero value: ComponentArea with zero value (empty ID and zero BoundingBox) is valid but not useful.
+// Set both fields explicitly when defining component areas.
+//
+//	var ca mouse.ComponentArea                 // Zero value - valid but useless
+//	ca2 := mouse.ComponentArea{ID: "button1", Area: mouse.NewBoundingBox(5, 10, 20, 3)}  // Correct
 type ComponentArea struct {
 	// ID is the unique identifier for the component.
 	ID string

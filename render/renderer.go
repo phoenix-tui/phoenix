@@ -318,6 +318,13 @@ func (b *Buffer) Release() {
 }
 
 // Style represents ANSI text styling.
+//
+// Zero value: Style with zero value is valid and represents default terminal style (no attributes).
+// Use StyleDefault() for explicit default, or constructor functions for styled instances.
+//
+//	var s render.Style                 // Zero value - valid, default style
+//	s2 := render.StyleDefault()        // Explicit - same as zero value
+//	s3 := render.StyleFg(255, 0, 0)    // Red foreground
 type Style struct {
 	internal value2.Style
 }

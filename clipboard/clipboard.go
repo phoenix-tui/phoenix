@@ -214,6 +214,12 @@ func (c *Clipboard) IsSSH() bool {
 }
 
 // Builder provides a fluent interface for creating a clipboard instance.
+//
+// Zero value: Builder with zero value is valid and ready to use with default settings.
+// All fields will be initialized by NewBuilder().
+//
+//	var b clipboard.Builder           // Zero value - valid but use NewBuilder()
+//	b2 := clipboard.NewBuilder()      // Correct - use constructor for proper defaults
 type Builder struct {
 	providers     []service.Provider
 	osc52Enabled  bool
@@ -467,6 +473,12 @@ func (c *Clipboard) ConvertRTFToHTML(rtf string) (string, error) {
 }
 
 // HistoryEntry represents a single clipboard history item in the public API.
+//
+// Zero value: HistoryEntry with zero value (empty strings, nil Content, zero time/size) is valid but not useful.
+// Use GetHistory() or GetHistoryEntry() to retrieve properly populated entries.
+//
+//	var he clipboard.HistoryEntry                 // Zero value - valid but useless
+//	he2, _ := clip.GetHistoryEntry("entry-id")    // Correct - retrieve from clipboard history
 type HistoryEntry struct {
 	ID        string
 	Content   []byte
