@@ -523,7 +523,7 @@ type Model struct {
 }
 ```
 
-**Future (v0.1.0+)**:
+**Future (v0.2.0+)**:
 ```go
 type Model struct {
     input input.Input  // Value (immutable-ish)
@@ -694,5 +694,5 @@ Migrating from Bubbletea where this worked fine.
 ---
 
 *Troubleshooting Guide Version: 1.0*
-*Last Updated: 2025-10-19*
+*Last Updated: 2025-11-04 (v0.1.0 STABLE)*
 *Based on: Real-world GoSh migration issues and user reports*
