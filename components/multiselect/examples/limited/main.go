@@ -35,15 +35,20 @@ func main() {
 		{10, "CI/CD", "Automated deployment pipeline"},
 	}
 
-	// Create options with descriptions
-	opts := make([]*multiselect.Opt[Feature], len(features))
-	for i, f := range features {
-		opts[i] = multiselect.Opt[Feature](f.Name, f, f.Desc)
-	}
-
 	m := Model{
 		multi: multiselect.New[Feature]("Select 2-5 features for your project:").
-			Options(opts...).
+			Options(
+				multiselect.Opt(features[0].Name, features[0], features[0].Desc),
+				multiselect.Opt(features[1].Name, features[1], features[1].Desc),
+				multiselect.Opt(features[2].Name, features[2], features[2].Desc),
+				multiselect.Opt(features[3].Name, features[3], features[3].Desc),
+				multiselect.Opt(features[4].Name, features[4], features[4].Desc),
+				multiselect.Opt(features[5].Name, features[5], features[5].Desc),
+				multiselect.Opt(features[6].Name, features[6], features[6].Desc),
+				multiselect.Opt(features[7].Name, features[7], features[7].Desc),
+				multiselect.Opt(features[8].Name, features[8], features[8].Desc),
+				multiselect.Opt(features[9].Name, features[9], features[9].Desc),
+			).
 			WithFilterable(true).
 			WithHeight(8).
 			Min(2). // At least 2 features required
@@ -51,8 +56,8 @@ func main() {
 		done: false,
 	}
 
-	p := tea.NewProgram(m)
-	if _, err := p.Run(); err != nil {
+	p := tea.New(m)
+	if err := p.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
@@ -62,7 +67,7 @@ func (m Model) Init() tea.Cmd {
 	return m.multi.Init()
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	if m.done {
 		return m, tea.Quit()
 	}

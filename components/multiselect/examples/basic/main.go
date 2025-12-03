@@ -33,8 +33,8 @@ func main() {
 		done: false,
 	}
 
-	p := tea.NewProgram(m)
-	if _, err := p.Run(); err != nil {
+	p := tea.New(m)
+	if err := p.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
@@ -44,7 +44,7 @@ func (m Model) Init() tea.Cmd {
 	return m.multi.Init()
 }
 
-func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m Model) Update(msg tea.Msg) (Model, tea.Cmd) {
 	if m.done {
 		return m, tea.Quit()
 	}
