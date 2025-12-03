@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased] - v0.2.0-dev
+## [0.2.0] - 2025-12-03
 
 ### Added
 
@@ -37,11 +37,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Windows stdin**: `WriteConsoleInputW` to unblock blocking `Read()` calls
 - **Multiselect examples**: Updated to Phoenix tea API (was using Bubbletea patterns)
 
-### Remaining for v0.2.0
-- Signals integration (reactive views with hybrid approach - optional)
-- Animation framework
-- Advanced layout features (Grid)
-- Context support (Add `*Context()` methods for async operations)
+### Platform Support
+
+- **Linux**: Full TTY control with ioctl TIOCGPGRP/TIOCSPGRP
+- **macOS**: Full TTY control with ioctl TIOCGPGRP/TIOCSPGRP
+- **Windows**: Console mode control with SetConsoleMode
 
 ---
 
