@@ -6,6 +6,7 @@ import (
 
 	"github.com/phoenix-tui/phoenix/components/viewport/internal/domain/model"
 	"github.com/phoenix-tui/phoenix/components/viewport/internal/infrastructure"
+	"github.com/phoenix-tui/phoenix/style"
 	"github.com/phoenix-tui/phoenix/tea"
 )
 
@@ -19,6 +20,7 @@ type Viewport struct {
 	isDragging   bool
 	dragStartY   int
 	scrollStartY int
+	theme        *style.Theme // Optional theme, defaults to DefaultTheme if nil
 }
 
 // New creates a new Viewport with the given dimensions.
@@ -71,6 +73,7 @@ func (v *Viewport) MouseEnabled(enabled bool) *Viewport {
 		isDragging:     v.isDragging,
 		dragStartY:     v.dragStartY,
 		scrollStartY:   v.scrollStartY,
+		theme:          v.theme,
 	}
 }
 
@@ -88,6 +91,7 @@ func (v *Viewport) SetWheelScrollLines(lines int) *Viewport {
 		isDragging:     v.isDragging,
 		dragStartY:     v.dragStartY,
 		scrollStartY:   v.scrollStartY,
+		theme:          v.theme,
 	}
 }
 
@@ -315,6 +319,7 @@ func (v *Viewport) withDomain(domain *model.Viewport) *Viewport {
 		isDragging:     v.isDragging,
 		dragStartY:     v.dragStartY,
 		scrollStartY:   v.scrollStartY,
+		theme:          v.theme,
 	}
 }
 
@@ -327,5 +332,20 @@ func (v *Viewport) withDragState(isDragging bool, dragStartY, scrollStartY int) 
 		isDragging:     isDragging,
 		dragStartY:     dragStartY,
 		scrollStartY:   scrollStartY,
+		theme:          v.theme,
+	}
+}
+
+// Theme sets the theme for styling the viewport component.
+// If nil is provided, DefaultTheme will be used during rendering.
+func (v *Viewport) Theme(theme *style.Theme) *Viewport {
+	return &Viewport{
+		domain:         v.domain,
+		mouseEnabled:   v.mouseEnabled,
+		linesPerScroll: v.linesPerScroll,
+		isDragging:     v.isDragging,
+		dragStartY:     v.dragStartY,
+		scrollStartY:   v.scrollStartY,
+		theme:          theme,
 	}
 }

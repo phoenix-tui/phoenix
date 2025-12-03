@@ -22,6 +22,7 @@ import (
 type Input struct {
 	domain      model.TextInput // VALUE, not pointer!
 	keyBindings KeyBindingHandler
+	theme       *style.Theme // Optional theme, defaults to DefaultTheme if nil
 }
 
 // KeyBindingHandler handles key messages and returns updated input.
@@ -95,6 +96,15 @@ func (i Input) Width(width int) Input {
 // IMPORTANT: Must reassign: input = input.KeyBindings(handler).
 func (i Input) KeyBindings(handler KeyBindingHandler) Input {
 	i.keyBindings = handler
+	return i
+}
+
+// Theme sets the theme for styling the input component.
+// If nil is provided, DefaultTheme will be used during rendering.
+// Returns new Input for method chaining (value semantics).
+// IMPORTANT: Must reassign: input = input.Theme(theme).
+func (i Input) Theme(theme *style.Theme) Input {
+	i.theme = theme
 	return i
 }
 
@@ -173,11 +183,17 @@ func (i Input) View() string {
 	return i.renderContent()
 }
 
-// renderPlaceholder renders the placeholder text with gray styling.
+// renderPlaceholder renders the placeholder text with theme styling.
 func (i Input) renderPlaceholder() string {
-	// Apply gray foreground color (ANSI color 240 is a nice gray)
-	grayStyle := style.New().Foreground(style.Color256(240))
-	return style.Render(grayStyle, i.domain.Placeholder())
+	// Get theme (use default if not set)
+	theme := i.theme
+	if theme == nil {
+		theme = style.DefaultTheme()
+	}
+
+	// Apply placeholder color from theme
+	placeholderStyle := style.New().Foreground(theme.Typography().PlaceholderColor)
+	return style.Render(placeholderStyle, i.domain.Placeholder())
 }
 
 // renderContent renders the input content with cursor.
@@ -246,7 +262,7 @@ func (i Input) renderContent() string {
 	return visibleContent
 }
 
-// renderCursor renders the cursor at the current position using reverse video.
+// renderCursor renders the cursor at the current position using theme colors.
 // Returns empty string if cursor rendering is disabled (terminal cursor used instead).
 func (i Input) renderCursor(at string) string {
 	// If cursor rendering is disabled, return the character without highlighting.
@@ -255,13 +271,23 @@ func (i Input) renderCursor(at string) string {
 		return at
 	}
 
-	// Render Phoenix's cursor using reverse video (swap foreground/background).
-	if at == "" {
-		// Cursor at end - use reverse video space for better visibility.
-		return "\x1b[7m \x1b[27m"
+	// Get theme (use default if not set)
+	theme := i.theme
+	if theme == nil {
+		theme = style.DefaultTheme()
 	}
-	// Cursor on character - apply reverse video.
-	return "\x1b[7m" + at + "\x1b[27m"
+
+	// Render Phoenix's cursor using theme focus color as background.
+	cursorStyle := style.New().
+		Background(theme.Colors().Focus).
+		Foreground(theme.Colors().Background)
+
+	if at == "" {
+		// Cursor at end - use space with focus background for better visibility.
+		return style.Render(cursorStyle, " ")
+	}
+	// Cursor on character - apply focus background.
+	return style.Render(cursorStyle, at)
 }
 
 // ValidationFunc is a function that validates input content.

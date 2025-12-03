@@ -34,12 +34,15 @@ import (
 	"github.com/phoenix-tui/phoenix/components/select/internal/domain/model"
 	"github.com/phoenix-tui/phoenix/components/select/internal/domain/value"
 	"github.com/phoenix-tui/phoenix/components/select/internal/infrastructure"
+	"github.com/phoenix-tui/phoenix/style"
 	"github.com/phoenix-tui/phoenix/tea"
 )
 
 // Select is the public API for the single-choice selection component.
 // It implements tea.Model for use in Elm Architecture applications.
+//nolint:unused // theme field will be used for View rendering in future iterations
 type Select[T any] struct {
+	theme       *style.Theme  // Optional theme, defaults to DefaultTheme if nil
 	title      string
 	domain     *model.Select[T]
 	keymap     *infrastructure.KeyBindingMap

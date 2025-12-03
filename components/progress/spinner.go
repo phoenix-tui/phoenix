@@ -6,6 +6,7 @@ import (
 
 	"github.com/phoenix-tui/phoenix/components/progress/internal/domain/model"
 	"github.com/phoenix-tui/phoenix/components/progress/internal/infrastructure"
+	"github.com/phoenix-tui/phoenix/style"
 	"github.com/phoenix-tui/phoenix/tea"
 )
 
@@ -20,6 +21,7 @@ import (
 //	s2 := progress.NewSpinner("dots")  // Correct - use constructor with style
 type Spinner struct {
 	domain model.Spinner // VALUE, not pointer!
+	theme  *style.Theme  // Optional theme, defaults to DefaultTheme if nil
 }
 
 // NewSpinner creates a new spinner with the specified pre-defined style.
@@ -48,6 +50,15 @@ func NewSpinnerCustom(_ []string, fps int) *Spinner {
 // IMPORTANT: Must reassign: spinner = spinner.Label("text").
 func (s Spinner) Label(label string) Spinner {
 	s.domain = s.domain.WithLabel(label)
+	return s
+}
+
+// Theme sets the theme for styling the spinner component.
+// If nil is provided, DefaultTheme will be used during rendering.
+// Returns new Spinner for method chaining (value semantics).
+// IMPORTANT: Must reassign: spinner = spinner.Theme(theme).
+func (s Spinner) Theme(theme *style.Theme) Spinner {
+	s.theme = theme
 	return s
 }
 

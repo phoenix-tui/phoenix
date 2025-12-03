@@ -43,12 +43,15 @@ import (
 	"github.com/phoenix-tui/phoenix/components/form/internal/domain/model"
 	"github.com/phoenix-tui/phoenix/components/form/internal/domain/value"
 	"github.com/phoenix-tui/phoenix/components/form/internal/infrastructure"
+	"github.com/phoenix-tui/phoenix/style"
 	"github.com/phoenix-tui/phoenix/tea"
 )
 
 // Form is the public API for the form container component.
 // It implements tea.Model for use in Elm Architecture applications.
+//nolint:unused // theme field will be used for View rendering in future iterations
 type Form struct {
+	theme  *style.Theme  // Optional theme, defaults to DefaultTheme if nil
 	domain     *model.Form
 	keymap     *infrastructure.KeyBindingMap
 	fieldNames map[string]int // Maps field name to index
