@@ -499,11 +499,13 @@ func (p *Program[T]) startInputReader() {
 			// Signal that goroutine has exited
 			close(p.inputReaderDone)
 
-			// Only clear flag if we're still the current generation
+			// Only clear state if we're still the current generation
 			// (prevents race with restart after stop timeout)
 			p.mu.Lock()
 			if p.inputReaderGeneration == generation {
 				p.inputReaderRunning = false
+				p.inputReaderCancel = nil
+				p.inputReaderDone = nil
 			}
 			p.mu.Unlock()
 		}()
