@@ -1,6 +1,7 @@
-//go:build unix || darwin
+//go:build darwin
 
-// Package program provides TTY control for Unix/Linux/macOS platforms.
+// Package program provides TTY control for macOS/darwin platforms.
+// Uses ioctl TIOCGPGRP/TIOCSPGRP for process group control.
 package program
 
 import (
@@ -10,14 +11,13 @@ import (
 	"os/exec"
 	"os/signal"
 	"syscall"
-
-	"golang.org/x/sys/unix"
+	"unsafe"
 )
 
 // TTYOptions configures TTY control behavior for external commands.
 type TTYOptions struct {
 	// TransferForeground controls whether to transfer foreground process group.
-	// Unix/Linux: Uses tcsetpgrp() to make child foreground.
+	// macOS: Uses ioctl TIOCSPGRP to make child foreground.
 	// This enables proper job control (Ctrl+Z in child won't affect parent).
 	TransferForeground bool
 
@@ -26,27 +26,38 @@ type TTYOptions struct {
 	CreateProcessGroup bool
 }
 
-// execWithTTYControl executes a command with full TTY control on Unix platforms.
+// TIOCGPGRP and TIOCSPGRP ioctl constants for macOS
+const (
+	TIOCGPGRP = 0x40047477 // Get process group (darwin)
+	TIOCSPGRP = 0x80047476 // Set process group (darwin)
+)
+
+// tcgetpgrp gets the foreground process group of the terminal.
+func tcgetpgrp(fd int) (int32, error) {
+	var pgrp int32
+	_, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), TIOCGPGRP, uintptr(unsafe.Pointer(&pgrp)))
+	if errno != 0 {
+		return 0, errno
+	}
+	return pgrp, nil
+}
+
+// tcsetpgrp sets the foreground process group of the terminal.
+func tcsetpgrp(fd int, pgrp int32) error {
+	_, _, errno := syscall.Syscall(syscall.SYS_IOCTL, uintptr(fd), TIOCSPGRP, uintptr(unsafe.Pointer(&pgrp)))
+	if errno != 0 {
+		return errno
+	}
+	return nil
+}
+
+// execWithTTYControl executes a command with full TTY control on macOS.
 //
 // This provides Level 2 TTY control with proper foreground process group transfer.
-// Uses tcsetpgrp() to give the child process full terminal control, enabling:
+// Uses ioctl TIOCSPGRP to give the child process full terminal control, enabling:
 //   - Proper job control signals (Ctrl+Z suspends child, not parent)
 //   - Child can use its own signal handlers
 //   - Proper TTY ownership for nested shells
-//
-// Implementation follows the Unix pattern:
-//  1. Suspend TUI (exit raw mode, exit alt screen, show cursor)
-//  2. Get current foreground process group (to restore later)
-//  3. Ignore SIGTTOU (prevent being stopped during tcsetpgrp)
-//  4. Create new process group for child (if requested)
-//  5. Start child process
-//  6. Transfer foreground to child via tcsetpgrp (from parent!)
-//  7. Wait for child to complete
-//  8. Reclaim foreground via tcsetpgrp
-//  9. Resume TUI (restore raw mode, alt screen, restart input)
-//
-// CRITICAL: tcsetpgrp() MUST be called from parent, not child!
-// See: https://github.com/golang/go/issues/37217
 //
 // Returns error if command execution or TTY control fails.
 func (p *Program[T]) execWithTTYControl(cmd *exec.Cmd, opts TTYOptions) error {
@@ -59,7 +70,7 @@ func (p *Program[T]) execWithTTYControl(cmd *exec.Cmd, opts TTYOptions) error {
 	ttyFD := int(os.Stdin.Fd())
 
 	// Get current foreground process group (to restore later)
-	parentPgid, err := unix.Tcgetpgrp(ttyFD)
+	parentPgid, err := tcgetpgrp(ttyFD)
 	if err != nil {
 		// Not a TTY - fall back to simple ExecProcess
 		log.Printf("WARNING: tcgetpgrp failed (not a TTY?): %v - falling back to simple exec", err)
@@ -104,7 +115,7 @@ func (p *Program[T]) execWithTTYControl(cmd *exec.Cmd, opts TTYOptions) error {
 	// STEP 5: Transfer foreground to child (if requested)
 	// CRITICAL: This MUST be called from parent, not child!
 	if opts.TransferForeground {
-		if err := unix.Tcsetpgrp(ttyFD, int32(childPid)); err != nil {
+		if err := tcsetpgrp(ttyFD, int32(childPid)); err != nil {
 			// Failed to transfer - kill child and restore TUI
 			_ = cmd.Process.Kill()
 			if resumeErr := p.Resume(); resumeErr != nil {
@@ -119,7 +130,7 @@ func (p *Program[T]) execWithTTYControl(cmd *exec.Cmd, opts TTYOptions) error {
 
 	// STEP 7: Reclaim foreground (restore parent as foreground)
 	if opts.TransferForeground {
-		if err := unix.Tcsetpgrp(ttyFD, parentPgid); err != nil {
+		if err := tcsetpgrp(ttyFD, parentPgid); err != nil {
 			// Critical error - log but continue with Resume
 			// This can happen if child process group is orphaned
 			log.Printf("WARNING: failed to restore TTY foreground: %v", err)
