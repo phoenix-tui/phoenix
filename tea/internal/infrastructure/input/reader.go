@@ -10,25 +10,60 @@ import (
 )
 
 // Reader reads input from stdin and parses it into messages.
+// Supports cancellation for ExecProcess stdin release.
+//
+// The zero value is not usable; use NewReader.
 type Reader struct {
-	reader *bufio.Reader
-	parser *ansi.Parser
+	reader           *bufio.Reader
+	parser           *ansi.Parser
+	cancelableReader *CancelableReader // For cancellation support
 }
 
-// NewReader creates a new input reader.
+// NewReader creates a new input reader with cancellation support.
+//
+// The reader wraps the provided io.Reader with CancelableReader,
+// allowing Cancel() to immediately unblock any pending Read() calls.
+// This is essential for ExecProcess to cleanly release stdin.
 func NewReader(r io.Reader) *Reader {
+	// Wrap with CancelableReader for cancellation support
+	cancelableReader := NewCancelableReader(r)
+
 	return &Reader{
-		reader: bufio.NewReader(r),
-		parser: ansi.NewParser(),
+		reader:           bufio.NewReader(cancelableReader),
+		parser:           ansi.NewParser(),
+		cancelableReader: cancelableReader,
 	}
 }
 
+// Cancel cancels any pending Read operations.
+// After Cancel(), Read() will return io.EOF.
+//
+// IMPORTANT: Must be called before ExecProcess to release stdin.
+// This ensures the inputReader goroutine fully stops before
+// the child process attempts to read from stdin.
+//
+// Safe to call multiple times.
+func (ir *Reader) Cancel() {
+	if ir.cancelableReader != nil {
+		ir.cancelableReader.Cancel()
+	}
+}
+
+// IsCanceled returns true if the reader has been canceled.
+func (ir *Reader) IsCanceled() bool {
+	if ir.cancelableReader != nil {
+		return ir.cancelableReader.IsCanceled()
+	}
+	return false
+}
+
 // Read reads input and returns a message.
-// Blocks until input is available.
+// Blocks until input is available or Cancel() is called.
 //
 // Returns:
-// - KeyMsg if keyboard input.
-// - error if read fails.
+//   - KeyMsg if keyboard input
+//   - nil, io.EOF if canceled or stream ended
+//   - nil, error if read fails
 //
 // Properly handles UTF-8 multi-byte sequences (Russian, Chinese, emoji, etc.).
 //
