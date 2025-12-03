@@ -2,8 +2,8 @@
 
 > **High-level development roadmap for Phoenix TUI Framework**
 > **Status**: ✅ 100% Complete - v0.1.0 STABLE RELEASE! 🚀
-> **Current Version**: v0.1.0 (Released 2025-11-04)
-> **Updated**: 2025-11-04
+> **Current Version**: v0.1.1 (Released 2025-12-03)
+> **Updated**: 2025-12-03
 
 ---
 
@@ -321,7 +321,7 @@ After 6 beta releases and comprehensive API validation (9/10 quality), Phoenix v
 
 **Actual Time**: < 1 hour (estimated: 10 hours) - API was already excellent!
 
-**Status**: ✅ **v0.1.0 RELEASED** (2025-11-04)
+**Status**: ✅ v0.1.1 STABLE | v0.2.0 in development (TTY Control + Form Components + Theme System complete!)
 
 ---
 
@@ -606,13 +606,13 @@ Based on real-world usage feedback:
 
 ---
 
-**Status**: ✅ **v0.1.0 RELEASED** (91.8% coverage, API quality 9/10, production ready!)
+**Status**: ✅ v0.1.1 STABLE | v0.2.0 in development (TTY Control + Form Components + Theme System complete!)
 **Achievement**: 20 weeks (6 months) - Foundation to stable release 🎉
-**Next**: v0.2.0 (Q1 2026) - Signals integration, form components, theme system
+**Next**: v0.2.0 - Signals integration (remaining), then v0.3.0
 
 ---
 
-*Last Updated: 2025-11-03*
+*Last Updated: 2025-12-03*
 *Version: 1.1.0 (public roadmap)*
 
 ---
@@ -620,3 +620,42 @@ Based on real-world usage feedback:
 **Phoenix TUI Framework** 🔥 - Rising from the ashes of legacy TUI frameworks
 
 *The future of Terminal UI development in Go* 🚀
+
+---
+
+## 🔮 v0.2.0 Development (In Progress)
+
+### Completed Features
+
+| Feature | Status | Commit | Notes |
+|---------|--------|--------|-------|
+| TTY Control Level 1 | ✅ Complete | `ef46c11` | Suspend/Resume API |
+| TTY Control Level 2 | ✅ Complete | `77df297` | tcsetpgrp (Unix) / SetConsoleMode (Windows) |
+| TTY Control Docs | ✅ Complete | `34fe1a6` | User guide for ExecProcess APIs |
+| Windows stdin fix | ✅ Complete | `f3d123b` | WriteConsoleInputW for blocking Read() |
+| Select Component | ✅ Complete | `18383b7` | Fuzzy filtering, generics, 86.9% coverage |
+| Confirm Component | ✅ Complete | `a92875b` | Yes/No/Cancel, safe defaults, 90%+ coverage |
+| MultiSelect Component | ✅ Complete | `aa049e9` | Toggle, select all/none, 92.7% coverage |
+| Form Component | ✅ Complete | `4e946f7` | Validation, Tab navigation, 70.8% coverage |
+| Theme System Core | ✅ Complete | `e2a16da` | 4 presets, ThemeManager, 94.7% coverage |
+| Theme Integration | ✅ Complete | `cd07f56` | All 10 components support Theme API |
+
+### Remaining Work
+
+| Feature | Priority | Estimate | Notes |
+|---------|----------|----------|-------|
+| Signals Integration | P1 | 2w | Reactive state (optional, alongside MVU) |
+| Animation Framework | P2 | 2w | Transitions, keyframes |
+| Grid Layout | P2 | 1w | CSS Grid-like layout |
+| Context Support | P2 | 1w | React-like context for state sharing |
+
+### Key Dates (v0.2.0)
+
+| Date | Milestone | Status |
+|------|-----------|--------|
+| **2025-12-03** | v0.1.1 hotfix release | ✅ Complete |
+| **2025-12-03** | TTY Control System complete | ✅ Complete |
+| **2025-12-03** | Form Components complete | ✅ Complete |
+| **2025-12-03** | Theme System complete | ✅ Complete |
+| **TBD** | v0.2.0 release | 🔄 In Progress |
+

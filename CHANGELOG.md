@@ -7,12 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [Unreleased] - v0.2.0-dev
 
-### Planned for v0.2.0
+### Added
+
+**TTY Control System** (Complete)
+- **Level 1**: `ExecProcess()` for simple commands (vim, less, git)
+- **Level 1+**: `Suspend()` / `Resume()` API for manual control
+- **Level 2**: `ExecProcessWithTTY()` with platform-specific TTY control
+  - Unix: `tcsetpgrp()` for proper job control
+  - Windows: `SetConsoleMode()` for VT processing
+- **Documentation**: Complete TTY Control Guide (`docs/user/TTY_CONTROL_GUIDE.md`)
+
+**Form Components** (Complete - 4 new components)
+- **Select**: Single-choice dropdown with fuzzy filtering, generics support (86.9% coverage)
+- **Confirm**: Yes/No/Cancel dialog with safe defaults, `DefaultNo()` for destructive actions (90%+ coverage)
+- **MultiSelect**: Multi-choice with toggle, select all/none, min/max limits (92.7% coverage)
+- **Form**: Container with validation, Tab navigation, field management (70.8% coverage)
+
+**Theme System** (Complete)
+- **Core**: `Theme` struct with ColorPalette, BorderStyles, SpacingScale, Typography
+- **Presets**: 4 built-in themes (Default, Dark, Light, HighContrast)
+- **ThemeManager**: Thread-safe runtime theme switching
+- **Component Integration**: All 10 components support `Theme()` API
+- **Coverage**: 94.7% in domain model, 100% in application layer
+
+### Fixed
+
+- **Windows stdin**: `WriteConsoleInputW` to unblock blocking `Read()` calls
+- **Multiselect examples**: Updated to Phoenix tea API (was using Bubbletea patterns)
+
+### Remaining for v0.2.0
 - Signals integration (reactive views with hybrid approach - optional)
-- Form components (Select, MultiSelect, Confirm, Form helpers)
-- Theme system with presets
 - Animation framework
 - Advanced layout features (Grid)
 - Context support (Add `*Context()` methods for async operations)

@@ -363,19 +363,20 @@ spinner := progress.NewSpinner(progress.SpinnerDots).
 
 ## What's Next?
 
-### v0.2.0 - Signals Integration & Form Components (Q1 2026)
+### v0.2.0 - Coming Soon!
 
-**Reactive State Management** (Hybrid Approach):
-- Optional signals support (Angular-inspired)
-- Both traditional and reactive patterns supported
-- Fine-grained reactivity for complex UIs
-- Backwards compatible with v0.1.0
+**Already Complete** (on develop branch):
+- ✅ TTY Control System (Level 1, 1+, 2) - Run vim, shells, job control
+- ✅ Form Components: Select, MultiSelect, Confirm, Form
+- ✅ Theme System with 4 presets (Default, Dark, Light, HighContrast)
+- ✅ All 10 components support Theme API
 
-**New Components**:
-- Form system (Select, MultiSelect, Confirm, Form)
-- Advanced components (FileTree, Charts, DatePicker, Autocomplete)
+**Remaining for v0.2.0**:
+- Signals integration (reactive views - optional, hybrid approach)
+- Animation framework
+- Grid layout
 
-**See [ROADMAP.md](ROADMAP.md) for detailed v0.2.0 plans**
+**See [CHANGELOG.md](CHANGELOG.md) for full v0.2.0 progress**
 
 ## Contributing
 
@@ -392,5 +393,5 @@ MIT License - see [LICENSE](LICENSE) file for details
 ---
 
 *Rising from the ashes of legacy TUI frameworks* 🔥
-**v0.1.0 STABLE - PRODUCTION READY!** ⭐
-*API Quality: 9/10 | 91.8% coverage | 29,000 FPS | Zero value docs complete*
+**v0.1.1 STABLE | v0.2.0 in development** ⭐
+*API Quality: 9/10 | 91.8% coverage | 29,000 FPS | Theme System + Form Components ready!*
