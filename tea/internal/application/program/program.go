@@ -474,11 +474,13 @@ func (p *Program[T]) renderView() {
 
 // startInputReader starts reading input in a goroutine.
 // Creates a new goroutine with cancellation support for ExecProcess.
+//
+// CRITICAL (v0.1.1): Always creates a NEW Reader because CancelableReader
+// cannot be reused after Cancel() - it permanently returns EOF.
 func (p *Program[T]) startInputReader() {
-	// Create input reader if not yet created
-	if p.inputReader == nil {
-		p.inputReader = input.NewReader(p.input)
-	}
+	// Always create a new Reader (CancelableReader cannot be reused after Cancel)
+	// This ensures fresh state after ExecProcess
+	p.inputReader = input.NewReader(p.input)
 
 	// Create cancellation context for this inputReader goroutine
 	ctx, cancel := context.WithCancel(context.Background())
@@ -497,11 +499,13 @@ func (p *Program[T]) startInputReader() {
 			// Signal that goroutine has exited
 			close(p.inputReaderDone)
 
-			// Only clear flag if we're still the current generation
+			// Only clear state if we're still the current generation
 			// (prevents race with restart after stop timeout)
 			p.mu.Lock()
 			if p.inputReaderGeneration == generation {
 				p.inputReaderRunning = false
+				p.inputReaderCancel = nil
+				p.inputReaderDone = nil
 			}
 			p.mu.Unlock()
 		}()
@@ -544,11 +548,16 @@ func (p *Program[T]) startInputReader() {
 // Safe to call even if inputReader is not running.
 //
 // This MUST be called before ExecProcess to prevent stdin stealing.
+//
+// CRITICAL FIX (v0.1.1): Now calls inputReader.Cancel() to immediately
+// unblock any pending Read() operations. Without this, the goroutine
+// would remain blocked in Read() causing race conditions with ExecProcess.
 func (p *Program[T]) stopInputReader() {
 	p.mu.Lock()
 	running := p.inputReaderRunning
 	cancel := p.inputReaderCancel
 	done := p.inputReaderDone
+	inputReader := p.inputReader // Capture for Cancel()
 	p.mu.Unlock()
 
 	if !running || cancel == nil {
@@ -556,22 +565,27 @@ func (p *Program[T]) stopInputReader() {
 		return
 	}
 
-	// Signal cancellation
+	// STEP 1: Cancel the reader itself (unblocks Read immediately)
+	// This is the critical fix - without this, Read() blocks forever.
+	if inputReader != nil {
+		inputReader.Cancel()
+	}
+
+	// STEP 2: Signal context cancellation
 	cancel()
 
-	// Wait for goroutine to exit (with timeout)
+	// STEP 3: Wait for goroutine to exit (now guaranteed to succeed quickly)
 	select {
 	case <-done:
 		// Goroutine exited gracefully
-	case <-time.After(500 * time.Millisecond):
-		// Timeout - goroutine may be stuck in Read()
-		// This is acceptable - inputReader.Read() will unblock on next stdin activity
-		// The goroutine will exit when it checks ctx.Done()
+	case <-time.After(100 * time.Millisecond):
+		// Short timeout - should rarely hit with CancelableReader
+		// If we do hit it, inputReader.Cancel() already unblocked Read()
 	}
 
+	// Clean up state
 	// Increment generation to invalidate old goroutine's defer
 	// (prevents race where old goroutine clears flag after restart)
-	// Then ensure flag is cleared for synchronization with restartInputReader
 	p.mu.Lock()
 	p.inputReaderGeneration++ // Invalidate old goroutine
 	p.inputReaderRunning = false
