@@ -49,9 +49,10 @@ import (
 
 // Form is the public API for the form container component.
 // It implements tea.Model for use in Elm Architecture applications.
+//
 //nolint:unused // theme field will be used for View rendering in future iterations
 type Form struct {
-	theme  *style.Theme  // Optional theme, defaults to DefaultTheme if nil
+	theme      *style.Theme // Optional theme, defaults to DefaultTheme if nil
 	domain     *model.Form
 	keymap     *infrastructure.KeyBindingMap
 	fieldNames map[string]int // Maps field name to index

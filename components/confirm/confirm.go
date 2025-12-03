@@ -41,9 +41,10 @@ import (
 
 // Confirm is the public API for the confirmation dialog component.
 // It implements tea.Model for use in Elm Architecture applications.
+//
 //nolint:unused // theme field will be used for View rendering in future iterations
 type Confirm struct {
-	theme  *style.Theme  // Optional theme, defaults to DefaultTheme if nil
+	theme   *style.Theme // Optional theme, defaults to DefaultTheme if nil
 	domain  *model.Confirm
 	keymap  *infrastructure.KeyBindingMap
 	focused bool // Whether this component has input focus

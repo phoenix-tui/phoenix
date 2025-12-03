@@ -1,5 +1,6 @@
-//nolint:gocritic
 // Dangerous action example demonstrates safe defaults for destructive operations.
+//
+//nolint:gocritic
 package main
 
 import (

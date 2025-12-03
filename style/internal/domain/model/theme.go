@@ -113,8 +113,9 @@ type Typography struct {
 }
 
 // NewTheme creates a new Theme with the given name and configuration.
-//nolint:gocritic // BorderStyles passed by value for immutability - struct is small enough.
 // This is the primary constructor - use preset functions for common themes.
+//
+//nolint:gocritic // BorderStyles passed by value for immutability - struct is small enough.
 func NewTheme(
 	name string,
 	colors ColorPalette,
@@ -169,8 +170,9 @@ func (t *Theme) WithColors(colors ColorPalette) *Theme {
 }
 
 // WithBorders returns a new theme with the given border styles.
-//nolint:gocritic // BorderStyles passed by value for immutability - struct is small enough.
 // Enables theme inheritance with border overrides.
+//
+//nolint:gocritic // BorderStyles passed by value for immutability - struct is small enough.
 func (t *Theme) WithBorders(borders BorderStyles) *Theme {
 	return &Theme{
 		name:       t.name,

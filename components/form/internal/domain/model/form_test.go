@@ -206,8 +206,8 @@ func TestValidateAll(t *testing.T) {
 	form := model.New("Test").WithFields([]*value.Field{field1, field2})
 
 	fieldValues := map[string]interface{}{
-		"name":  "",    // Invalid (empty)
-		"email": "ab",  // Invalid (too short)
+		"name":  "",   // Invalid (empty)
+		"email": "ab", // Invalid (too short)
 	}
 
 	newForm := form.ValidateAll(fieldValues)

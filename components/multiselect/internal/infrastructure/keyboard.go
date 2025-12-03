@@ -10,17 +10,17 @@ type Action string
 
 // Keyboard actions for MultiSelect component navigation and selection.
 const (
-	ActionMoveUp      Action = "move_up"        // Move cursor up one position
-	ActionMoveDown    Action = "move_down"      // Move cursor down one position
-	ActionMoveToStart Action = "move_to_start"  // Move cursor to first option
-	ActionMoveToEnd   Action = "move_to_end"    // Move cursor to last option
-	ActionToggle      Action = "toggle"         // Toggle current item selection
-	ActionSelectAll   Action = "select_all"     // Select all filtered items
-	ActionSelectNone  Action = "select_none"    // Deselect all items
-	ActionConfirm     Action = "confirm"        // Confirm selection
-	ActionClearFilter Action = "clear_filter"   // Clear filter query
-	ActionQuit        Action = "quit"           // Quit the application
-	ActionNone        Action = "none"           // No action (unmapped key)
+	ActionMoveUp      Action = "move_up"       // Move cursor up one position
+	ActionMoveDown    Action = "move_down"     // Move cursor down one position
+	ActionMoveToStart Action = "move_to_start" // Move cursor to first option
+	ActionMoveToEnd   Action = "move_to_end"   // Move cursor to last option
+	ActionToggle      Action = "toggle"        // Toggle current item selection
+	ActionSelectAll   Action = "select_all"    // Select all filtered items
+	ActionSelectNone  Action = "select_none"   // Deselect all items
+	ActionConfirm     Action = "confirm"       // Confirm selection
+	ActionClearFilter Action = "clear_filter"  // Clear filter query
+	ActionQuit        Action = "quit"          // Quit the application
+	ActionNone        Action = "none"          // No action (unmapped key)
 )
 
 // KeyBindingMap maps key messages to actions.

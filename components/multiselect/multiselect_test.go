@@ -129,7 +129,7 @@ func TestMultiSelect_WithFilterable(t *testing.T) {
 // 			Opt("B", "b"),
 // 			Opt("C", "c"),
 // 		)
-// 
+//
 // 	tests := []struct {
 // 		name      string
 // 		key       tea.KeyMsg
@@ -140,7 +140,7 @@ func TestMultiSelect_WithFilterable(t *testing.T) {
 // 		{"up arrow", tea.KeyMsg{Type: tea.KeyUp}, 0},
 // 		{"k", tea.KeyMsg{Type: tea.KeyRune, Rune: 'k'}, 0},
 // 	}
-// 
+//
 // 	for _, tt := range tests {
 // 		t.Run(tt.name, func(t *testing.T) {
 // 			newM, _ := m.Update(tt.key)
@@ -242,7 +242,7 @@ func TestMultiSelect_Update_ConfirmBlocked(t *testing.T) {
 // 			Opt("Cherry", "cherry"),
 // 		).
 // 		WithFilterable(true)
-// 
+//
 // 	// Type 'b'
 // 	m, _ = m.Update(tea.KeyMsg{Type: tea.KeyRune, Rune: 'b'})
 // 	if m.domain.FilterQuery() != "b" {
@@ -251,7 +251,7 @@ func TestMultiSelect_Update_ConfirmBlocked(t *testing.T) {
 // 	if m.domain.FilteredCount() != 2 { // Banana
 // 		t.Errorf("FilteredCount() = %d, want 1", m.domain.FilteredCount())
 // 	}
-// 
+//
 // 	// Type 'p' (query="ba")
 // 	m, _ = m.Update(tea.KeyMsg{Type: tea.KeyRune, Rune: 'p'})
 // 	if m.domain.FilterQuery() != "ba" {
@@ -260,13 +260,13 @@ func TestMultiSelect_Update_ConfirmBlocked(t *testing.T) {
 // 	if m.domain.FilteredCount() != 1 { // Apple only
 // 		t.Errorf("FilteredCount() = %d, want 2", m.domain.FilteredCount())
 // 	}
-// 
+//
 // 	// Backspace
 // 	m, _ = m.Update(tea.KeyMsg{Type: tea.KeyBackspace})
 // 	if m.domain.FilterQuery() != "b" {
 // 		t.Errorf("FilterQuery() = %q, want %q", m.domain.FilterQuery(), "b")
 // 	}
-// 
+//
 // 	// Esc to clear
 // 	m, _ = m.Update(tea.KeyMsg{Type: tea.KeyEsc})
 // 	if m.domain.FilterQuery() != "" {
@@ -278,10 +278,10 @@ func TestMultiSelect_Update_ConfirmBlocked(t *testing.T) {
 // 	m := New[string]("Select:").
 // 		Options(Opt("A", "b"), Opt("B", "b")).
 // 		WithFilterable(true)
-// 
+//
 // 	// Press 'b' (bound to select all)
 // 	m, _ = m.Update(tea.KeyMsg{Type: tea.KeyRune, Rune: 'b'})
-// 
+//
 // 	// Should trigger select all, not filter
 // 	if m.SelectionCount() != 2 {
 // 		t.Errorf("SelectionCount() = %d, want 1 (select all)", m.SelectionCount())

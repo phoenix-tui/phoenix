@@ -365,10 +365,10 @@ func (m *MultiSelect[T]) adjustScrollOffset() *MultiSelect[T] {
 func (m *MultiSelect[T]) WithSelectionConstraints(minCount, maxCount int) *MultiSelect[T] {
 	// Get current selection indices
 	currentIndices := m.selection.Indices()
-	
+
 	// Create new selection with new constraints and preserve selections
 	newSelection := value.NewSelection(minCount, maxCount).WithSelected(currentIndices...)
-	
+
 	return &MultiSelect[T]{
 		options:      m.options,
 		cursor:       m.cursor,

@@ -95,9 +95,9 @@ func main() {
 	override := style.NewTheme(
 		"CustomPrimary",
 		style.ColorPalette{Primary: style.RGB(255, 0, 0)}, // Only override primary color
-		style.BorderStyles{},                               // Keep base borders
-		style.SpacingScale{},                               // Keep base spacing
-		style.Typography{},                                 // Keep base typography
+		style.BorderStyles{},                              // Keep base borders
+		style.SpacingScale{},                              // Keep base spacing
+		style.Typography{},                                // Keep base typography
 	)
 	merged := base.Merge(override)
 	fmt.Printf("   Base: %s, Override Primary: Red\n", base.Name())

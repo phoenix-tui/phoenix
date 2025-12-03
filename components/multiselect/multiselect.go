@@ -47,9 +47,10 @@ import (
 
 // MultiSelect is the public API for the multi-choice selection component.
 // It implements tea.Model for use in Elm Architecture applications.
+//
 //nolint:unused // theme field will be used for View rendering in future iterations
 type MultiSelect[T any] struct {
-	theme       *style.Theme  // Optional theme, defaults to DefaultTheme if nil
+	theme      *style.Theme // Optional theme, defaults to DefaultTheme if nil
 	title      string
 	domain     *model.MultiSelect[T]
 	keymap     *infrastructure.KeyBindingMap
@@ -199,6 +200,7 @@ func (m *MultiSelect[T]) Update(msg tea.Msg) (*MultiSelect[T], tea.Cmd) {
 	}
 	return m, nil
 }
+
 //nolint:cyclop // Switch statement for keyboard actions is necessary
 
 // handleKey processes keyboard input.

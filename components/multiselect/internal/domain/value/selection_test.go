@@ -7,12 +7,12 @@ import (
 
 func TestNewSelection(t *testing.T) {
 	tests := []struct {
-		name     string
-		min      int
-		max      int
-		wantMin  int
-		wantMax  int
-		wantLen  int
+		name    string
+		min     int
+		max     int
+		wantMin int
+		wantMax int
+		wantLen int
 	}{
 		{"no constraints", 0, 0, 0, 0, 0},
 		{"min only", 2, 0, 2, 0, 0},
@@ -305,29 +305,29 @@ func TestSelection_Indices(t *testing.T) {
 
 func TestSelection_CanSelect(t *testing.T) {
 	tests := []struct {
-		name    string
-		setup   func() *Selection
-		want    bool
+		name  string
+		setup func() *Selection
+		want  bool
 	}{
 		{
-			name:    "no max constraint",
-			setup:   func() *Selection { return NewSelection(0, 0).WithSelected(1, 2, 3) },
-			want:    true,
+			name:  "no max constraint",
+			setup: func() *Selection { return NewSelection(0, 0).WithSelected(1, 2, 3) },
+			want:  true,
 		},
 		{
-			name:    "max not reached",
-			setup:   func() *Selection { return NewSelection(0, 5).WithSelected(1, 2) },
-			want:    true,
+			name:  "max not reached",
+			setup: func() *Selection { return NewSelection(0, 5).WithSelected(1, 2) },
+			want:  true,
 		},
 		{
-			name:    "max reached",
-			setup:   func() *Selection { return NewSelection(0, 3).WithSelected(1, 2, 3) },
-			want:    false,
+			name:  "max reached",
+			setup: func() *Selection { return NewSelection(0, 3).WithSelected(1, 2, 3) },
+			want:  false,
 		},
 		{
-			name:    "empty with max",
-			setup:   func() *Selection { return NewSelection(0, 5) },
-			want:    true,
+			name:  "empty with max",
+			setup: func() *Selection { return NewSelection(0, 5) },
+			want:  true,
 		},
 	}
 

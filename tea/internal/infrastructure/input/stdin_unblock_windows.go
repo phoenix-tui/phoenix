@@ -32,7 +32,7 @@ type inputRecord struct {
 }
 
 var (
-	kernel32             = windows.NewLazySystemDLL("kernel32.dll")
+	kernel32              = windows.NewLazySystemDLL("kernel32.dll")
 	procWriteConsoleInput = kernel32.NewProc("WriteConsoleInputW")
 )
 
@@ -69,9 +69,9 @@ func UnblockStdinRead() error {
 	// Create a minimal key event (key up, null character)
 	// Using key-up to minimize side effects
 	var keyEvent keyEventRecord
-	keyEvent.KeyDown = 0         // Key up event
+	keyEvent.KeyDown = 0 // Key up event
 	keyEvent.RepeatCount = 1
-	keyEvent.VirtualKeyCode = 0  // VK_NULL - produces no character
+	keyEvent.VirtualKeyCode = 0 // VK_NULL - produces no character
 	keyEvent.VirtualScanCode = 0
 	keyEvent.UnicodeChar = 0
 	keyEvent.ControlKeyState = 0

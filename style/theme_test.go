@@ -108,19 +108,19 @@ func TestThemeManager_Reset_PublicAPI(t *testing.T) {
 
 func TestNewColorPalette(t *testing.T) {
 	palette := NewColorPalette(
-		RGB(255, 0, 0),   // primary
-		RGB(0, 255, 0),   // secondary
-		RGB(0, 0, 0),     // background
-		RGB(10, 10, 10),  // surface
+		RGB(255, 0, 0),     // primary
+		RGB(0, 255, 0),     // secondary
+		RGB(0, 0, 0),       // background
+		RGB(10, 10, 10),    // surface
 		RGB(255, 255, 255), // text
 		RGB(128, 128, 128), // textMuted
-		RGB(255, 0, 0),   // error
-		RGB(255, 255, 0), // warning
-		RGB(0, 255, 0),   // success
-		RGB(0, 0, 255),   // info
+		RGB(255, 0, 0),     // error
+		RGB(255, 255, 0),   // warning
+		RGB(0, 255, 0),     // success
+		RGB(0, 0, 255),     // info
 		RGB(100, 100, 100), // border
-		RGB(0, 255, 255), // focus
-		RGB(80, 80, 80),  // disabled
+		RGB(0, 255, 255),   // focus
+		RGB(80, 80, 80),    // disabled
 	)
 
 	assert.Equal(t, RGB(255, 0, 0), palette.Primary)

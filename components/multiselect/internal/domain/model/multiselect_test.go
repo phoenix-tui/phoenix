@@ -161,7 +161,7 @@ func TestMultiSelect_Toggle(t *testing.T) {
 	}
 
 	// Toggle multiple items
-	m = m.Toggle() // index 0
+	m = m.Toggle()            // index 0
 	m = m.MoveDown().Toggle() // index 1
 	m = m.MoveDown().Toggle() // index 2
 	if m.SelectionCount() != 3 {

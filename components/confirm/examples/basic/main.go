@@ -1,5 +1,6 @@
-//nolint:gocritic
 // Basic example demonstrates simple Yes/No confirmation.
+//
+//nolint:gocritic
 package main
 
 import (
