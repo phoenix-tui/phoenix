@@ -19,6 +19,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.1] - 2025-12-03 (HOTFIX)
+
+### Fixed
+
+**ExecProcess stdin conflict without Alt Screen**
+
+- **NEW**: Added `CancelableReader` wrapper with channel-based cancellation support
+- **FIX**: `ExecProcess()` now properly releases stdin before starting child process
+- **FIX**: Fixed race condition where inputReader goroutine remained blocked in `Read()`
+- **FIX**: Fixed inputReader cleanup to properly nil out cancel/done values on natural exit
+
+This fix resolves critical stdin conflict when running interactive commands (vim, ssh, python)
+without Alt Screen mode. Previously, the inputReader goroutine would block indefinitely,
+causing race conditions with child processes.
+
+**Technical Details**:
+- `CancelableReader` uses background goroutine + channel pattern for interruptible reads
+- `stopInputReader()` now calls `Cancel()` to immediately unblock any pending reads
+- Goroutine defer properly cleans up state when exiting naturally (EOF)
+
+**Reported by**: GoSh Shell Project
+
+---
+
 ## [0.1.0] - 2025-11-04 (FIRST STABLE RELEASE 🚀)
 
 **Status**: ✅ PRODUCTION READY - API Quality 9/10
