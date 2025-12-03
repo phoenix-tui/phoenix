@@ -1,9 +1,9 @@
 # 🗺️ Phoenix TUI Framework - Public Roadmap
 
 > **High-level development roadmap for Phoenix TUI Framework**
-> **Status**: ✅ 100% Complete - v0.1.0 STABLE RELEASE! 🚀
-> **Current Version**: v0.1.0 (Released 2025-11-04)
-> **Updated**: 2025-11-04
+> **Status**: ✅ v0.2.0 RELEASED
+> **Current Version**: v0.2.0 (Released 2025-12-03)
+> **Updated**: 2025-12-03
 
 ---
 
@@ -13,13 +13,13 @@ Build the **#1 Terminal User Interface framework for Go** by solving critical is
 
 - ✅ **Perfect Unicode/Emoji support** (fixes Lipgloss bug)
 - ✅ **10x Performance** (29,000 FPS achieved!)
-- ✅ **Rich Component Library** (6 components ready)
+- ✅ **Rich Component Library** (10 components including Form system)
 - ✅ **Public APIs** (syntax highlighting possible)
-- ✅ **Production Quality** (93.5% test coverage)
+- ✅ **Production Quality** (91.8% test coverage)
 
 ---
 
-## 📊 Current Status (2025-11-04)
+## 📊 Current Status (2025-12-03)
 
 **Overall Progress**: 100% complete (20 weeks / 20 weeks planned) 🎉
 
@@ -37,7 +37,7 @@ Build the **#1 Terminal User Interface framework for Go** by solving critical is
 ✅ API Compliance  ████████████████  100%  (Week 20) ← COMPLETE! 🚀
 ```
 
-**Status**: ✅ **v0.1.0 STABLE RELEASE** - API Quality 9/10, Production Ready!
+**Status**: ✅ **v0.2.0 STABLE RELEASE** - Theme System + Form Components + TTY Control!
 
 ---
 
@@ -321,7 +321,7 @@ After 6 beta releases and comprehensive API validation (9/10 quality), Phoenix v
 
 **Actual Time**: < 1 hour (estimated: 10 hours) - API was already excellent!
 
-**Status**: ✅ **v0.1.0 RELEASED** (2025-11-04)
+**Status**: ✅ **v0.2.0 STABLE** - Theme System + Form Components + TTY Control!
 
 ---
 
@@ -606,13 +606,13 @@ Based on real-world usage feedback:
 
 ---
 
-**Status**: ✅ **v0.1.0 RELEASED** (91.8% coverage, API quality 9/10, production ready!)
+**Status**: ✅ **v0.2.0 STABLE** - Theme System + Form Components + TTY Control!
 **Achievement**: 20 weeks (6 months) - Foundation to stable release 🎉
-**Next**: v0.2.0 (Q1 2026) - Signals integration, form components, theme system
+**Next**: v0.3.0 - Signals integration, Animation framework, Advanced components
 
 ---
 
-*Last Updated: 2025-11-03*
+*Last Updated: 2025-12-03*
 *Version: 1.1.0 (public roadmap)*
 
 ---
@@ -620,3 +620,43 @@ Based on real-world usage feedback:
 **Phoenix TUI Framework** 🔥 - Rising from the ashes of legacy TUI frameworks
 
 *The future of Terminal UI development in Go* 🚀
+
+---
+
+## 🔮 v0.2.0 Development (In Progress)
+
+### Completed Features
+
+| Feature | Status | Commit | Notes |
+|---------|--------|--------|-------|
+| TTY Control Level 1 | ✅ Complete | `ef46c11` | Suspend/Resume API |
+| TTY Control Level 2 | ✅ Complete | `77df297` | tcsetpgrp (Unix) / SetConsoleMode (Windows) |
+| TTY Control Docs | ✅ Complete | `34fe1a6` | User guide for ExecProcess APIs |
+| Windows stdin fix | ✅ Complete | `f3d123b` | WriteConsoleInputW for blocking Read() |
+| Select Component | ✅ Complete | `18383b7` | Fuzzy filtering, generics, 86.9% coverage |
+| Confirm Component | ✅ Complete | `a92875b` | Yes/No/Cancel, safe defaults, 90%+ coverage |
+| MultiSelect Component | ✅ Complete | `aa049e9` | Toggle, select all/none, 92.7% coverage |
+| Form Component | ✅ Complete | `4e946f7` | Validation, Tab navigation, 70.8% coverage |
+| Theme System Core | ✅ Complete | `e2a16da` | 4 presets, ThemeManager, 94.7% coverage |
+| Theme Integration | ✅ Complete | `cd07f56` | All 10 components support Theme API |
+
+### v0.2.0 Release Complete! 🎉
+
+All planned features for v0.2.0 are complete and released.
+
+**Features moved to v0.3.0**:
+- Signals Integration (P1) - Reactive state (optional, alongside MVU)
+- Animation Framework (P2) - Transitions, keyframes
+- Grid Layout (P2) - CSS Grid-like layout
+- Context Support (P2) - React-like context for state sharing
+
+### Key Dates (v0.2.0)
+
+| Date | Milestone | Status |
+|------|-----------|--------|
+| **2025-12-03** | v0.1.1 hotfix release | ✅ Complete |
+| **2025-12-03** | TTY Control System complete | ✅ Complete |
+| **2025-12-03** | Form Components complete | ✅ Complete |
+| **2025-12-03** | Theme System complete | ✅ Complete |
+| **2025-12-03** | **v0.2.0 STABLE RELEASE** 🚀 | ✅ **RELEASED** |
+

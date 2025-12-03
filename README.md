@@ -1,5 +1,9 @@
 # Phoenix TUI Framework
 
+<p align="center">
+  <img src="assets/gh_logo.png" alt="Phoenix TUI Framework" width="600"/>
+</p>
+
 [![Go Version](https://img.shields.io/github/go-mod/go-version/phoenix-tui/phoenix)](https://github.com/phoenix-tui/phoenix)
 [![Release](https://img.shields.io/github/v/release/phoenix-tui/phoenix?include_prereleases)](https://github.com/phoenix-tui/phoenix/releases)
 [![CI](https://github.com/phoenix-tui/phoenix/actions/workflows/test.yml/badge.svg)](https://github.com/phoenix-tui/phoenix/actions)
@@ -12,14 +16,13 @@
 
 > Next-generation Terminal User Interface framework for Go
 
-**Status**: ✅ v0.1.0 RELEASED - PRODUCTION READY 🚀
-**Progress**: 100% complete (20/20 weeks) 🎉
+**Status**: ✅ v0.2.0 RELEASED 🚀
 **Organization**: [github.com/phoenix-tui](https://github.com/phoenix-tui)
 **Go Version**: 1.25+
 **Test Coverage**: **91.8%** (Excellent across all modules)
 **Performance**: 29,000 FPS (489x faster than 60 FPS target)
 **API Quality**: **9/10** (Validated against Go 2025 best practices)
-**Latest**: API compliance validation, zero value documentation, production-ready v0.1.0 STABLE 🚀
+**Latest**: Theme System, Form Components, TTY Control for external processes
 
 ## Why Phoenix?
 
@@ -37,15 +40,13 @@ Phoenix rises from the ashes of legacy TUI frameworks, solving critical problems
 Phoenix is a modular framework with 8 independent libraries:
 
 - **phoenix/core** ✅ - Terminal primitives, Unicode/Emoji support (CORRECT width calculation!)
-- **phoenix/style** ✅ - CSS-like styling (bold, colors, borders, padding)
+- **phoenix/style** ✅ - CSS-like styling + **Theme System** (4 presets, runtime switching)
 - **phoenix/layout** ✅ - Flexbox & grid layout (Box model, responsive sizing)
-- **phoenix/tea** ✅ - Elm Architecture (Model-View-Update, type-safe)
+- **phoenix/tea** ✅ - Elm Architecture + **TTY Control** (run vim, shells, job control)
 - **phoenix/render** ✅ - High-performance differential renderer (29,000 FPS!)
-- **phoenix/components** ✅ - Universal UI components (94.5% avg coverage):
-  - TextArea (multiline editing, 96.4%) **NEW: Advanced cursor control API!**
-  - TextInput (single-line, 90%)
-  - List (94.7%) | Viewport (94.5%) | Table (92%) | Menu | Tabs
-  - Modal (96.5%) | Progress (98.5%)
+- **phoenix/components** ✅ - 10 UI components:
+  - TextArea | TextInput | List | Viewport | Table | Modal | Progress
+  - **NEW in v0.2.0**: Select, MultiSelect, Confirm, Form (with validation)
 - **phoenix/mouse** ✅ - Mouse events (click, scroll, drag-drop, right-click support)
 - **phoenix/clipboard** ✅ - Cross-platform clipboard (OSC 52 for SSH)
 
@@ -361,21 +362,36 @@ spinner := progress.NewSpinner(progress.SpinnerDots).
 
 **Documentation**: See [components/progress/README.md](components/progress/README.md) for full API reference
 
-## What's Next?
+## What's New in v0.2.0
 
-### v0.2.0 - Signals Integration & Form Components (Q1 2026)
+### Released Features
 
-**Reactive State Management** (Hybrid Approach):
-- Optional signals support (Angular-inspired)
-- Both traditional and reactive patterns supported
-- Fine-grained reactivity for complex UIs
-- Backwards compatible with v0.1.0
+**TTY Control System** (Level 1, 1+, 2):
+- Run external processes like vim, nano, shells with full terminal control
+- Suspend/Resume Phoenix TUI while external process runs
+- Job control support (foreground/background process groups)
+- Platform support: Linux, macOS, Windows
 
-**New Components**:
-- Form system (Select, MultiSelect, Confirm, Form)
-- Advanced components (FileTree, Charts, DatePicker, Autocomplete)
+**Form Components**:
+- **Select** - Single-choice dropdown with keyboard navigation
+- **MultiSelect** - Multiple-choice selection with checkboxes
+- **Confirm** - Yes/No prompts with customizable buttons
+- **Form** - Complete form system with validation
 
-**See [ROADMAP.md](ROADMAP.md) for detailed v0.2.0 plans**
+**Theme System**:
+- 4 built-in presets: Default, Dark, Light, HighContrast
+- Runtime theme switching
+- All 10 components support Theme API
+- Custom theme creation
+
+**See [CHANGELOG.md](CHANGELOG.md) for full v0.2.0 details**
+
+### What's Next?
+
+**v0.3.0** (Future):
+- Signals integration (reactive views - optional, hybrid approach)
+- Animation framework
+- Grid layout enhancements
 
 ## Contributing
 
@@ -392,5 +408,5 @@ MIT License - see [LICENSE](LICENSE) file for details
 ---
 
 *Rising from the ashes of legacy TUI frameworks* 🔥
-**v0.1.0 STABLE - PRODUCTION READY!** ⭐
-*API Quality: 9/10 | 91.8% coverage | 29,000 FPS | Zero value docs complete*
+**v0.2.0 STABLE** ⭐
+*API Quality: 9/10 | 91.8% coverage | 29,000 FPS | Theme System + Form Components + TTY Control!*

@@ -21,6 +21,7 @@ import (
 	"github.com/phoenix-tui/phoenix/components/modal/internal/domain/service"
 	"github.com/phoenix-tui/phoenix/components/modal/internal/domain/value"
 	"github.com/phoenix-tui/phoenix/components/modal/internal/infrastructure"
+	"github.com/phoenix-tui/phoenix/style"
 	tea "github.com/phoenix-tui/phoenix/tea"
 )
 
@@ -51,6 +52,7 @@ type Modal struct {
 	keyBindings    infrastructure.KeyBindings
 	terminalWidth  int // Terminal size for rendering
 	terminalHeight int
+	theme          *style.Theme // Optional theme, defaults to DefaultTheme if nil
 }
 
 // New creates a new modal with the given content.
@@ -84,6 +86,7 @@ func (m *Modal) Size(width, height int) *Modal {
 		keyBindings:    m.keyBindings,
 		terminalWidth:  m.terminalWidth,
 		terminalHeight: m.terminalHeight,
+		theme:          m.theme,
 	}
 }
 
@@ -95,6 +98,7 @@ func (m *Modal) Position(x, y int) *Modal {
 		keyBindings:    m.keyBindings,
 		terminalWidth:  m.terminalWidth,
 		terminalHeight: m.terminalHeight,
+		theme:          m.theme,
 	}
 }
 
@@ -106,6 +110,7 @@ func (m *Modal) Centered() *Modal {
 		keyBindings:    m.keyBindings,
 		terminalWidth:  m.terminalWidth,
 		terminalHeight: m.terminalHeight,
+		theme:          m.theme,
 	}
 }
 
@@ -122,6 +127,7 @@ func (m *Modal) Buttons(buttons []Button) *Modal {
 		keyBindings:    m.keyBindings,
 		terminalWidth:  m.terminalWidth,
 		terminalHeight: m.terminalHeight,
+		theme:          m.theme,
 	}
 }
 
@@ -133,6 +139,7 @@ func (m *Modal) DimBackground(dim bool) *Modal {
 		keyBindings:    m.keyBindings,
 		terminalWidth:  m.terminalWidth,
 		terminalHeight: m.terminalHeight,
+		theme:          m.theme,
 	}
 }
 
@@ -144,6 +151,7 @@ func (m *Modal) Show() *Modal {
 		keyBindings:    m.keyBindings,
 		terminalWidth:  m.terminalWidth,
 		terminalHeight: m.terminalHeight,
+		theme:          m.theme,
 	}
 }
 
@@ -155,6 +163,7 @@ func (m *Modal) Hide() *Modal {
 		keyBindings:    m.keyBindings,
 		terminalWidth:  m.terminalWidth,
 		terminalHeight: m.terminalHeight,
+		theme:          m.theme,
 	}
 }
 
@@ -166,6 +175,20 @@ func (m *Modal) KeyBindings(kb infrastructure.KeyBindings) *Modal {
 		keyBindings:    kb,
 		terminalWidth:  m.terminalWidth,
 		terminalHeight: m.terminalHeight,
+		theme:          m.theme,
+	}
+}
+
+// Theme sets the theme for styling the modal component.
+// If nil is provided, DefaultTheme will be used during rendering.
+func (m *Modal) Theme(theme *style.Theme) *Modal {
+	return &Modal{
+		domain:         m.domain,
+		layoutService:  m.layoutService,
+		keyBindings:    m.keyBindings,
+		terminalWidth:  m.terminalWidth,
+		terminalHeight: m.terminalHeight,
+		theme:          theme,
 	}
 }
 
@@ -190,6 +213,7 @@ func (m *Modal) Update(msg tea.Msg) (*Modal, tea.Cmd) {
 			keyBindings:    m.keyBindings,
 			terminalWidth:  msg.Width,
 			terminalHeight: msg.Height,
+			theme:          m.theme,
 		}, nil
 
 	case tea.KeyMsg:
@@ -216,6 +240,7 @@ func (m *Modal) handleKeyPress(msg tea.KeyMsg) (*Modal, tea.Cmd) {
 			keyBindings:    m.keyBindings,
 			terminalWidth:  m.terminalWidth,
 			terminalHeight: m.terminalHeight,
+			theme:          m.theme,
 		}, nil
 	}
 
@@ -226,6 +251,7 @@ func (m *Modal) handleKeyPress(msg tea.KeyMsg) (*Modal, tea.Cmd) {
 			keyBindings:    m.keyBindings,
 			terminalWidth:  m.terminalWidth,
 			terminalHeight: m.terminalHeight,
+			theme:          m.theme,
 		}, nil
 	}
 

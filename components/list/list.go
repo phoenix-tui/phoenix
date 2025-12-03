@@ -32,6 +32,7 @@ import (
 	"github.com/phoenix-tui/phoenix/components/list/internal/domain/model"
 	"github.com/phoenix-tui/phoenix/components/list/internal/domain/value"
 	"github.com/phoenix-tui/phoenix/components/list/internal/infrastructure"
+	"github.com/phoenix-tui/phoenix/style"
 	tea "github.com/phoenix-tui/phoenix/tea"
 )
 
@@ -56,7 +57,8 @@ const (
 type List struct {
 	domain     *model.List
 	keymap     infrastructure.KeyBindingMap
-	showFilter bool // Whether to show filter input at bottom
+	showFilter bool         // Whether to show filter input at bottom
+	theme      *style.Theme // Optional theme, defaults to DefaultTheme if nil
 }
 
 // New creates a new list with the given items and selection mode.
@@ -136,12 +138,21 @@ func (l *List) KeyBindings(bindings []infrastructure.KeyBinding) *List {
 	return newList
 }
 
+// Theme sets the theme for styling the list component.
+// If nil is provided, DefaultTheme will be used during rendering.
+func (l *List) Theme(theme *style.Theme) *List {
+	newList := l.clone()
+	newList.theme = theme
+	return newList
+}
+
 // clone creates a shallow copy of the list for immutability.
 func (l *List) clone() *List {
 	return &List{
 		domain:     l.domain,
 		keymap:     l.keymap,
 		showFilter: l.showFilter,
+		theme:      l.theme,
 	}
 }
 
@@ -239,16 +250,25 @@ func (l *List) handleKey(msg tea.KeyMsg) (*List, tea.Cmd) {
 
 // View implements tea.Model.
 func (l *List) View() string {
+	// Get theme (use default if not set)
+	theme := l.theme
+	if theme == nil {
+		theme = style.DefaultTheme()
+	}
+	colors := theme.Colors()
+
 	var b strings.Builder
 
 	// Render visible items.
 	items := l.domain.RenderVisibleItems()
 	//nolint:nestif // Empty state handling is clear: filtered vs unfiltered with pagination
 	if len(items) == 0 {
+		// Use muted text color for empty state
+		mutedStyle := style.New().Foreground(colors.TextMuted)
 		if l.domain.IsFiltered() {
-			b.WriteString("(no matches)")
+			b.WriteString(style.Render(mutedStyle, "(no matches)"))
 		} else {
-			b.WriteString("(empty list)")
+			b.WriteString(style.Render(mutedStyle, "(empty list)"))
 		}
 	} else {
 		for i, item := range items {
@@ -262,7 +282,9 @@ func (l *List) View() string {
 	// Show filter status if enabled.
 	if l.showFilter && l.domain.IsFiltered() {
 		b.WriteRune('\n')
-		b.WriteString("Filter: (active)")
+		// Use info color for filter status
+		infoStyle := style.New().Foreground(colors.Info)
+		b.WriteString(style.Render(infoStyle, "Filter: (active)"))
 	}
 
 	return b.String()

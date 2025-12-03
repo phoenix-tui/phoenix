@@ -19,6 +19,7 @@ import (
 	"github.com/phoenix-tui/phoenix/components/table/internal/domain/service"
 	value2 "github.com/phoenix-tui/phoenix/components/table/internal/domain/value"
 	"github.com/phoenix-tui/phoenix/components/table/internal/infrastructure"
+	"github.com/phoenix-tui/phoenix/style"
 	tea "github.com/phoenix-tui/phoenix/tea"
 )
 
@@ -41,6 +42,7 @@ type Table struct {
 	domain      *model2.Table
 	sortService *service.SortService
 	keyBindings infrastructure.KeyBindings
+	theme       *style.Theme // Optional theme, defaults to DefaultTheme if nil
 }
 
 // New creates a new table with the given columns.
@@ -87,6 +89,7 @@ func (t *Table) Height(height int) *Table {
 		domain:      t.domain.WithHeight(height),
 		sortService: t.sortService,
 		keyBindings: t.keyBindings,
+		theme:       t.theme,
 	}
 }
 
@@ -96,6 +99,18 @@ func (t *Table) ShowHeader(show bool) *Table {
 		domain:      t.domain.WithShowHeader(show),
 		sortService: t.sortService,
 		keyBindings: t.keyBindings,
+		theme:       t.theme,
+	}
+}
+
+// Theme sets the theme for styling the table component.
+// If nil is provided, DefaultTheme will be used during rendering.
+func (t *Table) Theme(theme *style.Theme) *Table {
+	return &Table{
+		domain:      t.domain,
+		sortService: t.sortService,
+		keyBindings: t.keyBindings,
+		theme:       theme,
 	}
 }
 

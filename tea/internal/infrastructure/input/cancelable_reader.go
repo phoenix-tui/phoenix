@@ -154,10 +154,18 @@ func (cr *CancelableReader) Read(p []byte) (int, error) {
 // Safe to call multiple times.
 //
 // IMPORTANT: Must be called before ExecProcess to release stdin.
+//
+// On Windows, this also injects a fake input event to unblock any
+// goroutine blocked in a Read() syscall on stdin. This is necessary
+// because Go's blocking Read() cannot be interrupted by closing channels.
 func (cr *CancelableReader) Cancel() {
 	cr.doneOnce.Do(func() {
 		cr.canceled.Store(true)
 		close(cr.done)
+
+		// Inject fake input to unblock blocked Read() syscall (Windows-specific)
+		// On other platforms, this is a no-op
+		_ = UnblockStdinRead()
 	})
 }
 

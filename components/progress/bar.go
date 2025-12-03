@@ -4,6 +4,7 @@ package progress
 import (
 	"github.com/phoenix-tui/phoenix/components/progress/internal/domain/model"
 	"github.com/phoenix-tui/phoenix/components/progress/internal/domain/service"
+	"github.com/phoenix-tui/phoenix/style"
 	"github.com/phoenix-tui/phoenix/tea"
 )
 
@@ -19,6 +20,7 @@ import (
 type Bar struct {
 	domain  model.Bar // VALUE, not pointer!
 	service *service.RenderService
+	theme   *style.Theme // Optional theme, defaults to DefaultTheme if nil
 }
 
 // NewBar creates a new progress bar with the specified width.
@@ -96,6 +98,15 @@ func (b Bar) Increment(delta int) Bar {
 // IMPORTANT: Must reassign: bar = bar.Decrement(10).
 func (b Bar) Decrement(delta int) Bar {
 	b.domain = b.domain.Decrement(delta)
+	return b
+}
+
+// Theme sets the theme for styling the progress bar component.
+// If nil is provided, DefaultTheme will be used during rendering.
+// Returns new Bar for method chaining (value semantics).
+// IMPORTANT: Must reassign: bar = bar.Theme(theme).
+func (b Bar) Theme(theme *style.Theme) Bar {
+	b.theme = theme
 	return b
 }
 
