@@ -67,6 +67,17 @@ type Program[T any] struct {
 
 	// Quit channel
 	quitCh chan struct{}
+
+	// Suspend/Resume state (for ExecProcess and public API)
+	suspended    bool            // True if TUI is suspended
+	suspendState *suspendedState // Saved state when suspended
+}
+
+// suspendedState holds terminal state saved during Suspend().
+// Used to restore correct state during Resume().
+type suspendedState struct {
+	wasInRawMode   bool
+	wasInAltScreen bool
 }
 
 // New creates a new Program with the given model.
@@ -611,31 +622,216 @@ func (p *Program[T]) restartInputReader() {
 }
 
 // ┌─────────────────────────────────────────────────────────────────┐.
+// │ Suspend/Resume (Level 1 TTY Control)                            │.
+// └─────────────────────────────────────────────────────────────────┘.
+
+// Suspend temporarily suspends the TUI and restores terminal to normal mode.
+// This is the first step when running interactive external commands.
+//
+// Suspend performs the following in order:
+//  1. Stops the inputReader goroutine (releases stdin)
+//  2. Saves current terminal state (raw mode, alt screen)
+//  3. Exits raw mode (restores cooked mode)
+//  4. Exits alternate screen (if active)
+//  5. Shows cursor
+//
+// After Suspend, the terminal is in a normal state suitable for:
+//   - Running interactive commands (vim, ssh, python REPL)
+//   - User interaction outside the TUI
+//   - Shell commands that expect cooked mode
+//
+// Call Resume() to restore the TUI after the external operation.
+//
+// Example:
+//
+//	func (m Model) Update(msg Msg) (Model, Cmd) {
+//	    switch msg := msg.(type) {
+//	    case RunVimMsg:
+//	        return m, func() Msg {
+//	            p.Suspend()
+//	            cmd := exec.Command("vim", "file.txt")
+//	            err := cmd.Run()
+//	            p.Resume()
+//	            return VimFinishedMsg{Err: err}
+//	        }
+//	    }
+//	    return m, nil
+//	}
+//
+// Returns error if suspension fails (e.g., terminal operation error).
+// Safe to call multiple times - subsequent calls are no-ops.
+func (p *Program[T]) Suspend() error {
+	p.mu.Lock()
+	if p.suspended {
+		p.mu.Unlock()
+		return nil // Already suspended
+	}
+
+	// Validate terminal exists
+	if p.terminal == nil {
+		p.terminal = terminal.New()
+	}
+	p.mu.Unlock()
+
+	// STEP 1: Stop inputReader goroutine (releases stdin)
+	// Must be done outside mutex (stopInputReader uses mutex internally)
+	p.stopInputReader()
+
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	// STEP 2: Save current terminal state
+	state := &suspendedState{
+		wasInRawMode:   p.terminal.IsInRawMode(),
+		wasInAltScreen: p.terminal.IsInAltScreen(),
+	}
+
+	// STEP 3: Exit raw mode (restore cooked mode for external commands)
+	if state.wasInRawMode {
+		if err := p.terminal.ExitRawMode(); err != nil {
+			// Restart inputReader before returning error
+			p.mu.Unlock()
+			p.restartInputReader()
+			p.mu.Lock()
+			return fmt.Errorf("suspend: failed to exit raw mode: %w", err)
+		}
+	}
+
+	// STEP 4: Exit alternate screen (if active)
+	if state.wasInAltScreen {
+		if err := p.terminal.ExitAltScreen(); err != nil {
+			// Restore raw mode before returning error
+			if state.wasInRawMode {
+				_ = p.terminal.EnterRawMode() // Best effort
+			}
+			// Restart inputReader before returning error
+			p.mu.Unlock()
+			p.restartInputReader()
+			p.mu.Lock()
+			return fmt.Errorf("suspend: failed to exit alt screen: %w", err)
+		}
+	}
+
+	// STEP 5: Show cursor (always restore visibility for external commands)
+	if err := p.terminal.ShowCursor(); err != nil {
+		// Non-fatal - continue anyway
+		// Some terminals may not support cursor control
+	}
+
+	// Mark as suspended and save state
+	p.suspended = true
+	p.suspendState = state
+
+	return nil
+}
+
+// Resume restores the TUI after a Suspend.
+// This is the second step after running interactive external commands.
+//
+// Resume performs the following in order:
+//  1. Hides cursor
+//  2. Re-enters alternate screen (if was active before Suspend)
+//  3. Re-enters raw mode (if was active before Suspend)
+//  4. Restarts the inputReader goroutine
+//  5. Forces a full redraw
+//
+// Example:
+//
+//	p.Suspend()
+//	cmd := exec.Command("vim", "file.txt")
+//	cmd.Stdin = os.Stdin
+//	cmd.Stdout = os.Stdout
+//	cmd.Stderr = os.Stderr
+//	err := cmd.Run()
+//	p.Resume() // Restore TUI
+//
+// Returns error if restoration fails (e.g., terminal operation error).
+// Safe to call multiple times - subsequent calls are no-ops.
+// If Resume fails partway, terminal may be in inconsistent state.
+func (p *Program[T]) Resume() error {
+	p.mu.Lock()
+	if !p.suspended {
+		p.mu.Unlock()
+		return nil // Not suspended
+	}
+
+	state := p.suspendState
+	if state == nil {
+		// Should not happen, but be defensive
+		p.suspended = false
+		p.mu.Unlock()
+		return nil
+	}
+	p.mu.Unlock()
+
+	// STEP 1: Hide cursor (restore TUI cursor state)
+	p.mu.Lock()
+	if err := p.terminal.HideCursor(); err != nil {
+		// Non-fatal - continue anyway
+	}
+	p.mu.Unlock()
+
+	// STEP 2: Re-enter alternate screen (if was active before)
+	p.mu.Lock()
+	if state.wasInAltScreen {
+		if err := p.terminal.EnterAltScreen(); err != nil {
+			p.mu.Unlock()
+			return fmt.Errorf("resume: failed to restore alt screen: %w", err)
+		}
+	}
+	p.mu.Unlock()
+
+	// STEP 3: Re-enter raw mode (if was active before)
+	p.mu.Lock()
+	if state.wasInRawMode {
+		if err := p.terminal.EnterRawMode(); err != nil {
+			p.mu.Unlock()
+			return fmt.Errorf("resume: failed to restore raw mode: %w", err)
+		}
+	}
+
+	// Clear suspended state
+	p.suspended = false
+	p.suspendState = nil
+	p.mu.Unlock()
+
+	// STEP 4: Restart inputReader goroutine
+	p.restartInputReader()
+
+	// STEP 5: Force full redraw
+	p.renderView()
+
+	return nil
+}
+
+// IsSuspended returns true if the TUI is currently suspended.
+func (p *Program[T]) IsSuspended() bool {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return p.suspended
+}
+
+// ┌─────────────────────────────────────────────────────────────────┐.
 // │ External Process Execution                                      │.
 // └─────────────────────────────────────────────────────────────────┘.
 
 // ExecProcess executes an external interactive command with full terminal control.
 //
-// The program temporarily:.
-//  1. Stops inputReader goroutine (prevents stdin stealing).
-//  2. Exits raw mode (restores cooked mode for external command).
-//  3. Exits alternate screen buffer (if active).
-//  4. Shows cursor.
-//  5. Gives command full control of stdin/stdout/stderr.
-//  6. Waits for command completion (BLOCKING - call from Cmd goroutine!).
-//  7. Hides cursor.
-//  8. Re-enters alternate screen buffer (if was active).
-//  9. Re-enters raw mode (restores TUI input handling).
+// The program temporarily suspends the TUI (via Suspend) and gives the command
+// full control of stdin/stdout/stderr. After the command completes, the TUI is
+// restored (via Resume).
 //
-// 10. Restarts inputReader goroutine.
-// 11. Forces full TUI refresh.
+// This is essential for running interactive commands like:
+//   - Text editors (vim, nano, emacs)
+//   - Interactive shells (bash, python REPL, claude)
+//   - Pagers (less, more)
+//   - SSH sessions
+//   - Any command requiring TTY control
 //
-// This is essential for running interactive commands like:.
-//   - Text editors (vim, nano, emacs).
-//   - Interactive shells (bash, python REPL, claude).
-//   - Pagers (less, more).
-//   - SSH sessions.
-//   - Any command requiring TTY control.
+// Internally uses Suspend/Resume pattern:
+//  1. Suspend() - stops input, exits raw mode, exits alt screen, shows cursor
+//  2. Run command (BLOCKING)
+//  3. Resume() - restores raw mode, alt screen, restarts input, redraws
 //
 // Example:
 //
@@ -651,130 +847,41 @@ func (p *Program[T]) restartInputReader() {
 //	    return m, nil
 //	}
 //
-// IMPORTANT:.
-//   - Must be called from a Cmd goroutine (NOT from Update directly).
-//   - Blocks until command completes.
-//   - Requires terminal to be set (auto-created in Run or via WithTerminal).
-//   - inputReader is stopped before command and restarted after.
+// IMPORTANT:
+//   - Must be called from a Cmd goroutine (NOT from Update directly)
+//   - Blocks until command completes
+//   - Requires terminal to be set (auto-created in Run or via WithTerminal)
+//   - Uses Suspend/Resume internally for terminal management
 //
 // Returns error if command execution fails.
 func (p *Program[T]) ExecProcess(cmd *exec.Cmd) error {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-
-	// Validate terminal exists.
-	if p.terminal == nil {
-		// Auto-create terminal if not set (fallback for edge cases).
-		p.terminal = terminal.New()
-	}
-
-	// Validate command.
+	// Validate command
 	if cmd == nil {
 		return fmt.Errorf("exec: cmd is nil")
 	}
 
-	// STEP 1: Stop inputReader goroutine (CRITICAL FIX!)
-	// Must release mutex before calling stopInputReader (it needs mutex internally)
-	p.mu.Unlock()
-	p.stopInputReader()
-	p.mu.Lock()
-
-	// STEP 2: Save TUI state.
-	// Remember if we were in raw mode and alt screen.
-	wasInRawMode := p.terminal.IsInRawMode()
-	wasInAltScreen := p.terminal.IsInAltScreen()
-
-	// STEP 3: Exit raw mode (restore cooked mode for external command).
-	// CRITICAL: External commands (vim, ssh, python REPL) expect cooked mode!
-	if wasInRawMode {
-		if err := p.terminal.ExitRawMode(); err != nil {
-			// Restore inputReader before returning error
-			p.mu.Unlock()
-			p.restartInputReader()
-			p.mu.Lock()
-			return fmt.Errorf("exec: failed to exit raw mode: %w", err)
-		}
+	// STEP 1: Suspend TUI (stop input, exit raw mode, exit alt screen, show cursor)
+	if err := p.Suspend(); err != nil {
+		return fmt.Errorf("exec: %w", err)
 	}
 
-	// STEP 4: Exit alternate screen (if active).
-	if wasInAltScreen {
-		if err := p.terminal.ExitAltScreen(); err != nil {
-			// Restore raw mode before returning error
-			if wasInRawMode {
-				_ = p.terminal.EnterRawMode() // Best effort
-			}
-			// Restore inputReader before returning error
-			p.mu.Unlock()
-			p.restartInputReader()
-			p.mu.Lock()
-			return fmt.Errorf("exec: failed to exit alt screen: %w", err)
-		}
-	}
-
-	// STEP 5: Show cursor (always restore visibility).
-	if err := p.terminal.ShowCursor(); err != nil {
-		// Non-fatal - continue anyway.
-		// Some terminals may not support cursor control.
-	}
-
-	// STEP 6: Setup command I/O - give it full terminal control.
+	// STEP 2: Setup command I/O - give it full terminal control
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	// STEP 7: Run command (BLOCKING).
-	// Release mutex while command runs (may take long time)
-	p.mu.Unlock()
+	// STEP 3: Run command (BLOCKING)
 	cmdErr := cmd.Run()
-	p.mu.Lock()
 
-	// STEP 8: ALWAYS restore TUI state (even if command failed).
-	// Hide cursor first (restore TUI cursor state).
-	if err := p.terminal.HideCursor(); err != nil {
-		// Non-fatal - continue anyway.
-	}
-
-	// STEP 9: Re-enter alternate screen (if we were in it before).
-	if wasInAltScreen {
-		if err := p.terminal.EnterAltScreen(); err != nil {
-			// CRITICAL: TUI state corrupted.
-			// Still restart inputReader before returning
-			p.mu.Unlock()
-			p.restartInputReader()
-			p.mu.Lock()
-			if cmdErr != nil {
-				return fmt.Errorf("exec: command failed (%v) and failed to restore alt screen: %w", cmdErr, err)
-			}
-			return fmt.Errorf("exec: failed to restore alt screen: %w", err)
+	// STEP 4: Resume TUI (restore raw mode, alt screen, restart input, redraw)
+	// ALWAYS resume, even if command failed
+	if err := p.Resume(); err != nil {
+		if cmdErr != nil {
+			return fmt.Errorf("exec: command failed (%v) and %w", cmdErr, err)
 		}
+		return fmt.Errorf("exec: %w", err)
 	}
 
-	// STEP 10: Re-enter raw mode (restore TUI input mode).
-	// CRITICAL: Must restore raw mode for TUI to receive character input!
-	if wasInRawMode {
-		if err := p.terminal.EnterRawMode(); err != nil {
-			// CRITICAL: TUI can't receive input without raw mode.
-			// Restore inputReader before returning
-			p.mu.Unlock()
-			p.restartInputReader()
-			p.mu.Lock()
-			if cmdErr != nil {
-				return fmt.Errorf("exec: command failed (%v) and failed to re-enter raw mode: %w", cmdErr, err)
-			}
-			return fmt.Errorf("exec: failed to re-enter raw mode: %w", err)
-		}
-	}
-
-	// STEP 11: Restart inputReader goroutine (CRITICAL FIX!)
-	// Release mutex before restarting
-	p.mu.Unlock()
-	p.restartInputReader()
-	p.mu.Lock()
-
-	// STEP 12: Force full redraw.
-	// The TUI needs to repaint after external command.
-	p.renderView()
-
-	// Return original command error (if any).
+	// Return original command error (if any)
 	return cmdErr
 }

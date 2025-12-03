@@ -814,3 +814,39 @@ func WithTerminal[T any](term terminal.Terminal) Option[T] {
 func (p *Program[T]) ExecProcess(cmd *exec.Cmd) error {
 	return p.p.ExecProcess(cmd)
 }
+
+// Suspend temporarily suspends the TUI and restores terminal to normal mode.
+// Use this when you need to temporarily give terminal control to external code.
+//
+// After calling Suspend, the terminal is in normal (cooked) mode:
+//   - Raw mode is disabled
+//   - Alternate screen is exited (if was active)
+//   - Cursor is visible
+//   - Input reader is stopped
+//
+// Call Resume() to restore the TUI after the external operation.
+//
+// Returns error if suspension fails.
+// Safe to call multiple times - subsequent calls are no-ops.
+func (p *Program[T]) Suspend() error {
+	return p.p.Suspend()
+}
+
+// Resume restores the TUI after a Suspend.
+// This restores all terminal state that was active before Suspend:
+//   - Raw mode (if was active)
+//   - Alternate screen (if was active)
+//   - Cursor hidden
+//   - Input reader restarted
+//   - Full redraw triggered
+//
+// Returns error if restoration fails.
+// Safe to call multiple times - subsequent calls are no-ops.
+func (p *Program[T]) Resume() error {
+	return p.p.Resume()
+}
+
+// IsSuspended returns true if the TUI is currently suspended.
+func (p *Program[T]) IsSuspended() bool {
+	return p.p.IsSuspended()
+}
