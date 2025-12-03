@@ -885,3 +885,54 @@ func (p *Program[T]) ExecProcess(cmd *exec.Cmd) error {
 	// Return original command error (if any)
 	return cmdErr
 }
+
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Advanced TTY Control (Level 2)                                  │.
+// └─────────────────────────────────────────────────────────────────┘.
+
+// ExecProcessWithTTY executes an external command with advanced TTY control.
+//
+// This provides Level 2 TTY control with platform-specific enhancements:
+//   - Unix/Linux/macOS: Uses tcsetpgrp() for proper foreground process group transfer
+//   - Windows: Enhanced console mode management
+//
+// Advantages over ExecProcess:
+//   - Proper job control (Ctrl+Z in child suspends child, not parent)
+//   - Child can use its own signal handlers
+//   - Better isolation between parent and child processes
+//
+// Example:
+//
+//	func (m Model) Update(msg Msg) (Model, Cmd) {
+//	    switch msg := msg.(type) {
+//	    case RunShellMsg:
+//	        return m, func() Msg {
+//	            cmd := exec.Command("bash")
+//	            opts := TTYOptions{
+//	                TransferForeground: true,
+//	                CreateProcessGroup: true,
+//	            }
+//	            err := m.program.ExecProcessWithTTY(cmd, opts)
+//	            return ShellExitedMsg{Err: err}
+//	        }
+//	    }
+//	    return m, nil
+//	}
+//
+// IMPORTANT:
+//   - Must be called from a Cmd goroutine (NOT from Update directly)
+//   - Blocks until command completes
+//   - Falls back to ExecProcess if TTY control unavailable
+//   - Platform-specific implementation (see tty_control_unix.go, tty_control_windows.go)
+//
+// Returns error if command execution fails.
+func (p *Program[T]) ExecProcessWithTTY(cmd *exec.Cmd, opts TTYOptions) error {
+	// Platform-specific implementation in tty_control_unix.go or tty_control_windows.go
+	return p.execWithTTYControl(cmd, opts)
+}
+
+// execWithTTYControl is implemented in platform-specific files:
+//   - tty_control_unix.go (Unix/Linux/macOS) - uses tcsetpgrp()
+//   - tty_control_windows.go (Windows) - uses SetConsoleMode()
+//
+// The build tags ensure only one implementation is compiled per platform.

@@ -850,3 +850,50 @@ func (p *Program[T]) Resume() error {
 func (p *Program[T]) IsSuspended() bool {
 	return p.p.IsSuspended()
 }
+
+// ┌─────────────────────────────────────────────────────────────────┐.
+// │ Advanced TTY Control (Level 2)                                  │.
+// └─────────────────────────────────────────────────────────────────┘.
+
+// TTYOptions configures advanced TTY control for ExecProcessWithTTY.
+type TTYOptions = program2.TTYOptions
+
+// ExecProcessWithTTY executes an external command with advanced TTY control.
+//
+// This provides Level 2 TTY control with platform-specific enhancements:
+//   - Unix/Linux/macOS: Uses tcsetpgrp() for proper foreground process group transfer
+//   - Windows: Enhanced console mode management
+//
+// Advantages over ExecProcess:
+//   - Proper job control (Ctrl+Z in child suspends child, not parent)
+//   - Child can use its own signal handlers
+//   - Better isolation between parent and child processes
+//
+// Example:
+//
+//	func (m Model) Update(msg Msg) (Model, Cmd) {
+//	    switch msg := msg.(type) {
+//	    case RunShellMsg:
+//	        return m, func() Msg {
+//	            cmd := exec.Command("bash")
+//	            opts := tea.TTYOptions{
+//	                TransferForeground: true,
+//	                CreateProcessGroup: true,
+//	            }
+//	            err := m.program.ExecProcessWithTTY(cmd, opts)
+//	            return ShellExitedMsg{Err: err}
+//	        }
+//	    }
+//	    return m, nil
+//	}
+//
+// IMPORTANT:
+//   - Must be called from a Cmd goroutine (NOT from Update directly)
+//   - Blocks until command completes
+//   - Falls back to ExecProcess if TTY control unavailable
+//   - Platform-specific implementation (see internal docs)
+//
+// Returns error if command execution fails.
+func (p *Program[T]) ExecProcessWithTTY(cmd *exec.Cmd, opts TTYOptions) error {
+	return p.p.ExecProcessWithTTY(cmd, opts)
+}
