@@ -50,6 +50,12 @@ var (
 //
 // Returns nil if stdin is not a console (e.g., redirected or in tests).
 // This is not an error - just means unblocking is not needed.
+//
+// NOTE: On MSYS2/mintty (Git Bash), stdin is a pty, not a Windows Console.
+// GetConsoleMode() fails → this function becomes a no-op. For MSYS, the
+// pipe-based CancelableReader + SetReadDeadline is the primary cancellation
+// mechanism. This function serves as a secondary fallback for true Windows
+// Console environments.
 func UnblockStdinRead() error {
 	// Get stdin handle
 	handle, err := windows.GetStdHandle(windows.STD_INPUT_HANDLE)

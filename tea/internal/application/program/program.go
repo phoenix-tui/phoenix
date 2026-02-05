@@ -576,8 +576,9 @@ func (p *Program[T]) stopInputReader() {
 		return
 	}
 
-	// STEP 1: Cancel the reader itself (unblocks Read immediately)
-	// This is the critical fix - without this, Read() blocks forever.
+	// STEP 1: Cancel the reader itself (unblocks Read immediately).
+	// Uses pipe-based relay: closing pipe writer causes readLoopPipe to return
+	// io.EOF instantly. SetReadDeadline + UnblockStdinRead unblock the relay.
 	if inputReader != nil {
 		inputReader.Cancel()
 	}
@@ -585,13 +586,20 @@ func (p *Program[T]) stopInputReader() {
 	// STEP 2: Signal context cancellation
 	cancel()
 
-	// STEP 3: Wait for goroutine to exit (now guaranteed to succeed quickly)
+	// STEP 3: Wait for goroutine to exit (now guaranteed to succeed quickly
+	// thanks to pipe-based CancelableReader — Cancel closes the pipe)
 	select {
 	case <-done:
 		// Goroutine exited gracefully
-	case <-time.After(100 * time.Millisecond):
-		// Short timeout - should rarely hit with CancelableReader
-		// If we do hit it, inputReader.Cancel() already unblocked Read()
+	case <-time.After(200 * time.Millisecond):
+		// Safety net — should rarely hit with pipe-based CancelableReader.
+		// Relay goroutine may still be blocked in stdin Read on platforms
+		// where SetReadDeadline is not supported; it will exit on next input.
+	}
+
+	// STEP 4: Wait for CancelableReader background goroutines to fully stop
+	if inputReader != nil {
+		inputReader.WaitForShutdown()
 	}
 
 	// Clean up state

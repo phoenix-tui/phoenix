@@ -49,6 +49,14 @@ func (ir *Reader) Cancel() {
 	}
 }
 
+// WaitForShutdown waits for background goroutines to exit after Cancel().
+// Call this after Cancel() to ensure the pipe relay and read loop are fully stopped.
+func (ir *Reader) WaitForShutdown() {
+	if ir.cancelableReader != nil {
+		ir.cancelableReader.WaitForShutdown()
+	}
+}
+
 // IsCanceled returns true if the reader has been canceled.
 func (ir *Reader) IsCanceled() bool {
 	if ir.cancelableReader != nil {

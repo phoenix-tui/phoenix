@@ -31,7 +31,7 @@ func TestCancelableReader_MultipleReads(t *testing.T) {
 	defer cr.Cancel()
 
 	var result bytes.Buffer
-	buf := make([]byte, 256) // Buffer large enough for CancelableReader's internal buffer
+	buf := make([]byte, 256)
 
 	for {
 		n, err := cr.Read(buf)
@@ -221,7 +221,181 @@ func TestCancelableReader_SmallBuffer(t *testing.T) {
 	}
 }
 
-// BenchmarkCancelableReader_Read measures read performance.
+// ═══════════════════════════════════════════════════════════════════
+// Pipe-based relay tests (MSYS/mintty fix)
+// ═══════════════════════════════════════════════════════════════════
+
+func TestCancelableReader_PipeBased_CancelUnblocksImmediately(t *testing.T) {
+	// io.Pipe simulates a blocking reader (like MSYS stdin)
+	pr, _ := io.Pipe()
+	cr := NewCancelableReader(pr)
+
+	if !cr.usePipe {
+		t.Skip("os.Pipe not available on this platform")
+	}
+
+	// Start a read that will block
+	readDone := make(chan struct{})
+	go func() {
+		buf := make([]byte, 256)
+		cr.Read(buf)
+		close(readDone)
+	}()
+
+	// Give it time to block
+	time.Sleep(30 * time.Millisecond)
+
+	// Cancel should unblock within 10ms (pipe close is instant)
+	start := time.Now()
+	cr.Cancel()
+
+	select {
+	case <-readDone:
+		elapsed := time.Since(start)
+		if elapsed > 100*time.Millisecond {
+			t.Errorf("Cancel took too long: %v (expected < 100ms)", elapsed)
+		}
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("Read did not unblock after Cancel — pipe close failed")
+	}
+}
+
+func TestCancelableReader_PipeBased_DataFlows(t *testing.T) {
+	// Data should flow through: underlying reader → relay → pipe → readLoopPipe → Read()
+	pr, pw := io.Pipe()
+	cr := NewCancelableReader(pr)
+	defer cr.Cancel()
+
+	if !cr.usePipe {
+		t.Skip("os.Pipe not available on this platform")
+	}
+
+	// Write data in background
+	expected := "hello from pipe relay"
+	go func() {
+		pw.Write([]byte(expected))
+	}()
+
+	// Read through CancelableReader
+	buf := make([]byte, 256)
+	n, err := cr.Read(buf)
+
+	if err != nil && err != io.EOF {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if string(buf[:n]) != expected {
+		t.Errorf("got %q, want %q", string(buf[:n]), expected)
+	}
+}
+
+func TestCancelableReader_PipeBased_RelayExitsOnPipeClose(t *testing.T) {
+	// When Cancel() closes os.Pipe and underlying reader unblocks,
+	// relay should detect write error and exit.
+	pr, pw := io.Pipe()
+	cr := NewCancelableReader(pr)
+
+	if !cr.usePipe {
+		t.Skip("os.Pipe not available on this platform")
+	}
+
+	// Write some data to ensure relay is active
+	go func() {
+		pw.Write([]byte("data"))
+	}()
+
+	// Read the data
+	buf := make([]byte, 256)
+	cr.Read(buf)
+
+	// Cancel closes os.Pipe writer → readLoopPipe exits immediately.
+	// Close io.Pipe writer → relay's pr.Read() returns EOF → relay exits.
+	// (In production, SetReadDeadline or UnblockStdinRead unblocks the relay;
+	// io.Pipe doesn't support deadlines, so we close it manually here.)
+	cr.Cancel()
+	pw.Close()
+
+	// Relay should exit (underlying reader returned EOF)
+	select {
+	case <-cr.relayDone:
+		// Relay exited — success
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("relay goroutine did not exit after pipe close")
+	}
+}
+
+func TestCancelableReader_PipeBased_NoGoroutineLeak(t *testing.T) {
+	pr, pw := io.Pipe()
+	cr := NewCancelableReader(pr)
+
+	if !cr.usePipe {
+		t.Skip("os.Pipe not available on this platform")
+	}
+
+	// Write and read to activate all goroutines
+	go func() {
+		pw.Write([]byte("test"))
+	}()
+	buf := make([]byte, 256)
+	cr.Read(buf)
+
+	// Cancel and wait for full shutdown
+	cr.Cancel()
+
+	shutdownDone := make(chan struct{})
+	go func() {
+		cr.WaitForShutdown()
+		close(shutdownDone)
+	}()
+
+	select {
+	case <-shutdownDone:
+		// Clean shutdown — no goroutine leak
+	case <-time.After(1 * time.Second):
+		t.Fatal("WaitForShutdown did not complete — goroutine leak?")
+	}
+
+	// Verify readLoopPipe exited
+	select {
+	case <-cr.readerDone:
+		// Good
+	default:
+		t.Error("readLoopPipe did not exit")
+	}
+}
+
+func TestCancelableReader_PipeBased_SequentialCancelRestart(t *testing.T) {
+	// Simulate ExecProcess pattern: create → cancel → create new → cancel
+	for i := 0; i < 3; i++ {
+		pr, pw := io.Pipe()
+		cr := NewCancelableReader(pr)
+
+		if !cr.usePipe {
+			t.Skip("os.Pipe not available on this platform")
+		}
+
+		// Write data
+		expected := "iteration"
+		go func() {
+			pw.Write([]byte(expected))
+		}()
+
+		// Read
+		buf := make([]byte, 256)
+		n, _ := cr.Read(buf)
+		if string(buf[:n]) != expected {
+			t.Errorf("iteration %d: got %q, want %q", i, string(buf[:n]), expected)
+		}
+
+		// Cancel and cleanup
+		cr.Cancel()
+		cr.WaitForShutdown()
+	}
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// Benchmarks
+// ═══════════════════════════════════════════════════════════════════
+
 func BenchmarkCancelableReader_Read(b *testing.B) {
 	data := strings.Repeat("x", 4096)
 
@@ -234,7 +408,6 @@ func BenchmarkCancelableReader_Read(b *testing.B) {
 	}
 }
 
-// BenchmarkCancelableReader_Cancel measures cancel latency.
 func BenchmarkCancelableReader_Cancel(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		pr, _ := io.Pipe()
