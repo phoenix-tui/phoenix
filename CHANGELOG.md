@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.2] - 2026-02-06 (PATCH)
+
+### Fixed
+
+- **layout/style**: Cascade removal of `rivo/uniseg` indirect dependency from `go.mod` (missed in v0.2.1)
+
+---
+
 ## [0.2.1] - 2026-02-06 (HOTFIX)
 
 ### Fixed
@@ -55,6 +63,19 @@ Cancellation is now instant on ALL platforms:
 - `PipeBased_CancelWithoutRead` — Edge case: cancel before any read
 - `PipeBased_MultipleWaitForShutdown` — Idempotent shutdown
 - `InputReaderRestartIdempotent` — Stabilized (was flaky)
+
+**Dependency Updates**:
+- `golang.org/x/sys` v0.37.0 → v0.40.0
+- `golang.org/x/term` v0.36.0 → v0.39.0
+- `github.com/unilibs/uniwidth` v0.1.0-beta → v0.2.0
+- `github.com/spf13/cobra` v1.8.0 → v1.10.2
+- `github.com/spf13/pflag` v1.0.5 → v1.0.10
+
+### Changed
+
+- **core**: Removed `rivo/uniseg` dependency — `uniwidth v0.2.0` handles all width calculation
+- **core**: `StringWidthWithConfig`/`ClusterWidthWithConfig` use delta-based EA Ambiguous adjustment (fixes emoji modifier width in wide mode)
+- **examples**: Fixed broken imports in style examples, added missing replace directives
 
 **Reported by**: GoSh Shell Project
 
