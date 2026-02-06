@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.2] - 2026-02-06 (PATCH)
+
+### Fixed
+
+- **layout/style**: Cascade removal of `rivo/uniseg` indirect dependency from `go.mod` (missed in v0.2.1)
+
+---
+
 ## [0.2.1] - 2026-02-06 (HOTFIX)
 
 ### Fixed
