@@ -179,7 +179,6 @@ func TestStringWidth_Mixed(t *testing.T) {
 	}
 }
 
-
 // TestClusterWidth_ASCII tests width calculation for ASCII clusters
 func TestClusterWidth_ASCII(t *testing.T) {
 	us := NewUnicodeService()
@@ -436,7 +435,6 @@ func TestIsCJK(t *testing.T) {
 		})
 	}
 }
-
 
 func TestStringWidthWithConfig_EastAsianAmbiguous(t *testing.T) {
 	us := NewUnicodeService()
