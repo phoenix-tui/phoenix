@@ -38,8 +38,7 @@ type TTYOptions struct {
 //  4. Create new process group (if requested)
 //  5. Setup command I/O
 //  6. Run child process
-//  7. Restore original console mode
-//  8. Resume TUI (restore raw mode, alt screen, restart input)
+//  7. Resume TUI (restore raw mode, alt screen, restart input)
 //
 // Returns error if command execution or console control fails.
 func (p *Program[T]) execWithTTYControl(cmd *exec.Cmd, opts TTYOptions) error {
@@ -70,18 +69,11 @@ func (p *Program[T]) execWithTTYControl(cmd *exec.Cmd, opts TTYOptions) error {
 	}
 
 	// STEP 4: Disable virtual terminal processing (let child control console)
-	newMode := originalMode &^ windows.ENABLE_VIRTUAL_TERMINAL_INPUT
-	if err := windows.SetConsoleMode(consoleHandle, newMode); err != nil {
+	childMode := originalMode &^ windows.ENABLE_VIRTUAL_TERMINAL_INPUT
+	if err := windows.SetConsoleMode(consoleHandle, childMode); err != nil {
 		// Non-fatal - continue anyway
 		log.Printf("WARNING: SetConsoleMode failed: %v - continuing with original mode", err)
 	}
-
-	// Ensure restoration even if cmd.Run() panics
-	defer func() {
-		if err := windows.SetConsoleMode(consoleHandle, originalMode); err != nil {
-			log.Printf("WARNING: failed to restore console mode: %v", err)
-		}
-	}()
 
 	// STEP 5: Configure child process group (if requested)
 	if opts.CreateProcessGroup {
@@ -99,13 +91,14 @@ func (p *Program[T]) execWithTTYControl(cmd *exec.Cmd, opts TTYOptions) error {
 	// STEP 7: Run child process (BLOCKING)
 	cmdErr := cmd.Run()
 
-	// Console mode is restored by defer above
-
 	// STEP 8: Resume TUI (restore raw mode, alt screen, restart input, redraw)
-	// ALWAYS resume, even if command failed
+	// ALWAYS resume, even if command failed.
+	// NOTE: No defer SetConsoleMode(originalMode) — Resume() calls EnterRawMode()
+	// which sets the correct console flags. A defer would fire AFTER Resume(),
+	// restoring cooked-mode flags and undoing EnterRawMode (see bug report).
 	if err := p.Resume(); err != nil {
 		if cmdErr != nil {
-			return fmt.Errorf("exec: command failed (%v) and %w", cmdErr, err)
+			return fmt.Errorf("exec: command failed (%w) and %w", cmdErr, err)
 		}
 		return fmt.Errorf("exec: %w", err)
 	}

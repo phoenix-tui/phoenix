@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.3] - 2026-02-06 (PATCH)
+
+### Fixed
+
+- **tea**: Fix `execWithTTYControl` defer restoring cooked mode after `Resume()` on Windows
+  - `defer SetConsoleMode(originalMode)` fired AFTER `Resume()` → `EnterRawMode()`, undoing raw mode
+  - Symptoms: arrow keys broken, OS echo enabled, line buffering after `ExecProcessWithTTY`
+  - Fix: removed harmful defer — `Resume()` already restores correct console mode via `EnterRawMode()`
+  - Affected: Windows Console, Windows Terminal; not affected: MSYS/mintty (falls back to `ExecProcess`)
+- **tea**: Fix `errorlint` warning — use `%w` for both errors in `execWithTTYControl`
+- **examples**: Cascade `rivo/uniseg` removal from `context-menu` and `hover-highlight` go.mod
+
+---
+
 ## [0.2.2] - 2026-02-06 (PATCH)
 
 ### Fixed
