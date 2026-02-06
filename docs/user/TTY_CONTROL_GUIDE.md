@@ -535,5 +535,5 @@ if !term.IsTerminal(int(os.Stdin.Fd())) {
 
 ---
 
-*Version: v0.2.0*
-*Updated: 2025-12-03*
+*Version: v0.2.1*
+*Updated: 2026-02-06*

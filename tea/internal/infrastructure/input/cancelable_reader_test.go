@@ -393,6 +393,167 @@ func TestCancelableReader_PipeBased_SequentialCancelRestart(t *testing.T) {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// Pipe writer double-close protection tests
+// ═══════════════════════════════════════════════════════════════════
+
+func TestCancelableReader_PipeBased_CancelThenRelayExit(t *testing.T) {
+	// Scenario: Cancel() closes pipeWriter first, then relay defer also
+	// calls closePipeWriter. With sync.Once this must not panic or error.
+	pr, pw := io.Pipe()
+	cr := NewCancelableReader(pr)
+
+	if !cr.usePipe {
+		t.Skip("os.Pipe not available on this platform")
+	}
+
+	// Feed data so relay is actively running
+	go func() {
+		pw.Write([]byte("data"))
+	}()
+	buf := make([]byte, 256)
+	cr.Read(buf)
+
+	// Cancel closes pipeWriter (first close via closePipeWriter)
+	cr.Cancel()
+
+	// Unblock the relay's underlying reader so it exits and runs defer
+	pw.Close()
+
+	// Wait for relay to fully exit (its defer calls closePipeWriter again)
+	select {
+	case <-cr.relayDone:
+		// No panic — sync.Once protected the double close
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("relay did not exit — possible deadlock in closePipeWriter")
+	}
+}
+
+func TestCancelableReader_PipeBased_RelayExitsBeforeCancel(t *testing.T) {
+	// Scenario: underlying reader returns EOF → relay exits and closes
+	// pipeWriter via defer. Then Cancel() calls closePipeWriter again.
+	pr, pw := io.Pipe()
+	cr := NewCancelableReader(pr)
+
+	if !cr.usePipe {
+		t.Skip("os.Pipe not available on this platform")
+	}
+
+	// Feed data then close — causes relay to get EOF and exit
+	go func() {
+		pw.Write([]byte("data"))
+		pw.Close() // Relay's cr.r.Read() returns EOF
+	}()
+
+	buf := make([]byte, 256)
+	cr.Read(buf)
+
+	// Wait for relay to exit naturally (closes pipeWriter via defer)
+	select {
+	case <-cr.relayDone:
+		// Relay exited and closed pipeWriter
+	case <-time.After(500 * time.Millisecond):
+		t.Fatal("relay did not exit on underlying reader EOF")
+	}
+
+	// Now Cancel calls closePipeWriter again — must not panic
+	cr.Cancel()
+	cr.WaitForShutdown()
+}
+
+func TestCancelableReader_PipeBased_ConcurrentCancelAndRelayExit(t *testing.T) {
+	// Stress test: Cancel() and relay exit race on closePipeWriter
+	for i := 0; i < 50; i++ {
+		pr, pw := io.Pipe()
+		cr := NewCancelableReader(pr)
+
+		if !cr.usePipe {
+			t.Skip("os.Pipe not available on this platform")
+		}
+
+		go func() {
+			pw.Write([]byte("x"))
+		}()
+		buf := make([]byte, 256)
+		cr.Read(buf)
+
+		// Race: Cancel and underlying EOF at the same time
+		go func() {
+			pw.Close() // Causes relay to see EOF and exit
+		}()
+		cr.Cancel()
+		cr.WaitForShutdown()
+	}
+}
+
+func TestCancelableReader_PipeBased_RapidCreateCancelCycles(t *testing.T) {
+	// Verify no fd leaks over many create/cancel cycles.
+	// Each cycle creates 2 fds (os.Pipe). Without proper cleanup,
+	// the process runs out of file descriptors.
+	for i := 0; i < 100; i++ {
+		pr, pw := io.Pipe()
+		cr := NewCancelableReader(pr)
+
+		if !cr.usePipe {
+			t.Skip("os.Pipe not available on this platform")
+		}
+
+		go func() {
+			pw.Write([]byte("cycle"))
+		}()
+		buf := make([]byte, 256)
+		cr.Read(buf)
+
+		cr.Cancel()
+		pw.Close()
+		cr.WaitForShutdown()
+	}
+	// If we get here without "too many open files", cleanup works.
+}
+
+func TestCancelableReader_PipeBased_CancelWithoutRead(t *testing.T) {
+	// Cancel immediately after creation — relay may or may not have started yet
+	pr, _ := io.Pipe()
+	cr := NewCancelableReader(pr)
+
+	if !cr.usePipe {
+		t.Skip("os.Pipe not available on this platform")
+	}
+
+	cr.Cancel()
+	cr.WaitForShutdown()
+
+	// Verify Read returns EOF after Cancel
+	buf := make([]byte, 256)
+	_, err := cr.Read(buf)
+	if err != io.EOF {
+		t.Errorf("expected io.EOF after Cancel, got %v", err)
+	}
+}
+
+func TestCancelableReader_PipeBased_MultipleWaitForShutdown(t *testing.T) {
+	// WaitForShutdown must be idempotent — safe to call multiple times
+	pr, pw := io.Pipe()
+	cr := NewCancelableReader(pr)
+
+	if !cr.usePipe {
+		t.Skip("os.Pipe not available on this platform")
+	}
+
+	go func() {
+		pw.Write([]byte("data"))
+		pw.Close()
+	}()
+
+	buf := make([]byte, 256)
+	cr.Read(buf)
+
+	cr.Cancel()
+	cr.WaitForShutdown()
+	cr.WaitForShutdown() // Second call — must not panic or deadlock
+	cr.WaitForShutdown() // Third call
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // Benchmarks
 // ═══════════════════════════════════════════════════════════════════
 

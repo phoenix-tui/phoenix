@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.1] - 2026-02-06 (HOTFIX)
+
+### Fixed
+
+**Pipe-based CancelableReader for MSYS/mintty stdin race**
+
+- **NEW**: Pipe-based relay architecture for platform-agnostic stdin cancellation
+- **FIX**: Instant Cancel() on MSYS2/mintty where `WriteConsoleInputW` is a no-op
+- **FIX**: Double-close protection on pipe writer via `sync.Once` (prevents fd reuse bugs)
+- **FIX**: Flaky `InputReaderRestartIdempotent` test stabilized
+
+This hotfix resolves a critical stdin race condition on MSYS2/mintty (Git Bash on Windows).
+Previously, `Cancel()` relied on `WriteConsoleInputW` to unblock stdin reads, but MSYS2
+uses a pty (not Windows Console), making this call a no-op. The inputReader goroutine
+would remain blocked indefinitely, causing hangs when running external processes.
+
+**Architecture**:
+```
+stdin → [relayLoop] → os.Pipe → [readLoopPipe] → readCh → Read()
+```
+
+Cancellation is now instant on ALL platforms:
+1. `Cancel()` closes pipe writer → `readLoopPipe` returns EOF immediately
+2. `SetReadDeadline(now)` → unblocks relay goroutine's stdin Read
+3. `WriteConsoleInputW` → secondary fallback for true Windows Console
+4. Fallback to legacy direct-read if `os.Pipe()` fails (extremely rare)
+
+**Technical Details**:
+- `relayLoop()` copies stdin → pipe writer (4KB buffer)
+- `readLoopPipe()` reads pipe reader → delivers via channel (256B buffer)
+- `closePipeWriter()` uses `sync.Once` to prevent double-close between Cancel() and relay defer
+- `WaitForShutdown()` ensures all goroutines exit before restart
+- `stopInputReader()` timeout increased to 200ms with explicit STEP 4 (WaitForShutdown)
+- `golang.org/x/sys` and `golang.org/x/term` promoted from indirect to direct dependencies
+
+**Tests Added**: 6 new pipe-based tests + 6 double-close protection tests
+- `PipeBased_CancelUnblocksImmediately` — Cancel latency < 100ms
+- `PipeBased_DataFlows` — E2E data through relay pipeline
+- `PipeBased_RelayExitsOnPipeClose` — Relay cleanup verification
+- `PipeBased_NoGoroutineLeak` — WaitForShutdown completeness
+- `PipeBased_SequentialCancelRestart` — ExecProcess pattern simulation
+- `PipeBased_CancelThenRelayExit` — sync.Once double-close protection
+- `PipeBased_RelayExitsBeforeCancel` — Reverse ordering protection
+- `PipeBased_ConcurrentCancelAndRelayExit` — 50-iteration race stress test
+- `PipeBased_RapidCreateCancelCycles` — 100-cycle fd leak detection
+- `PipeBased_CancelWithoutRead` — Edge case: cancel before any read
+- `PipeBased_MultipleWaitForShutdown` — Idempotent shutdown
+- `InputReaderRestartIdempotent` — Stabilized (was flaky)
+
+**Reported by**: GoSh Shell Project
+
+---
+
 ## [0.2.0] - 2025-12-03
 
 ### Added

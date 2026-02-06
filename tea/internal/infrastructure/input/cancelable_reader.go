@@ -43,10 +43,11 @@ type CancelableReader struct {
 	readerDone chan struct{}
 
 	// Pipe-based relay (platform-agnostic cancellation)
-	pipeReader *os.File     // Read end - readLoop reads from this
-	pipeWriter *os.File     // Write end - relay writes to this, Cancel() closes
-	relayDone  chan struct{} // Signals when relay goroutine exits
-	usePipe    bool         // true if pipe relay is active
+	pipeReader     *os.File     // Read end - readLoop reads from this
+	pipeWriter     *os.File     // Write end - relay writes to this, Cancel() closes
+	pipeWriterOnce sync.Once    // Protects pipeWriter from double-close
+	relayDone      chan struct{} // Signals when relay goroutine exits
+	usePipe        bool         // true if pipe relay is active
 }
 
 // readResult holds the result of a single read operation.
@@ -97,6 +98,14 @@ func NewCancelableReader(r io.Reader) *CancelableReader {
 	return cr
 }
 
+// closePipeWriter closes the pipe write end exactly once.
+// Safe to call from both Cancel() and relayLoop defer concurrently.
+func (cr *CancelableReader) closePipeWriter() {
+	cr.pipeWriterOnce.Do(func() {
+		cr.pipeWriter.Close()
+	})
+}
+
 // relayLoop copies data from the underlying reader (stdin) to the pipe writer.
 // Exits when: the pipe writer is closed (Cancel), the underlying reader returns
 // EOF, or the done channel is closed.
@@ -112,7 +121,7 @@ func NewCancelableReader(r io.Reader) *CancelableReader {
 // to ensure the relay exits promptly.
 func (cr *CancelableReader) relayLoop() {
 	defer close(cr.relayDone)
-	defer cr.pipeWriter.Close() // Signal EOF to readLoopPipe on any exit
+	defer cr.closePipeWriter() // Signal EOF to readLoopPipe on any exit
 
 	buf := make([]byte, 4096)
 
@@ -271,7 +280,7 @@ func (cr *CancelableReader) Cancel() {
 
 		if cr.usePipe {
 			// Phase 1: Close pipe writer → readLoopPipe returns EOF immediately
-			_ = cr.pipeWriter.Close()
+			cr.closePipeWriter()
 
 			// Phase 2: Try to unblock relay goroutine's stdin Read
 			cr.unblockRelay()

@@ -1,9 +1,9 @@
 # 🗺️ Phoenix TUI Framework - Public Roadmap
 
 > **High-level development roadmap for Phoenix TUI Framework**
-> **Status**: ✅ v0.2.0 RELEASED
-> **Current Version**: v0.2.0 (Released 2025-12-03)
-> **Updated**: 2025-12-03
+> **Status**: ✅ v0.2.1 RELEASED (hotfix)
+> **Current Version**: v0.2.1 (Released 2026-02-06)
+> **Updated**: 2026-02-06
 
 ---
 
@@ -37,7 +37,7 @@ Build the **#1 Terminal User Interface framework for Go** by solving critical is
 ✅ API Compliance  ████████████████  100%  (Week 20) ← COMPLETE! 🚀
 ```
 
-**Status**: ✅ **v0.2.0 STABLE RELEASE** - Theme System + Form Components + TTY Control!
+**Status**: ✅ **v0.2.1 STABLE** - Hotfix: pipe-based stdin cancellation for MSYS/mintty
 
 ---
 
@@ -606,14 +606,14 @@ Based on real-world usage feedback:
 
 ---
 
-**Status**: ✅ **v0.2.0 STABLE** - Theme System + Form Components + TTY Control!
+**Status**: ✅ **v0.2.1 STABLE** - Hotfix: pipe-based stdin for MSYS/mintty
 **Achievement**: 20 weeks (6 months) - Foundation to stable release 🎉
 **Next**: v0.3.0 - Signals integration, Animation framework, Advanced components
 
 ---
 
-*Last Updated: 2025-12-03*
-*Version: 1.1.0 (public roadmap)*
+*Last Updated: 2026-02-06*
+*Version: 1.2.0 (public roadmap)*
 
 ---
 
@@ -659,4 +659,5 @@ All planned features for v0.2.0 are complete and released.
 | **2025-12-03** | Form Components complete | ✅ Complete |
 | **2025-12-03** | Theme System complete | ✅ Complete |
 | **2025-12-03** | **v0.2.0 STABLE RELEASE** 🚀 | ✅ **RELEASED** |
+| **2026-02-06** | **v0.2.1 HOTFIX** (pipe-based stdin for MSYS) | ✅ **RELEASED** |
 
