@@ -3,11 +3,11 @@ module github.com/phoenix-tui/phoenix/tea
 go 1.25.1
 
 require (
-	github.com/phoenix-tui/phoenix/terminal v0.1.0-beta.3
+	github.com/phoenix-tui/phoenix/terminal v0.2.0
 	github.com/phoenix-tui/phoenix/testing v0.1.0-beta.3
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/sys v0.37.0
-	golang.org/x/term v0.36.0
+	golang.org/x/sys v0.40.0
+	golang.org/x/term v0.39.0
 )
 
 require (
