@@ -43,11 +43,11 @@ type CancelableReader struct {
 	readerDone chan struct{}
 
 	// Pipe-based relay (platform-agnostic cancellation)
-	pipeReader     *os.File     // Read end - readLoop reads from this
-	pipeWriter     *os.File     // Write end - relay writes to this, Cancel() closes
-	pipeWriterOnce sync.Once    // Protects pipeWriter from double-close
+	pipeReader     *os.File      // Read end - readLoop reads from this
+	pipeWriter     *os.File      // Write end - relay writes to this, Cancel() closes
+	pipeWriterOnce sync.Once     // Protects pipeWriter from double-close
 	relayDone      chan struct{} // Signals when relay goroutine exits
-	usePipe        bool         // true if pipe relay is active
+	usePipe        bool          // true if pipe relay is active
 }
 
 // readResult holds the result of a single read operation.
