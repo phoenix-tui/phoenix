@@ -178,42 +178,6 @@ func BenchmarkStringWidth_RealWorld3(b *testing.B) {
 }
 
 // ========================================
-// GraphemeClusters Benchmarks
-// ========================================
-
-func BenchmarkGraphemeClusters_ASCII(b *testing.B) {
-	us := NewUnicodeService()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = us.GraphemeClusters(benchASCIIMed)
-	}
-}
-
-func BenchmarkGraphemeClusters_Emoji(b *testing.B) {
-	us := NewUnicodeService()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = us.GraphemeClusters(benchEmojiMed)
-	}
-}
-
-func BenchmarkGraphemeClusters_CJK(b *testing.B) {
-	us := NewUnicodeService()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = us.GraphemeClusters(benchCJKMed)
-	}
-}
-
-func BenchmarkGraphemeClusters_Mixed(b *testing.B) {
-	us := NewUnicodeService()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = us.GraphemeClusters(benchMixedMed)
-	}
-}
-
-// ========================================
 // ClusterWidth Benchmarks
 // ========================================
 
@@ -277,15 +241,6 @@ func BenchmarkStringWidth_Memory_Mixed(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		_ = us.StringWidth(benchMixedMed)
-	}
-}
-
-func BenchmarkGraphemeClusters_Memory(b *testing.B) {
-	us := NewUnicodeService()
-	b.ReportAllocs()
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
-		_ = us.GraphemeClusters(benchMixedMed)
 	}
 }
 

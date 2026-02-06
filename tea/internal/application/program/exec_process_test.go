@@ -1,12 +1,14 @@
 package program
 
 import (
+	"context"
 	"errors"
 	"os/exec"
 	"runtime"
 	"strconv"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -585,16 +587,46 @@ func TestProgram_ExecProcess_InputReaderStopIdempotent(t *testing.T) {
 	assert.False(t, running, "inputReader should remain stopped after multiple stops")
 }
 
+// blockingMockReader blocks in Read() until Close() is called.
+// This prevents inputReader goroutine from exiting prematurely during tests.
+type blockingMockReader struct {
+	ctx    context.Context
+	cancel context.CancelFunc
+}
+
+func newBlockingMockReader() *blockingMockReader {
+	ctx, cancel := context.WithCancel(context.Background())
+	return &blockingMockReader{ctx: ctx, cancel: cancel}
+}
+
+func (r *blockingMockReader) Read(p []byte) (n int, err error) {
+	// Block until context canceled
+	<-r.ctx.Done()
+	return 0, r.ctx.Err()
+}
+
+func (r *blockingMockReader) Close() error {
+	r.cancel()
+	return nil
+}
+
 // TestProgram_ExecProcess_InputReaderRestartIdempotent verifies restart is idempotent.
 func TestProgram_ExecProcess_InputReaderRestartIdempotent(t *testing.T) {
+	blockingReader := newBlockingMockReader()
+	defer blockingReader.Close()
+
 	mockTerm := phoenixtesting.NewMockTerminal()
 	m := TestModel{}
-	p := New(m, WithTerminal[TestModel](mockTerm))
+	p := New(m, WithTerminal[TestModel](mockTerm), WithInput[TestModel](blockingReader))
 
 	// Start inputReader
 	p.startInputReader()
 
+	// Give goroutine time to enter Read() loop (where it will block)
+	time.Sleep(50 * time.Millisecond)
+
 	// Restart multiple times (should be safe - no duplicates)
+	// Each restart should early-return because inputReaderRunning=true
 	p.restartInputReader()
 	p.restartInputReader()
 	p.restartInputReader()

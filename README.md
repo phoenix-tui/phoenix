@@ -16,13 +16,13 @@
 
 > Next-generation Terminal User Interface framework for Go
 
-**Status**: ✅ v0.2.0 RELEASED 🚀
+**Status**: ✅ v0.2.1 RELEASED (hotfix)
 **Organization**: [github.com/phoenix-tui](https://github.com/phoenix-tui)
 **Go Version**: 1.25+
 **Test Coverage**: **91.8%** (Excellent across all modules)
 **Performance**: 29,000 FPS (489x faster than 60 FPS target)
 **API Quality**: **9/10** (Validated against Go 2025 best practices)
-**Latest**: Theme System, Form Components, TTY Control for external processes
+**Latest**: Pipe-based stdin cancellation for MSYS/mintty, double-close protection
 
 ## Why Phoenix?
 
@@ -362,9 +362,17 @@ spinner := progress.NewSpinner(progress.SpinnerDots).
 
 **Documentation**: See [components/progress/README.md](components/progress/README.md) for full API reference
 
-## What's New in v0.2.0
+## What's New in v0.2.1 (Hotfix)
 
-### Released Features
+**Pipe-based CancelableReader** - fixes critical stdin race on MSYS2/mintty (Git Bash):
+- Instant `Cancel()` on ALL platforms via os.Pipe relay architecture
+- Double-close protection via `sync.Once`
+- Stabilized flaky `InputReaderRestartIdempotent` test
+- 12 new tests for pipe relay and shutdown safety
+
+**See [CHANGELOG.md](CHANGELOG.md) for full v0.2.1 details**
+
+## What's in v0.2.0
 
 **TTY Control System** (Level 1, 1+, 2):
 - Run external processes like vim, nano, shells with full terminal control
@@ -408,5 +416,5 @@ MIT License - see [LICENSE](LICENSE) file for details
 ---
 
 *Rising from the ashes of legacy TUI frameworks* 🔥
-**v0.2.0 STABLE** ⭐
-*API Quality: 9/10 | 91.8% coverage | 29,000 FPS | Theme System + Form Components + TTY Control!*
+**v0.2.1 STABLE** ⭐
+*API Quality: 9/10 | 91.8% coverage | 29,000 FPS | Pipe-based stdin for MSYS/mintty!*
