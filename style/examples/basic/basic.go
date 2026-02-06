@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/phoenix-tui/phoenix/style/api"
+	"github.com/phoenix-tui/phoenix/style"
 )
 
 func main() {
