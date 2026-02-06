@@ -16,7 +16,7 @@
 
 > Next-generation Terminal User Interface framework for Go
 
-**Status**: ✅ v0.2.1 RELEASED (hotfix)
+**Status**: ✅ v0.2.3 STABLE
 **Organization**: [github.com/phoenix-tui](https://github.com/phoenix-tui)
 **Go Version**: 1.25+
 **Test Coverage**: **91.8%** (Excellent across all modules)
@@ -362,15 +362,17 @@ spinner := progress.NewSpinner(progress.SpinnerDots).
 
 **Documentation**: See [components/progress/README.md](components/progress/README.md) for full API reference
 
-## What's New in v0.2.1 (Hotfix)
+## What's New in v0.2.1–v0.2.3
 
-**Pipe-based CancelableReader** - fixes critical stdin race on MSYS2/mintty (Git Bash):
+**v0.2.3** - Fix `ExecProcessWithTTY` on Windows (defer undid raw mode after Resume)
+
+**v0.2.1** - Pipe-based CancelableReader (fixes stdin race on MSYS2/mintty):
 - Instant `Cancel()` on ALL platforms via os.Pipe relay architecture
 - Double-close protection via `sync.Once`
-- Stabilized flaky `InputReaderRestartIdempotent` test
+- Removed `rivo/uniseg` from core — `uniwidth v0.2.0` handles all width calculation
 - 12 new tests for pipe relay and shutdown safety
 
-**See [CHANGELOG.md](CHANGELOG.md) for full v0.2.1 details**
+**See [CHANGELOG.md](CHANGELOG.md) for full details**
 
 ## What's in v0.2.0
 
@@ -416,5 +418,5 @@ MIT License - see [LICENSE](LICENSE) file for details
 ---
 
 *Rising from the ashes of legacy TUI frameworks* 🔥
-**v0.2.1 STABLE** ⭐
-*API Quality: 9/10 | 91.8% coverage | 29,000 FPS | Pipe-based stdin for MSYS/mintty!*
+**v0.2.3 STABLE** ⭐
+*API Quality: 9/10 | 91.8% coverage | 29,000 FPS | ExecProcessWithTTY fixed!*
