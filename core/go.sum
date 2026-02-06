@@ -1,4 +1,2 @@
-github.com/rivo/uniseg v0.4.7 h1:WUdvkW8uEhrYfLC4ZzdpI2ztxP1I582+49Oc5Mq64VQ=
-github.com/rivo/uniseg v0.4.7/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUcx88=
-github.com/unilibs/uniwidth v0.1.0-beta h1:IsUiW20VJCu0ifUokq8heOwituqAiMfyOdvvyBJpKN8=
-github.com/unilibs/uniwidth v0.1.0-beta/go.mod h1:NLplcdoNxAn5JTjjkI7v1Hasyf7PzYBe3GQ4d8lMpVs=
+github.com/unilibs/uniwidth v0.2.0 h1:HUNZ8aagjHcBIxT2Wq8ijEXoa8XXd/+f+1JnA/0wxB4=
+github.com/unilibs/uniwidth v0.2.0/go.mod h1:NLplcdoNxAn5JTjjkI7v1Hasyf7PzYBe3GQ4d8lMpVs=

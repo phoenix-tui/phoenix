@@ -179,104 +179,6 @@ func TestStringWidth_Mixed(t *testing.T) {
 	}
 }
 
-// TestGraphemeClusters_ASCII tests grapheme cluster splitting for ASCII
-func TestGraphemeClusters_ASCII(t *testing.T) {
-	us := NewUnicodeService()
-
-	tests := []struct {
-		name  string
-		input string
-		want  []string
-	}{
-		{"empty string", "", []string{}},
-		{"single char", "a", []string{"a"}},
-		{"word", "Hello", []string{"H", "e", "l", "l", "o"}},
-		{"spaces", "a b", []string{"a", " ", "b"}},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := us.GraphemeClusters(tt.input)
-			if !slicesEqual(got, tt.want) {
-				t.Errorf("GraphemeClusters(%q) = %v, want %v", tt.input, got, tt.want)
-			}
-		})
-	}
-}
-
-// TestGraphemeClusters_Emoji tests grapheme cluster splitting for emoji
-func TestGraphemeClusters_Emoji(t *testing.T) {
-	us := NewUnicodeService()
-
-	tests := []struct {
-		name  string
-		input string
-		want  []string
-	}{
-		{"simple emoji", "😀", []string{"😀"}},
-		{"emoji with modifier", "👋🏻", []string{"👋🏻"}},
-		{"multiple emoji", "😀😃", []string{"😀", "😃"}},
-		{"family emoji", "👨‍👩‍👧‍👦", []string{"👨‍👩‍👧‍👦"}},
-		{"flag", "🇺🇸", []string{"🇺🇸"}},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := us.GraphemeClusters(tt.input)
-			if !slicesEqual(got, tt.want) {
-				t.Errorf("GraphemeClusters(%q) = %v, want %v", tt.input, got, tt.want)
-			}
-		})
-	}
-}
-
-// TestGraphemeClusters_CJK tests grapheme cluster splitting for CJK
-func TestGraphemeClusters_CJK(t *testing.T) {
-	us := NewUnicodeService()
-
-	tests := []struct {
-		name  string
-		input string
-		want  []string
-	}{
-		{"Chinese", "你好", []string{"你", "好"}},
-		{"Japanese", "こんにちは", []string{"こ", "ん", "に", "ち", "は"}},
-		{"Korean", "한글", []string{"한", "글"}},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := us.GraphemeClusters(tt.input)
-			if !slicesEqual(got, tt.want) {
-				t.Errorf("GraphemeClusters(%q) = %v, want %v", tt.input, got, tt.want)
-			}
-		})
-	}
-}
-
-// TestGraphemeClusters_Combining tests grapheme cluster splitting for combining chars
-func TestGraphemeClusters_Combining(t *testing.T) {
-	us := NewUnicodeService()
-
-	tests := []struct {
-		name  string
-		input string
-		want  []string
-	}{
-		{"e with acute", "é", []string{"é"}},
-		{"Cafe", "Café", []string{"C", "a", "f", "é"}},
-		{"German word", "Müller", []string{"M", "ü", "l", "l", "e", "r"}},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := us.GraphemeClusters(tt.input)
-			if !slicesEqual(got, tt.want) {
-				t.Errorf("GraphemeClusters(%q) = %v, want %v", tt.input, got, tt.want)
-			}
-		})
-	}
-}
 
 // TestClusterWidth_ASCII tests width calculation for ASCII clusters
 func TestClusterWidth_ASCII(t *testing.T) {
@@ -535,18 +437,6 @@ func TestIsCJK(t *testing.T) {
 	}
 }
 
-// Helper function to compare string slices
-func slicesEqual(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
-}
 
 func TestStringWidthWithConfig_EastAsianAmbiguous(t *testing.T) {
 	us := NewUnicodeService()

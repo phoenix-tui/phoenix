@@ -4,7 +4,6 @@ import (
 	"unicode"
 
 	"github.com/phoenix-tui/phoenix/core/internal/domain/value"
-	"github.com/rivo/uniseg"
 	"github.com/unilibs/uniwidth"
 )
 
@@ -29,9 +28,8 @@ func NewUnicodeService() *UnicodeService {
 //   - Zero-width characters: 0 columns
 //   - Combining characters: 0 columns
 //
-// Performance optimization: Uses uniwidth library (9-23x faster than go-runewidth)
-// with tiered lookup: O(1) for 90-95% of cases (ASCII, CJK, emoji), O(log n) for rare chars.
-// Falls back to uniseg grapheme clustering only for truly complex Unicode (5-10% of cases).
+// Powered by uniwidth which provides tiered O(1) lookup for all Unicode categories
+// including ZWJ sequences, emoji modifiers, and variation selectors.
 //
 // Example:
 //
@@ -44,73 +42,7 @@ func (us *UnicodeService) StringWidth(s string) int {
 	if s == "" {
 		return 0
 	}
-
-	// OPTIMIZATION: Use uniwidth for all non-complex Unicode (90-95% of cases)
-	// uniwidth has built-in fast paths: ASCII (O(1)), CJK (O(1)), emoji (O(1))
-	// This is 9-23x faster than go-runewidth!
-	if !containsTrulyComplexUnicode(s) {
-		return uniwidth.StringWidth(s)
-	}
-
-	// Slow path: Complex Unicode with grapheme clustering
-	// ONLY for emoji with modifiers, ZWJ sequences, combining marks (5-10% of cases)
-	width := 0
-	gr := uniseg.NewGraphemes(s)
-	for gr.Next() {
-		cluster := gr.Str()
-		width += us.ClusterWidth(cluster)
-	}
-	return width
-}
-
-// containsTrulyComplexUnicode checks if string contains characters that REQUIRE
-// grapheme segmentation: ZWJ sequences, emoji modifiers, combining marks.
-// Simple emoji (👋, 🎉, ⏰) return FALSE - they can be handled with runewidth.
-func containsTrulyComplexUnicode(s string) bool {
-	for _, r := range s {
-		// Zero-width joiner (for emoji sequences like 👨‍👩‍👧‍👦)
-		if r == 0x200D {
-			return true
-		}
-		// Variation selectors (for emoji presentation control)
-		if r >= 0xFE00 && r <= 0xFE0F {
-			return true
-		}
-		// Emoji modifiers (skin tones: 🏻🏼🏽🏾🏿)
-		if r >= 0x1F3FB && r <= 0x1F3FF {
-			return true
-		}
-		// Combining marks (accents, diacritics)
-		if unicode.In(r, unicode.Mn, unicode.Me, unicode.Mc) {
-			return true
-		}
-	}
-	return false
-}
-
-// GraphemeClusters splits a string into grapheme clusters.
-// A grapheme cluster is a user-perceived character:
-//   - "a" -> ["a"]
-//   - "👋🏻" -> ["👋🏻"] (emoji + modifier = 1 cluster)
-//   - "é" -> ["é"] (base + combining = 1 cluster)
-//   - "👨‍👩‍👧‍👦" -> ["👨‍👩‍👧‍👦"] (family emoji with ZWJ = 1 cluster)
-//
-// Example:
-//
-//	GraphemeClusters("Hello")     // ["H", "e", "l", "l", "o"]
-//	GraphemeClusters("👋🏻")       // ["👋🏻"]
-//	GraphemeClusters("Café")      // ["C", "a", "f", "é"]
-func (us *UnicodeService) GraphemeClusters(s string) []string {
-	if s == "" {
-		return []string{}
-	}
-
-	var clusters []string
-	gr := uniseg.NewGraphemes(s)
-	for gr.Next() {
-		clusters = append(clusters, gr.Str())
-	}
-	return clusters
+	return uniwidth.StringWidth(s)
 }
 
 // ClusterWidth calculates the visual width of a single grapheme cluster.
@@ -122,70 +54,24 @@ func (us *UnicodeService) GraphemeClusters(s string) []string {
 // A grapheme cluster is a user-perceived character that may consist of multiple runes:
 //   - Simple: "a" (1 rune) → width 1
 //   - Emoji: "👋" (1 rune) → width 2
-//   - Emoji + modifier: "👋🏻" (2 runes) → width 2 (use base emoji width)
-//   - ZWJ sequence: "👨‍👩‍👧‍👦" (7 runes) → width 2 (use first emoji width)
+//   - Emoji + modifier: "👋🏻" (2 runes) → width 2
+//   - ZWJ sequence: "👨‍👩‍👧‍👦" (7 runes) → width 2
 //   - Combining: "é" (2 runes: e + combining acute) → width 1
-//
-// For multi-rune clusters, we use the width of the FIRST (base) character only,
-// because modifiers, ZWJ, and combining marks don't add visual width.
 //
 // Example:
 //
 //	ClusterWidth("a")      // 1
 //	ClusterWidth("👋")     // 2
-//	ClusterWidth("👋🏻")    // 2 (emoji with modifier - uses 👋 width)
-//	ClusterWidth("👨‍👩‍👧‍👦") // 2 (ZWJ sequence - uses 👨 width)
+//	ClusterWidth("👋🏻")    // 2 (emoji with modifier)
+//	ClusterWidth("👨‍👩‍👧‍👦") // 2 (ZWJ sequence)
 //	ClusterWidth("中")     // 2 (CJK)
-//	ClusterWidth("é")      // 1 (e + combining acute - uses e width)
+//	ClusterWidth("é")      // 1 (e + combining acute)
 //	ClusterWidth("\u0301") // 0 (combining acute accent alone)
 func (us *UnicodeService) ClusterWidth(cluster string) int {
 	if cluster == "" {
 		return 0
 	}
-
-	runes := []rune(cluster)
-	if len(runes) == 0 {
-		return 0
-	}
-
-	// Single rune: use uniwidth.RuneWidth directly
-	if len(runes) == 1 {
-		return uniwidth.RuneWidth(runes[0])
-	}
-
-	// Multi-rune cluster: Check for special cases
-	firstRune := runes[0]
-
-	// Check if first rune is zero-width (shouldn't be, but handle edge case)
-	if isZeroWidth(firstRune) {
-		return 0
-	}
-
-	// SPECIAL CASE: Variation selectors (U+FE0E text, U+FE0F emoji)
-	// These modify the presentation of the base character and affect width:
-	// - "☀︎" (sun + U+FE0E) → text presentation, width 1
-	// - "☀️" (sun + U+FE0F) → emoji presentation, width 2
-	// For these cases, uniwidth.StringWidth handles it correctly
-	if len(runes) >= 2 {
-		secondRune := runes[1]
-		if secondRune == 0xFE0E || secondRune == 0xFE0F {
-			// Use uniwidth.StringWidth which handles variation selectors correctly
-			return uniwidth.StringWidth(cluster)
-		}
-	}
-
-	// GENERAL CASE: Emoji modifiers, ZWJ sequences, combining marks
-	// For these, use width of FIRST (base) rune only
-	// Why? Because:
-	// - Emoji modifiers (🏻🏼🏽🏾🏿) modify the base emoji, don't add width
-	// - ZWJ sequences (👨‍👩‍👧‍👦) are visually rendered as single emoji
-	// - Combining marks (é = e + ́) don't add width to base character
-	//
-	// Examples:
-	// - "👋🏻" → use width of 👋 (2), ignore 🏻 modifier
-	// - "👨‍👩" → use width of 👨 (2), ignore ZWJ + 👩
-	// - "é" → use width of e (1), ignore combining acute
-	return uniwidth.RuneWidth(firstRune)
+	return uniwidth.StringWidth(cluster)
 }
 
 // isZeroWidth checks if a rune is zero-width.
@@ -316,21 +202,24 @@ func (us *UnicodeService) StringWidthWithConfig(s string, config value.UnicodeCo
 		return 0
 	}
 
-	// For complex Unicode (emoji modifiers, ZWJ, etc.), config doesn't affect width
-	// Grapheme clustering is always the same regardless of locale
-	if containsTrulyComplexUnicode(s) {
-		width := 0
-		gr := uniseg.NewGraphemes(s)
-		for gr.Next() {
-			cluster := gr.Str()
-			width += us.ClusterWidthWithConfig(cluster, config)
+	// Base width (handles emoji/ZWJ/modifiers correctly via grapheme awareness)
+	width := uniwidth.StringWidth(s)
+
+	// Adjust for East Asian Ambiguous characters in wide mode.
+	// We compute per-rune delta because StringWidthWithOptions lacks
+	// grapheme awareness for emoji modifiers/ZWJ sequences.
+	if config.IsEastAsianWide() {
+		for _, r := range s {
+			wideW := uniwidth.RuneWidthWithOptions(r,
+				uniwidth.WithEastAsianAmbiguous(config.EastAsianAmbiguous()))
+			narrowW := uniwidth.RuneWidth(r)
+			if wideW > narrowW {
+				width += wideW - narrowW
+			}
 		}
-		return width
 	}
 
-	// For simple Unicode, use uniwidth with options
-	return uniwidth.StringWidthWithOptions(s,
-		uniwidth.WithEastAsianAmbiguous(config.EastAsianAmbiguous()))
+	return width
 }
 
 // ClusterWidthWithConfig calculates the width of a grapheme cluster with custom configuration.
@@ -350,34 +239,22 @@ func (us *UnicodeService) ClusterWidthWithConfig(cluster string, config value.Un
 		return 0
 	}
 
-	runes := []rune(cluster)
-	if len(runes) == 0 {
-		return 0
-	}
+	// Base width (handles emoji/ZWJ/modifiers correctly via grapheme awareness)
+	width := uniwidth.StringWidth(cluster)
 
-	// Single rune: use uniwidth with options
-	if len(runes) == 1 {
-		return uniwidth.RuneWidthWithOptions(runes[0],
-			uniwidth.WithEastAsianAmbiguous(config.EastAsianAmbiguous()))
-	}
-
-	// Multi-rune cluster handling (same as ClusterWidth)
-	firstRune := runes[0]
-
-	if isZeroWidth(firstRune) {
-		return 0
-	}
-
-	// Variation selectors
-	if len(runes) >= 2 {
-		secondRune := runes[1]
-		if secondRune == 0xFE0E || secondRune == 0xFE0F {
-			return uniwidth.StringWidthWithOptions(cluster,
+	// Adjust for East Asian Ambiguous characters in wide mode.
+	// We compute per-rune delta because StringWidthWithOptions lacks
+	// grapheme awareness for emoji modifiers/ZWJ sequences.
+	if config.IsEastAsianWide() {
+		for _, r := range cluster {
+			wideW := uniwidth.RuneWidthWithOptions(r,
 				uniwidth.WithEastAsianAmbiguous(config.EastAsianAmbiguous()))
+			narrowW := uniwidth.RuneWidth(r)
+			if wideW > narrowW {
+				width += wideW - narrowW
+			}
 		}
 	}
 
-	// Emoji modifiers, ZWJ, combining marks - use first rune width
-	return uniwidth.RuneWidthWithOptions(firstRune,
-		uniwidth.WithEastAsianAmbiguous(config.EastAsianAmbiguous()))
+	return width
 }
