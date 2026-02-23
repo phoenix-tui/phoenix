@@ -4,23 +4,20 @@
 
 Part of the Phoenix TUI Framework.
 
-**Status**: ✅ Production Ready (Week 16)
 **Module**: `github.com/phoenix-tui/phoenix/mouse`
-**Version**: v0.1.0-alpha
-**Coverage**: ~60% (working toward 90%+)
 
 ---
 
 ## Features
 
-- ✅ **All Mouse Buttons**: Left, Right, Middle, Scroll Wheel
-- ✅ **Click Detection**: Single, Double, Triple clicks (automatic)
-- ✅ **Drag & Drop**: State tracking with threshold detection
-- ✅ **Scroll Wheel**: Up/Down with configurable delta
-- ✅ **Modifier Keys**: Shift, Ctrl, Alt detection
-- ✅ **Multi-Protocol**: SGR (modern), X10 (legacy), URxvt (alternative)
-- ✅ **DDD Architecture**: Rich domain models with behavior
-- ✅ **Zero Dependencies**: Built from scratch (stdlib only)
+- **All Mouse Buttons**: Left, Right, Middle, Scroll Wheel
+- **Click Detection**: Single, Double, Triple clicks (automatic)
+- **Drag & Drop**: State tracking with threshold detection
+- **Scroll Wheel**: Up/Down with configurable delta
+- **Modifier Keys**: Shift, Ctrl, Alt detection
+- **Multi-Protocol**: SGR (modern), X10 (legacy), URxvt (alternative)
+- **DDD Architecture**: Rich domain models with behavior
+- **Zero Dependencies**: Built from scratch (stdlib only)
 
 ---
 
@@ -70,8 +67,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 ```go
 mouse.ButtonNone       // No button (motion only)
-mouse.ButtonLeft       // Left mouse button ⭐
-mouse.ButtonRight      // Right mouse button ⭐
+mouse.ButtonLeft       // Left mouse button
+mouse.ButtonRight      // Right mouse button
 mouse.ButtonMiddle     // Middle button (scroll wheel press)
 mouse.ButtonWheelUp    // Scroll wheel up
 mouse.ButtonWheelDown  // Scroll wheel down
@@ -141,7 +138,7 @@ func (i *Input) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 ```
 
-### 2. Context Menu (Right Click) ⭐
+### 2. Context Menu (Right Click)
 
 ```go
 type Model struct {
@@ -261,7 +258,7 @@ case tea.MouseMsg:
 ```
 
 **Detection Rules**:
-- **Double click**: Two clicks within 500ms at same position (±1 cell tolerance)
+- **Double click**: Two clicks within 500ms at same position (+-1 cell tolerance)
 - **Triple click**: Three clicks within 500ms at same position
 - Automatic timeout after 500ms
 
@@ -301,7 +298,7 @@ case tea.MouseMsg:
 
 Phoenix supports multiple mouse protocols with automatic fallback:
 
-### SGR (1006) - Modern ⭐ PREFERRED
+### SGR (1006) - Modern (Preferred)
 
 ```
 \x1b[<0;10;5M   # Left press at (10, 5)
@@ -370,7 +367,7 @@ input := textinput.New().
     WithPlaceholder("Click to position cursor...").
     WithMouseSupport(true)  // Enable mouse clicks
 
-// User clicks at X coordinate → cursor moves to that position
+// User clicks at X coordinate -> cursor moves to that position
 ```
 
 ### Viewport - Scrolling
@@ -382,7 +379,7 @@ viewport := viewport.New(80, 20).
     WithContent(longText).
     WithMouseScroll(true)  // Enable scroll wheel
 
-// User scrolls wheel → viewport scrolls up/down
+// User scrolls wheel -> viewport scrolls up/down
 ```
 
 ### List - Item Selection
@@ -393,8 +390,8 @@ Phoenix List supports click selection:
 list := list.New(items).
     WithMouseSelect(true)  // Enable click selection
 
-// User clicks item → item selected
-// User right-clicks item → context menu?
+// User clicks item -> item selected
+// User right-clicks item -> context menu?
 ```
 
 ---
@@ -463,16 +460,16 @@ mouse/
 
 | Platform | Protocol | Support |
 |----------|----------|---------|
-| **iTerm2** | SGR (1006) | ✅ Full |
-| **Windows Terminal** | SGR (1006) | ✅ Full |
-| **Alacritty** | SGR (1006) | ✅ Full |
-| **Kitty** | SGR (1006) | ✅ Full |
-| **xterm** | SGR (1006) | ✅ Full |
-| **tmux** | SGR (1006) | ✅ Full |
-| **Terminal.app** (macOS) | SGR (1006) | ✅ Full |
-| **GNOME Terminal** | SGR (1006) | ✅ Full |
-| **Old xterm** | X10 (1000) | ⚠️ Limited |
-| **PuTTY** | X10 (1000) | ⚠️ Limited |
+| **iTerm2** | SGR (1006) | Full |
+| **Windows Terminal** | SGR (1006) | Full |
+| **Alacritty** | SGR (1006) | Full |
+| **Kitty** | SGR (1006) | Full |
+| **xterm** | SGR (1006) | Full |
+| **tmux** | SGR (1006) | Full |
+| **Terminal.app** (macOS) | SGR (1006) | Full |
+| **GNOME Terminal** | SGR (1006) | Full |
+| **Old xterm** | X10 (1000) | Limited |
+| **PuTTY** | X10 (1000) | Limited |
 
 ---
 
@@ -518,45 +515,26 @@ See `examples/` directory:
 |---------|---------|-----------|
 | **Click Detection** | Built-in | Manual |
 | **Drag Tracking** | Built-in | Manual |
-| **Right Click** | ✅ Full support | ✅ Supported |
-| **Middle Click** | ✅ Full support | ✅ Supported |
+| **Right Click** | Full support | Supported |
+| **Middle Click** | Full support | Supported |
 | **Protocol Abstraction** | DDD | Raw events |
 | **Domain Model** | Rich | Anemic |
-| **Test Coverage** | 60%+ (→90%) | Unknown |
-
----
-
-## Roadmap
-
-### v0.1.0 (Current)
-- ✅ All button support (Left, Right, Middle, Wheel)
-- ✅ Click detection (single, double, triple)
-- ✅ Drag & drop tracking
-- ✅ Scroll wheel
-- ✅ SGR protocol
-- ⏳ 90% test coverage (currently ~60%)
-
-### v0.2.0 (Future)
-- Hover events (motion tracking)
-- Touch events (mobile terminals)
-- Gesture recognition
-- Advanced drag & drop (file types, MIME)
 
 ---
 
 ## FAQ
 
 **Q: Does right click work?**
-A: ✅ Yes! Full support for left, right, and middle buttons.
+A: Yes! Full support for left, right, and middle buttons.
 
 **Q: How do I show a context menu on right click?**
 A: Check `msg.Button == mouse.ButtonRight` and render your context menu component.
 
 **Q: Can I detect double-click?**
-A: ✅ Yes! Phoenix automatically detects double and triple clicks.
+A: Yes! Phoenix automatically detects double and triple clicks.
 
 **Q: Does scroll wheel work in SSH?**
-A: ✅ Yes, if your terminal supports SGR protocol (most modern terminals do).
+A: Yes, if your terminal supports SGR protocol (most modern terminals do).
 
 **Q: How do I enable mouse support?**
 A: Call `mouse.Enable()` at program start, or use `tea.WithMouseCellMotion()` in tea.Program options.
@@ -578,11 +556,3 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
 ## Credits
 
 Part of the **Phoenix TUI Framework** - Next-generation terminal UI for Go.
-
-**Week 16 Implementation** - Mouse & Clipboard support complete.
-
----
-
-*Documentation Version: 1.0*
-*Last Updated: 2025-10-17*
-*Status: Production Ready*

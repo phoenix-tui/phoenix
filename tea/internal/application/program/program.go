@@ -13,6 +13,7 @@ import (
 
 	model2 "github.com/phoenix-tui/phoenix/tea/internal/domain/model"
 	"github.com/phoenix-tui/phoenix/tea/internal/infrastructure/input"
+	"github.com/phoenix-tui/phoenix/tea/internal/infrastructure/renderer"
 	"github.com/phoenix-tui/phoenix/terminal"
 )
 
@@ -67,6 +68,12 @@ type Program[T any] struct {
 
 	// Quit channel
 	quitCh chan struct{}
+
+	// Inline renderer for non-alt-screen mode.
+	// Initialized lazily in renderView() on the first render call.
+	// Tracks linesRendered so subsequent renders overwrite the previous frame
+	// instead of appending below it.
+	inlineRenderer *renderer.InlineRenderer
 
 	// Suspend/Resume state (for ExecProcess and public API)
 	suspended    bool            // True if TUI is suspended
@@ -219,6 +226,13 @@ func (p *Program[T]) Run() error {
 				continue
 			}
 
+			// Intercept WindowSizeMsg to keep inline renderer dimensions current.
+			if sizeMsg, ok := msg.(model2.WindowSizeMsg); ok && !p.altScreen {
+				if p.inlineRenderer != nil {
+					p.inlineRenderer.Resize(sizeMsg.Width, sizeMsg.Height)
+				}
+			}
+
 			// Update model
 			newModel, cmd := p.model.Update(msg)
 			p.model = newModel
@@ -335,6 +349,13 @@ func (p *Program[T]) Start() error {
 						p.msgCh <- m
 					}
 					continue
+				}
+
+				// Intercept WindowSizeMsg to keep inline renderer dimensions current.
+				if sizeMsg, ok := msg.(model2.WindowSizeMsg); ok && !p.altScreen {
+					if p.inlineRenderer != nil {
+						p.inlineRenderer.Resize(sizeMsg.Width, sizeMsg.Height)
+					}
 				}
 
 				// Update
@@ -474,13 +495,30 @@ func (p *Program[T]) executeCommand(cmd model2.Cmd) {
 }
 
 // renderView renders the current model's view to output.
+//
+// In inline (non-alt-screen) mode the InlineRenderer is used to overwrite
+// the previous frame using ANSI cursor-up sequences, preventing the
+// stacked-output bug where each update appends below the last.
+//
+// In alt-screen mode a plain write is used; the alt-screen renderer will be
+// integrated in a future release.
 func (p *Program[T]) renderView() {
 	view := p.model.View()
 
-	// Write to output
-	// Day 4: simple write. Day 5: will add diff rendering
+	if !p.altScreen {
+		// Lazily initialize the inline renderer on the first call.
+		// Width/height start at 0 (disables truncation/clipping) until
+		// a WindowSizeMsg updates the dimensions.
+		if p.inlineRenderer == nil {
+			p.inlineRenderer = renderer.NewInlineRenderer(p.output, 0, 0)
+		}
+		// Render errors are non-fatal (e.g. write to closed pipe during tests).
+		_ = p.inlineRenderer.Render(view)
+		return
+	}
+
+	// Alt-screen mode: plain write (cursor is at absolute position after \x1b[H).
 	_, _ = p.output.Write([]byte(view))
-	// Ignore write errors for now (may occur during tests)
 }
 
 // startInputReader starts reading input in a goroutine.
@@ -806,7 +844,13 @@ func (p *Program[T]) Resume() error {
 	// STEP 4: Restart inputReader goroutine
 	p.restartInputReader()
 
-	// STEP 5: Force full redraw
+	// STEP 5: Force full redraw.
+	// Clear the inline renderer diff cache so all lines are repainted.
+	// The external command may have written arbitrary content to the terminal,
+	// invalidating our previous frame tracking.
+	if p.inlineRenderer != nil {
+		p.inlineRenderer.Repaint()
+	}
 	p.renderView()
 
 	return nil

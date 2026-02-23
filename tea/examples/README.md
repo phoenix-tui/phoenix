@@ -301,4 +301,4 @@ case service.TickMsg:
 
 ---
 
-*Examples created for Week 6 Day 7 - phoenix/tea v1.0*
+*phoenix/tea examples*

@@ -112,7 +112,7 @@ The `ImageCodec` is a domain service providing:
 
 ### Test Coverage
 
-The ImageCodec service has **95.7% test coverage**, exceeding the 90% target.
+The ImageCodec service has extensive test coverage, exceeding project targets.
 
 ## Clipboard Integration (Future)
 

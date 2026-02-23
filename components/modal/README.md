@@ -13,11 +13,7 @@ Universal modal/overlay component for Phoenix TUI Framework.
 - **Background dimming** - Improves UX by making modal stand out
 - **Immutable API** - Fluent interface with immutable operations
 - **Type-safe** - Full type safety with Go 1.25+ generics
-- **High test coverage** - 96.5% coverage
-
-## Status
-
-**Week 12 Day 3-4 COMPLETE** - Production-ready, universal component.
+- **High test coverage** - Extensive coverage across all layers
 
 ## Installation
 
@@ -349,13 +345,13 @@ Phoenix Modal follows Domain-Driven Design (DDD):
 
 ```
 modal/
-├── domain/           # Business logic (95%+ coverage)
+├── domain/           # Business logic
 │   ├── model/       # Rich domain models (Button, Modal)
 │   ├── value/       # Value objects (Position, Size)
 │   └── service/     # Domain services (LayoutService)
-├── infrastructure/   # Technical implementation (100% coverage)
+├── infrastructure/   # Technical implementation
 │   └── keybindings.go
-├── api/             # Public interface (94.4% coverage)
+├── api/             # Public interface
 │   └── modal.go     # Fluent API + tea.Model
 └── examples/        # Example applications
 ```
@@ -370,7 +366,7 @@ modal/
 
 ## Use Cases
 
-### 1. Confirmation Dialogs (gosh - Week 17-18)
+### 1. Confirmation Dialogs
 
 ```go
 // Ask user before executing dangerous command
@@ -413,7 +409,7 @@ Font Size: 14
 m := modal.NewWithTitle("Settings", settingsContent).Size(50, 15)
 ```
 
-## Integration with gosh (Week 17-18)
+## Integration with gosh
 
 Phoenix Modal will be used in gosh for:
 
@@ -447,12 +443,7 @@ go test -cover ./...
 go test -v ./...
 ```
 
-Current coverage: **96.5%**
-- Domain model: 100%
-- Domain service: 100%
-- Domain value: 100%
-- Infrastructure: 100%
-- API: 94.4%
+High test coverage across all layers (domain, infrastructure, API).
 
 ## Comparison with Charm Bubbles
 
@@ -464,7 +455,7 @@ Current coverage: **96.5%**
 | Button Navigation | ✅ Yes | ⚠️ Manual |
 | Custom Positioning | ✅ Yes | ❌ No |
 | Background Dimming | ✅ Yes | ❌ No |
-| Test Coverage | ✅ 96.5% | ⚠️ Variable |
+| Test Coverage | ✅ High | ⚠️ Variable |
 | Unicode Correctness | ✅ Yes | ❌ No (lipgloss #562) |
 | Dependencies | ✅ Zero external | ❌ Many |
 
@@ -472,18 +463,12 @@ Current coverage: **96.5%**
 
 Phoenix Modal is part of the Phoenix TUI Framework project.
 
-See [ROADMAP.md](../../docs/dev/ROADMAP.md) for the 20-week development plan.
+See [ROADMAP.md](../../docs/dev/ROADMAP.md) for the development plan.
 
 ## License
 
-Phoenix TUI Framework is open-source (license TBD at v0.1.0 release).
-
-## Version
-
-**v0.1.0-alpha** (Week 12 complete - Week 11-12: Components)
-
-Next: **Progress component** (Week 12 Day 5-7)
+Phoenix TUI Framework is open-source.
 
 ---
 
-**Phoenix TUI Framework** - Building the #1 TUI framework for Go by 2026.
+**Phoenix TUI Framework** - Building the #1 TUI framework for Go.

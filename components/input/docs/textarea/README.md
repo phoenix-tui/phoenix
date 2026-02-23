@@ -304,9 +304,7 @@ Run tests with coverage:
 go test ./... -cover
 ```
 
-Current coverage:
-- Domain layer: **24.1%** (expanding to 95%+ target)
-- Overall: **Expanding**
+Run the coverage report to see current results.
 
 ---
 
@@ -373,4 +371,4 @@ Part of Phoenix TUI Framework. See main project LICENSE.
 ---
 
 *Built for GoSh Classic mode migration.*
-*Part of Phoenix TUI Framework v0.1.0-alpha*
+*Part of Phoenix TUI Framework*

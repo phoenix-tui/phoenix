@@ -2,19 +2,17 @@
 
 Phoenix Layout implements a CSS-like box model and Flexbox layout for terminal user interfaces with support for padding, margins, borders, alignment, and flexible layouts.
 
-**Status**: ✅ Week 9-10 Complete - Box Model + Flexbox Ready
 **Module**: `github.com/phoenix-tui/phoenix/layout`
-**Coverage**: 98.3% (API), 99.2% (domain/model), 95.6% (domain/service)
 
 ## Features
 
-- ✅ **CSS Box Model** - Content, padding, border, margin layers
-- ✅ **Flexbox Layout** - Row/column layouts with flexible sizing (NEW!)
-- ✅ **Unicode-Aware** - Correct width calculation for CJK and emoji
-- ✅ **Fluent API** - Chainable method calls for easy styling
-- ✅ **Type-Safe** - Compile-time guarantees
-- ✅ **DDD Architecture** - Clean, testable, maintainable
-- ✅ **98%+ Coverage** - Comprehensive test suite
+- **CSS Box Model** - Content, padding, border, margin layers
+- **Flexbox Layout** - Row/column layouts with flexible sizing
+- **Unicode-Aware** - Correct width calculation for CJK and emoji
+- **Fluent API** - Chainable method calls for easy styling
+- **Type-Safe** - Compile-time guarantees
+- **DDD Architecture** - Clean, testable, maintainable
+- **Extensive test coverage** - Comprehensive test suite
 
 ## Quick Start
 
@@ -38,11 +36,11 @@ func main() {
 
 Output:
 ```
-┌─────────────┐
-│             │
-│ Hello World │
-│             │
-└─────────────┘
++---------------+
+|               |
+| Hello World   |
+|               |
++---------------+
 ```
 
 ## API Reference
@@ -101,7 +99,7 @@ pos := box.Layout(80, 24)       // Position in parent
 fmt.Printf("At (%d, %d)\n", pos.X(), pos.Y())
 ```
 
-## Flexbox Layout (NEW!)
+## Flexbox Layout
 
 ### Creating Flexbox Containers
 
@@ -159,14 +157,14 @@ flex.AlignCenter()   // Center items
 
 Visual (Row):
 ```
-AlignStretch:  ┌───┐ ┌───┐ ┌───┐
-               │ 1 │ │ 2 │ │ 3 │  ← All same height
-               └───┘ └───┘ └───┘
+AlignStretch:  +---+ +---+ +---+
+               | 1 | | 2 | | 3 |  <- All same height
+               +---+ +---+ +---+
 
-AlignStart:    ┌───┐ ┌───┐ ┌───┐
-               │ 1 │ │ 2 │ │ 3 │  ← Aligned to top
-               │   │ └───┘ │   │
-               └───┘       └───┘
+AlignStart:    +---+ +---+ +---+
+               | 1 | | 2 | | 3 |  <- Aligned to top
+               |   | +---+ |   |
+               +---+       +---+
 ```
 
 ### Gap Spacing
@@ -240,18 +238,18 @@ go run ./examples/shell_layouts/complex     # Nested and complex layouts
 ## Box Model
 
 ```
-┌─────────────────────────┐
-│       Margin            │  ← Outside spacing
-│  ┌──────────────────┐   │
-│  │     Border       │   │  ← Visual boundary
-│  │  ┌───────────┐   │   │
-│  │  │  Padding  │   │   │  ← Inside spacing
-│  │  │ ┌───────┐ │   │   │
-│  │  │ │Content│ │   │   │  ← Text content
-│  │  │ └───────┘ │   │   │
-│  │  └───────────┘   │   │
-│  └──────────────────┘   │
-└─────────────────────────┘
++-------------------------+
+|       Margin            |  <- Outside spacing
+|  +------------------+   |
+|  |     Border       |   |  <- Visual boundary
+|  |  +-----------+   |   |
+|  |  |  Padding  |   |   |  <- Inside spacing
+|  |  | +-------+ |   |   |
+|  |  | |Content| |   |   |  <- Text content
+|  |  | +-------+ |   |   |
+|  |  +-----------+   |   |
+|  +------------------+   |
++-------------------------+
 ```
 
 ## Architecture
@@ -262,28 +260,9 @@ layout/
 │   ├── model/      # Box, Node entities
 │   ├── value/      # Size, Position, Spacing
 │   └── service/    # Measure, Layout, Render services
-├── api/            # Public fluent API (100% coverage)
+├── api/            # Public fluent API
 └── examples/       # Usage examples
 ```
-
-## Status
-
-### Week 9 (Complete)
-- ✅ Day 1-2: Value Objects + Domain Models (Size, Position, Spacing, Alignment, Box, Node)
-- ✅ Day 3: Layout Engine Services (Measure, Layout, Render)
-- ✅ Day 4: Public API + Examples + Documentation
-
-### Week 10 (Complete)
-- ✅ Day 5: Flexbox Domain Model (FlexContainer, Direction, JustifyContent, AlignItems)
-- ✅ Day 6: Flexbox Layout Engine (Row/column distribution, gap support)
-- ✅ Day 7: Flexbox Public API + Shell Layout Examples
-
-## Roadmap
-
-### v0.2.0 (Future)
-- Grid layout
-- Absolute positioning
-- Z-index stacking
 
 ## Testing
 
@@ -292,13 +271,6 @@ go test ./...              # All tests
 go test ./... -cover       # With coverage
 go test ./api/... -v       # API tests verbose
 ```
-
-**Current Coverage**:
-- API: 98.3%
-- Domain/Model: 99.2%
-- Domain/Service: 95.6%
-- Domain/Value: 98.5%
-- **Overall: 97.9%** (exceeds 95% target!)
 
 ## License
 

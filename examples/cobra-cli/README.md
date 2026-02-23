@@ -121,7 +121,7 @@ This example could be built with Charm (Huh + Lipgloss), but Phoenix offers:
 | **Performance** | ~60 FPS | 29,000 FPS |
 | **Modularity** | Monolithic | DDD layers |
 | **Customization** | Limited | Full control |
-| **Test Coverage** | Unknown | 91.8% |
+| **Test Coverage** | Unknown | High (90%+ target) |
 
 ### Unicode Bug Example
 
@@ -153,12 +153,12 @@ prompt := "Name 👋: "  // Perfect width calculation ✓
 ### Add More Components
 
 ```go
-// Select dropdown (coming in v0.2.0)
+// Select dropdown (see phoenix/components)
 selectInput := components.NewSelect(
     components.WithOptions([]string{"Option 1", "Option 2"}),
 )
 
-// Confirm dialog (coming in v0.2.0)
+// Confirm dialog (see phoenix/components)
 confirm := components.NewConfirm(
     components.WithMessage("Are you sure?"),
 )

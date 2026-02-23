@@ -144,7 +144,7 @@ This example shows **low-level** hover detection suitable for custom components.
 For higher-level UI components (TextInput, Button, etc.), use **phoenix/components** which have built-in hover support:
 
 ```go
-// High-level component with hover (coming in phoenix/components v0.2.0)
+// High-level component with hover (see phoenix/components)
 btn := components.NewButton().
     Text("Click Me").
     OnHover(func(hovered bool) { /* ... */ }).
@@ -181,4 +181,3 @@ See [phoenix/mouse documentation](../../mouse/README.md) for full API details:
 
 **Phoenix TUI Framework** - Modern TUI library for Go
 **GitHub**: https://github.com/phoenix-tui/phoenix
-**Version**: v0.1.0-beta.5 (Week 15 - Mouse & Clipboard)

@@ -52,7 +52,7 @@ benchmarks/
 │   ├── README.md            # Detailed results documentation
 │   ├── current/             # Latest benchmark runs
 │   ├── baseline/            # Stable baseline for comparisons
-│   └── history/             # Release milestones (v0.1.0-beta.3, etc.)
+│   └── history/             # Release milestones
 └── scripts/                  # Automation scripts
     ├── run_benchmarks.sh    # Run all benchmarks
     ├── compare.sh           # Compare current vs baseline
@@ -61,7 +61,7 @@ benchmarks/
 
 ---
 
-## 🚀 Current Performance (v0.1.0-beta.3)
+## 🚀 Current Performance
 
 ### Render Performance
 
@@ -87,7 +87,7 @@ benchmarks/
 | Code Editor | 117 µs/op |
 | Small UI Change | 28 µs/op |
 
-Full results: [`results/history/v0.1.0-beta.3/summary.md`](results/history/v0.1.0-beta.3/summary.md)
+Full results: see `results/history/` for per-release summaries.
 
 ---
 
@@ -222,7 +222,7 @@ go test -bench=. -memprofile=mem.prof
 
 - [Go Benchmark Documentation](https://pkg.go.dev/testing#hdr-Benchmarks)
 - [benchstat tool](https://pkg.go.dev/golang.org/x/perf/cmd/benchstat)
-- [Phoenix Performance Report](results/history/v0.1.0-beta.3/summary.md)
+- [Phoenix Performance Reports](results/history/)
 
 ---
 
@@ -242,5 +242,4 @@ A: Run benchmarks, save results, and open issue with before/after comparison.
 
 ---
 
-**Last Updated**: 2025-10-23
-**Baseline**: v0.1.0-beta.3
+*Phoenix TUI - Performance Benchmarks*

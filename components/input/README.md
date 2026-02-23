@@ -11,7 +11,7 @@
 - **Validation hooks** - Custom validation with clear error states
 - **Extensible keybindings** - Add your own key handlers
 - **Immutable design** - All operations return new instances
-- **High test coverage** - 95%+ domain, 100% API
+- **High test coverage** - Extensive domain and API coverage
 
 ## Installation
 
@@ -266,7 +266,7 @@ customRender := before + "[" + at + "]" + after  // Render cursor as brackets
 
 See: `examples/cursor_api/main.go`
 
-## How gosh Will Use TextInput (Week 17-18)
+## How gosh Will Use TextInput
 
 TextInput is **universal** - gosh will wrap it in `ShellInput` with shell-specific features:
 
@@ -314,13 +314,13 @@ func (s *ShellInput) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 ```
 input/
-├── domain/              # Pure business logic (95%+ coverage)
+├── domain/              # Pure business logic
 │   ├── model/          # TextInput aggregate root
 │   ├── value/          # Cursor, Selection value objects
 │   └── service/        # CursorMovement, Validation services
-├── infrastructure/      # Technical implementation (90%+ coverage)
+├── infrastructure/      # Technical implementation
 │   └── keybindings.go  # Default and custom key handlers
-├── api/                # Public interface (100% coverage)
+├── api/                # Public interface
 │   └── input.go        # Fluent API, tea.Model integration
 └── examples/           # Usage demonstrations
     ├── basic.go
@@ -344,12 +344,7 @@ go test ./...
 # Run with coverage
 go test -cover ./...
 
-# Expected coverage:
-# domain/model:  95%+
-# domain/value:  100%
-# domain/service: 95%+
-# infrastructure: 90%+
-# api:           100%
+# High coverage across all layers
 ```
 
 ## Comparison with Bubbles textinput
@@ -364,7 +359,7 @@ go test -cover ./...
 | Custom keybindings | ✅ KeyBindingHandler interface | ⚠️ Override entire Update() |
 | Scrolling | ✅ Horizontal scrolling | ✅ Similar |
 | Architecture | ✅ DDD with clear layers | ⚠️ Monolithic |
-| Test coverage | ✅ 95%+ | ⚠️ Lower |
+| Test coverage | ✅ High | ⚠️ Lower |
 
 **Key differentiator:** Public cursor API enables applications to:
 - Customize cursor rendering (shell prompts, syntax highlighting)
@@ -397,7 +392,7 @@ value := input.Value()
 - `Focused(bool)` instead of `Focus()/Blur()`
 - `Value()` instead of `Value()` (same!)
 
-## Future Enhancements (Post v0.1.0)
+## Future Enhancements
 
 - **Styling integration** - Full phoenix/style support
 - **Multi-line mode** - Textarea variant
@@ -416,7 +411,4 @@ Apache-2.0 (same as Phoenix TUI Framework)
 
 ---
 
-**Status:** ✅ Week 11 Day 1-3 Complete (v0.1.0-alpha)
-**Coverage:** Domain 95%+, API 100%
 **Examples:** 4 complete (basic, validated, styled, cursor_api)
-**Next:** Week 11 Day 4-7 - List, Viewport, Table components

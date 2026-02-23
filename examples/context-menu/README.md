@@ -187,6 +187,6 @@ After understanding this example:
 
 ---
 
-**Part of Phoenix TUI Framework Week 15 (Advanced Mouse Features)**
+**Part of Phoenix TUI Framework (Advanced Mouse Features)**
 **Author**: Phoenix TUI Contributors
 **License**: MIT
