@@ -404,12 +404,10 @@ func TestProgram_ExecProcess_ErrorPropagation(t *testing.T) {
 // │ InputReader Lifecycle Tests (CRITICAL BUG FIX)                  │.
 // └─────────────────────────────────────────────────────────────────┘.
 
-// TestProgram_ExecProcess_InputReaderStopped verifies inputReader is stopped before command.
+// TestProgram_ExecProcess_InputReaderStopped verifies inputReader is stopped and
+// restarted during ExecProcess. Uses inputReaderGeneration instead of
+// inputReaderRunning to avoid race conditions (goroutine may exit before check).
 func TestProgram_ExecProcess_InputReaderStopped(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("Skipping on Windows: inputReader state timing is non-deterministic due to stdin blocking")
-	}
-
 	mockTerm := phoenixtesting.NewMockTerminal()
 	m := TestModel{}
 	p := New(m, WithTerminal[TestModel](mockTerm))
@@ -417,10 +415,11 @@ func TestProgram_ExecProcess_InputReaderStopped(t *testing.T) {
 	// Start inputReader (simulating Run() lifecycle)
 	p.startInputReader()
 
-	// Verify inputReader is running
+	// Capture generation after start — proves startInputReader was called.
 	p.mu.Lock()
-	assert.True(t, p.inputReaderRunning, "inputReader should be running before ExecProcess")
+	genAfterStart := p.inputReaderGeneration
 	p.mu.Unlock()
+	assert.Greater(t, genAfterStart, uint64(0), "generation should be > 0 after start")
 
 	// Create simple command
 	var cmd *exec.Cmd
@@ -434,20 +433,17 @@ func TestProgram_ExecProcess_InputReaderStopped(t *testing.T) {
 	err := p.ExecProcess(cmd)
 	assert.NoError(t, err)
 
-	// After ExecProcess, inputReader should be restarted
+	// After ExecProcess, generation must have increased (stop increments + restart increments).
 	p.mu.Lock()
-	running := p.inputReaderRunning
+	genAfterExec := p.inputReaderGeneration
 	p.mu.Unlock()
 
-	assert.True(t, running, "inputReader should be restarted after ExecProcess")
+	assert.Greater(t, genAfterExec, genAfterStart, "generation should increase after ExecProcess (proves stop+restart)")
 }
 
 // TestProgram_ExecProcess_InputReaderRestarted verifies inputReader restarts after command.
+// Uses inputReaderGeneration to verify restart without timing dependency.
 func TestProgram_ExecProcess_InputReaderRestarted(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("Skipping on Windows: inputReader restart timing is non-deterministic due to stdin blocking")
-	}
-
 	mockTerm := phoenixtesting.NewMockTerminal()
 	m := TestModel{}
 	p := New(m, WithTerminal[TestModel](mockTerm))
@@ -455,12 +451,11 @@ func TestProgram_ExecProcess_InputReaderRestarted(t *testing.T) {
 	// Start inputReader
 	p.startInputReader()
 
-	// Get original inputReader state
+	// Capture generation — proves startInputReader was called.
 	p.mu.Lock()
-	originalRunning := p.inputReaderRunning
+	genAfterStart := p.inputReaderGeneration
 	p.mu.Unlock()
-
-	assert.True(t, originalRunning, "inputReader should be running initially")
+	assert.Greater(t, genAfterStart, uint64(0), "generation should be > 0 after start")
 
 	// Create simple command
 	var cmd *exec.Cmd
@@ -474,12 +469,14 @@ func TestProgram_ExecProcess_InputReaderRestarted(t *testing.T) {
 	err := p.ExecProcess(cmd)
 	assert.NoError(t, err)
 
-	// Verify inputReader was restarted
+	// Verify inputReader was restarted via generation increase.
+	// ExecProcess calls stopInputReader (gen++) then startInputReader (gen++),
+	// so generation must increase by at least 2.
 	p.mu.Lock()
-	restartedRunning := p.inputReaderRunning
+	genAfterExec := p.inputReaderGeneration
 	p.mu.Unlock()
 
-	assert.True(t, restartedRunning, "inputReader should be running after ExecProcess")
+	assert.Greater(t, genAfterExec, genAfterStart, "generation should increase (proves restart)")
 
 	// Cleanup: stop inputReader to prevent goroutine leak
 	p.stopInputReader()
@@ -487,49 +484,51 @@ func TestProgram_ExecProcess_InputReaderRestarted(t *testing.T) {
 
 // TestProgram_ExecProcess_NoInputReaderLeak verifies stop/restart mechanism.
 //
-// This test verifies that ExecProcess properly stops and restarts the inputReader.
-// The actual mechanism (context cancellation, goroutine cleanup) is what prevents leaks.
+// This test verifies that ExecProcess properly stops and restarts the inputReader
+// across multiple sequential command executions. Uses generation counter to verify
+// lifecycle without timing dependency on goroutine state.
 func TestProgram_ExecProcess_NoInputReaderLeak(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("Skipping on Windows: inputReader cleanup timing is non-deterministic due to stdin blocking")
-	}
-
 	mockTerm := phoenixtesting.NewMockTerminal()
 	m := TestModel{}
 	p := New(m, WithTerminal[TestModel](mockTerm))
 
-	// Execute multiple commands sequentially
-	// Each call to ExecProcess should properly manage inputReader lifecycle
+	// Execute multiple commands sequentially.
+	// Each call to ExecProcess should properly manage inputReader lifecycle.
 	for i := 0; i < 3; i++ {
 		// Create command
 		var cmd *exec.Cmd
 		if runtime.GOOS == "windows" {
-			cmd = exec.Command("cmd", "/c", "echo", "iteration", string(rune('0'+i)))
+			cmd = exec.Command("cmd", "/c", "echo", "iteration", strconv.Itoa(i))
 		} else {
-			cmd = exec.Command("echo", "iteration", string(rune('0'+i)))
+			cmd = exec.Command("echo", "iteration", strconv.Itoa(i))
 		}
 
-		// Start inputReader (simulating TUI running state)
-		p.startInputReader()
-
-		// Verify it started (flag set synchronously)
+		// Capture generation before start.
 		p.mu.Lock()
-		assert.True(t, p.inputReaderRunning, "inputReader flag should be set")
-		assert.NotNil(t, p.inputReaderCancel, "cancel func should be set")
-		assert.NotNil(t, p.inputReaderDone, "done channel should be set")
+		genBefore := p.inputReaderGeneration
 		p.mu.Unlock()
 
-		// Execute command (should stop inputReader, run command, restart inputReader)
+		// Start inputReader (simulating TUI running state).
+		p.startInputReader()
+
+		// Generation must have increased (proves startInputReader ran).
+		p.mu.Lock()
+		genAfterStart := p.inputReaderGeneration
+		p.mu.Unlock()
+		assert.Greater(t, genAfterStart, genBefore, "iteration %d: generation should increase after start", i)
+
+		// Execute command (should stop inputReader, run command, restart inputReader).
 		err := p.ExecProcess(cmd)
 		assert.NoError(t, err, "iteration %d should succeed", i)
 
-		// Verify no deadlock, no panic occurred
-		// (If inputReader wasn't properly stopped, we'd have deadlock or panic)
+		// Verify no deadlock, no panic occurred.
+		// (If inputReader wasn't properly stopped, we'd have deadlock or panic.)
 
-		// Clean up for next iteration
+		// Clean up for next iteration.
 		p.stopInputReader()
 
-		// Verify cleanup worked
+		// Verify cleanup: stopInputReader blocks until done and explicitly
+		// sets inputReaderRunning=false, so this check is race-free.
 		p.mu.Lock()
 		assert.False(t, p.inputReaderRunning, "inputReader should be stopped")
 		assert.Nil(t, p.inputReaderCancel, "cancel func should be nil")
@@ -544,20 +543,20 @@ func TestProgram_ExecProcess_InputReaderStopGraceful(t *testing.T) {
 	m := TestModel{}
 	p := New(m, WithTerminal[TestModel](mockTerm))
 
-	// Start inputReader
+	// Start inputReader.
 	p.startInputReader()
 
-	// Verify running
+	// Verify start happened via generation (race-free).
 	p.mu.Lock()
-	assert.True(t, p.inputReaderRunning)
-	assert.NotNil(t, p.inputReaderCancel)
-	assert.NotNil(t, p.inputReaderDone)
+	gen := p.inputReaderGeneration
 	p.mu.Unlock()
+	assert.Greater(t, gen, uint64(0), "generation should be > 0 after start")
 
-	// Stop inputReader
+	// Stop inputReader (blocks until goroutine exits).
 	p.stopInputReader()
 
-	// Verify stopped
+	// Verify stopped — stopInputReader blocks and explicitly sets running=false,
+	// so this check is race-free.
 	p.mu.Lock()
 	running := p.inputReaderRunning
 	p.mu.Unlock()
@@ -643,15 +642,21 @@ func TestProgram_ExecProcess_InputReaderRestartIdempotent(t *testing.T) {
 }
 
 // TestProgram_ExecProcess_InputReaderErrorRecovery verifies recovery on command error.
+// Uses inputReaderGeneration to verify restart without timing dependency.
 func TestProgram_ExecProcess_InputReaderErrorRecovery(t *testing.T) {
 	mockTerm := phoenixtesting.NewMockTerminal()
 	m := TestModel{}
 	p := New(m, WithTerminal[TestModel](mockTerm))
 
-	// Start inputReader
+	// Start inputReader.
 	p.startInputReader()
 
-	// Create failing command
+	// Capture generation after start.
+	p.mu.Lock()
+	genAfterStart := p.inputReaderGeneration
+	p.mu.Unlock()
+
+	// Create failing command.
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
 		cmd = exec.Command("cmd", "/c", "exit", "1")
@@ -659,16 +664,18 @@ func TestProgram_ExecProcess_InputReaderErrorRecovery(t *testing.T) {
 		cmd = exec.Command("sh", "-c", "exit 1")
 	}
 
-	// Execute command (will fail)
+	// Execute command (will fail).
 	err := p.ExecProcess(cmd)
 	assert.Error(t, err, "command should fail")
 
-	// Verify inputReader was still restarted (even on error)
+	// Verify inputReader was still restarted (even on error) via generation increase.
+	// ExecProcess always calls Resume() which calls restartInputReader().
 	p.mu.Lock()
-	running := p.inputReaderRunning
+	genAfterExec := p.inputReaderGeneration
 	p.mu.Unlock()
 
-	assert.True(t, running, "inputReader should be restarted even when command fails")
+	assert.Greater(t, genAfterExec, genAfterStart,
+		"generation should increase after failed ExecProcess (proves restart happened)")
 
 	// Cleanup
 	p.stopInputReader()

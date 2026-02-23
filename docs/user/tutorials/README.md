@@ -339,15 +339,14 @@ We want to make these tutorials better!
 
 ## Tutorial Versions
 
-These tutorials are for **Phoenix TUI v0.1.0**.
+These tutorials track the latest stable Phoenix TUI release.
 
 **API Stability:**
-- v0.1.x: Minor breaking changes possible
-- v1.0.0: API stable (semantic versioning)
+- Pre-1.0: Minor breaking changes possible
+- 1.0+: API stable (semantic versioning)
 
 **Updating Tutorials:**
 - We update tutorials with each release
-- Check tutorial footer for "Last updated" date
 - If API changed, tutorials will reflect it
 
 ---
@@ -401,7 +400,5 @@ Tutorials are part of Phoenix TUI Framework documentation.
 ---
 
 *Phoenix TUI Framework - Tutorial Series*
-*Version: 1.0.0 (for Phoenix v0.1.0)*
-*Last updated: 2025-01-04*
 
-Happy coding! 🚀
+Happy coding!

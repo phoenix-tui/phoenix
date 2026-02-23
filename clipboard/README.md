@@ -376,15 +376,6 @@ func (m *TextInputModel) handlePaste() tea.Cmd {
 
 ## Roadmap
 
-### v0.1.0 (Current)
-- [x] Cross-platform clipboard support
-- [x] OSC 52 implementation
-- [x] Native platform providers (Windows, macOS, Linux)
-- [x] Auto-detection and fallback
-- [x] Domain-driven architecture
-- [x] 90%+ test coverage
-- [x] Examples and documentation
-
 ### Future Enhancements
 - [ ] Rich text format support
 - [ ] Image clipboard support

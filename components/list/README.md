@@ -11,7 +11,7 @@ A universal selectable list component for Phoenix TUI Framework. Build file pick
 - **Scrolling** - Automatic viewport scrolling for long lists
 - **Immutable API** - All operations return new instances (follows Elm Architecture)
 - **Type-Safe** - Fully typed with Go generics support
-- **Well-Tested** - 94.7% test coverage
+- **Well-Tested** - High test coverage
 
 ## Installation
 
@@ -271,7 +271,7 @@ list/
 1. **Rich Domain Models** - Business logic encapsulated in domain models, not anemic data structures
 2. **Immutability** - All operations return new instances following Elm Architecture
 3. **Type Safety** - Leverage Go generics for compile-time safety
-4. **Testability** - 94.7% test coverage (domain layer 97%+)
+4. **Testability** - High test coverage across all layers
 5. **Zero External Dependencies** - Only depends on `phoenix/tea` for Elm Architecture
 
 ## How gosh Will Use This
@@ -314,21 +314,14 @@ go test ./... -coverprofile=coverage.out
 go tool cover -html=coverage.out
 ```
 
-### Coverage
-
-- **Overall**: 94.7%
-- **domain/model**: 97.1%
-- **domain/service**: 98.0%
-- **domain/value**: 100%
-- **infrastructure**: 100%
-- **api**: 85.9%
+High test coverage across all layers (domain, infrastructure, API).
 
 ## Contributing
 
 Phoenix TUI Framework follows strict quality standards:
 
 - **DDD First** - Rich domain models with behavior
-- **90%+ Test Coverage** - Especially domain layer (95%+)
+- **High Test Coverage** - Especially domain layer
 - **Immutable API** - All operations return new instances
 - **Type Safety** - Use Go 1.25+ features
 - **Documentation** - Clear examples and API docs
@@ -344,8 +337,4 @@ MIT License - See LICENSE file for details
 - [phoenix/layout](../../layout) - Box Model & Flexbox layout
 - [phoenix/core](../../core) - Terminal primitives & Unicode
 
-## Version
-
-Current: v0.1.0-alpha (Week 11 Complete)
-
-Phoenix TUI Framework is under active development. API may change before v1.0.0 release.
+Phoenix TUI Framework is under active development. API may change before a stable release.

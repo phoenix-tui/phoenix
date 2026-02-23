@@ -2,9 +2,7 @@
 
 Rich, reusable TUI components for Phoenix Framework with DDD architecture, type safety, and comprehensive testing.
 
-**Status**: ✅ Week 11-12 Complete + v0.1.0-beta.2 (TextArea Cursor Control)
 **Module**: `github.com/phoenix-tui/phoenix/components`
-**Coverage**: 94.5% average across all components
 **License**: MIT (planned)
 
 ---
@@ -14,13 +12,13 @@ Rich, reusable TUI components for Phoenix Framework with DDD architecture, type 
 Phoenix Components is a rich library of terminal UI widgets built on top of Phoenix/tea (Elm Architecture). Each component follows Domain-Driven Design principles with clear separation between business logic, presentation, and infrastructure.
 
 **Features**:
-- ✅ **6 Production-Ready Components** - Input, TextArea, List, Viewport, Table, Modal, Progress
-- ✅ **DDD Architecture** - Domain layer with 90%+ coverage
-- ✅ **Type-Safe** - Generic constraints for compile-time safety
-- ✅ **Fluent API** - Chainable method calls for easy styling
-- ✅ **Unicode-Aware** - Perfect CJK and emoji support
-- ✅ **Highly Tested** - 94.5% average coverage
-- ✅ **Zero External TUI Dependencies** - Built from scratch
+- **7 Production-Ready Components** - Input, TextArea, List, Viewport, Table, Modal, Progress
+- **DDD Architecture** - Domain layer with high test coverage
+- **Type-Safe** - Generic constraints for compile-time safety
+- **Fluent API** - Chainable method calls for easy styling
+- **Unicode-Aware** - Perfect CJK and emoji support
+- **Extensive Test Suite** - High coverage across all components
+- **Zero External TUI Dependencies** - Built from scratch
 
 ---
 
@@ -28,7 +26,6 @@ Phoenix Components is a rich library of terminal UI widgets built on top of Phoe
 
 ### 1. Input - Single-Line Text Input
 **Module**: `github.com/phoenix-tui/phoenix/components/input`
-**Coverage**: 90.0%
 
 Single-line text input with placeholder, validation, password mode, and character filtering.
 
@@ -60,9 +57,8 @@ field := input.New(40).
 
 ---
 
-### 2. TextArea - Multiline Text Editor ⭐ NEW in v0.1.0-beta.2
+### 2. TextArea - Multiline Text Editor
 **Module**: `github.com/phoenix-tui/phoenix/components/input/textarea`
-**Coverage**: 83.4% (domain model)
 
 Multiline text editor with advanced cursor control, perfect for shells, code editors, and chat interfaces.
 
@@ -89,7 +85,7 @@ ta := textarea.New().
     })
 ```
 
-**Features** (v0.1.0-beta.2):
+**Features**:
 - ✅ **SetCursorPosition(row, col)** - Programmatic cursor positioning
 - ✅ **OnMovement(validator)** - Movement validation (protect areas)
 - ✅ **OnCursorMoved(handler)** - Cursor movement observer
@@ -113,7 +109,6 @@ ta := textarea.New().
 
 ### 3. List - Scrollable Item List
 **Module**: `github.com/phoenix-tui/phoenix/components/list`
-**Coverage**: 94.7%
 
 Scrollable list with filtering, multi-select, and custom item rendering.
 
@@ -139,9 +134,8 @@ l := list.New([]string{"Item 1", "Item 2", "Item 3"}).
 
 ---
 
-### 4. Viewport - Scrollable Content Area ⭐ Enhanced: Wheel Scrolling Configuration (Week 15)
+### 4. Viewport - Scrollable Content Area
 **Module**: `github.com/phoenix-tui/phoenix/components/viewport`
-**Coverage**: 98.7%
 
 Scrollable content area for displaying long text, logs, or chat history with configurable wheel scrolling and drag support.
 
@@ -159,25 +153,24 @@ p := tea.New(model, tea.WithMouseAllMotion[Model]())
 ```
 
 **Features**:
-- ✅ **Configurable Wheel Scrolling** (NEW!) - Adjust scroll speed (1-10+ lines per tick)
-- ✅ **Drag Scrolling** - Click and drag to scroll (natural touch behavior)
-- ✅ Mouse wheel support (default: 3 lines per tick, customizable)
-- ✅ Keyboard navigation (arrows, page up/down, Home/End, Ctrl+U/D)
-- ✅ Dynamic content updates with FollowMode (tail -f style)
-- ✅ Precise scroll position control (SetYOffset)
-- ✅ Line wrapping and truncation support
-- ✅ Bounds checking (won't scroll past content)
-- ✅ Immutable operations (functional updates)
+- **Configurable Wheel Scrolling** - Adjust scroll speed (1-10+ lines per tick)
+- **Drag Scrolling** - Click and drag to scroll (natural touch behavior)
+- Mouse wheel support (default: 3 lines per tick, customizable)
+- Keyboard navigation (arrows, page up/down, Home/End, Ctrl+U/D)
+- Dynamic content updates with FollowMode (tail -f style)
+- Precise scroll position control (SetYOffset)
+- Line wrapping and truncation support
+- Bounds checking (won't scroll past content)
+- Immutable operations (functional updates)
 
-**Wheel Scrolling Configuration** (Week 15 Day 5-6):
+**Wheel Scrolling Configuration**:
 - `SetWheelScrollLines(lines int)` - Configure scroll amount per wheel tick
 - Default: 3 lines per tick
 - Recommended: 1-10 lines for smooth scrolling
 - Minimum enforced: 1 line (values < 1 are clamped)
 - Dynamic adjustment: Change scroll speed on the fly
-- 12 comprehensive tests (98.7% coverage)
 
-**Drag Scrolling** (Week 15 Day 3-4):
+**Drag Scrolling**:
 - Left mouse button drag to scroll
 - Natural direction: drag down → content scrolls up
 - Works with 10,000+ lines smoothly
@@ -191,7 +184,6 @@ p := tea.New(model, tea.WithMouseAllMotion[Model]())
 
 ### 5. Table - Data Table with Sorting
 **Module**: `github.com/phoenix-tui/phoenix/components/table`
-**Coverage**: 92.0%
 
 Data table with columns, rows, sorting, and pagination.
 
@@ -226,7 +218,6 @@ t := table.New().
 
 ### 6. Modal - Dialog Boxes
 **Module**: `github.com/phoenix-tui/phoenix/components/modal`
-**Coverage**: 96.5%
 
 Modal dialogs for confirmations, alerts, and user prompts.
 
@@ -258,7 +249,6 @@ m := modal.New().
 
 ### 7. Progress - Progress Bars and Spinners
 **Module**: `github.com/phoenix-tui/phoenix/components/progress`
-**Coverage**: 98.5%
 
 Progress indicators for loading states and long-running operations.
 
@@ -404,22 +394,22 @@ All Phoenix components follow Domain-Driven Design:
 
 ```
 component/
-├── domain/          # Business logic (95%+ coverage)
+├── domain/          # Business logic
 │   ├── model/      # Entities and aggregates
 │   ├── value/      # Value objects
 │   └── service/    # Domain services
-├── infrastructure/  # Technical implementation (80%+ coverage)
+├── infrastructure/  # Technical implementation
 │   ├── renderer/   # View rendering
 │   └── keybindings/# Keyboard handling
-└── api/            # Public interface (90%+ coverage)
+└── api/            # Public interface
     └── component.go
 ```
 
 **Why DDD?**
-- ✅ Pure business logic in domain (easy to test)
-- ✅ Infrastructure swappable (ANSI → native → web?)
-- ✅ API layer provides fluent interface
-- ✅ 90%+ test coverage consistently achieved
+- Pure business logic in domain (easy to test)
+- Infrastructure swappable (ANSI -> native -> web?)
+- API layer provides fluent interface
+- High test coverage consistently achieved
 
 ---
 
@@ -485,49 +475,22 @@ go test -cover ./...
 go test ./input/... -v
 ```
 
-**Coverage by Component**:
-| Component | API | Domain | Infrastructure | Overall |
-|-----------|-----|--------|---------------|---------|
-| Input | 56.9% | 92.2% | 100.0% | 90.0% |
-| TextArea | 56.2% | 83.4% | 77.4% | 73.2% |
-| List | ~60% | ~95% | ~85% | 94.7% |
-| Viewport | ~60% | ~95% | 100.0% | 98.7% | ⭐ Enhanced Week 15 (Wheel Config)
-| Table | ~60% | ~93% | ~90% | 92.0% |
-| Modal | ~65% | ~98% | ~95% | 96.5% |
-| Progress | 97.4% | 100.0% | 100.0% | 98.5% |
-
-**Average**: 94.5% (exceeds 90% target!)
-**Viewport**: 98.7% with drag + wheel scrolling (26 comprehensive tests)
+All components have extensive test coverage across API, domain, and infrastructure layers.
 
 ---
 
-## Roadmap
+## Future Components
 
-### Completed (Week 11-12)
-- ✅ Input component (single-line text)
-- ✅ TextArea component (multiline editor)
-- ✅ List component (scrollable items)
-- ✅ Viewport component (scrollable content)
-- ✅ Table component (data tables)
-- ✅ Modal component (dialogs)
-- ✅ Progress component (bars/spinners)
-
-### v0.1.0-beta.2 (Released 2025-10-20)
-- ✅ TextArea cursor control API
-- ✅ Linter cleanup (204 issues → 0)
-- ✅ Go 1.21+ compatibility
-- ✅ OSS best practices
-
-### Future (v0.2.0+)
-- 🚧 Form component (validation, submission)
-- 🚧 Tree component (hierarchical data)
-- 🚧 Menu component (dropdowns, context menus)
-- 🚧 Tabs component (multi-panel views)
-- 🚧 Chart component (graphs, plots)
-- 🚧 File picker component
-- 🚧 Calendar component
+- Form component (validation, submission)
+- Tree component (hierarchical data)
+- Menu component (dropdowns, context menus)
+- Tabs component (multi-panel views)
+- Chart component (graphs, plots)
+- File picker component
+- Calendar component
 
 ### Long-term
+
 - Theme system with presets
 - Animation framework
 - Accessibility improvements
@@ -541,13 +504,10 @@ go test ./input/... -v
 |---------|-------------------|---------|
 | Architecture | ✅ DDD (testable) | ⚠️ Monolithic |
 | Type Safety | ✅ Generic constraints | ⚠️ interface{} |
-| Test Coverage | ✅ 94.5% average | ⚠️ Variable |
-| Unicode Support | ✅ Perfect (CJK/emoji) | ❌ Broken ([lipgloss#562](https://github.com/charmbracelet/lipgloss/issues/562)) |
-| API Stability | ⚠️ Beta (v0.1.0-beta.2) | ⚠️ Breaking changes |
-| Dependencies | ✅ Zero external TUI deps | ⚠️ Charm ecosystem |
-| Component Count | ✅ 7 components | ✅ 10+ components |
-| Maturity | ⚠️ Beta (Week 11-12/20) | ✅ Battle-tested |
-| Migration Path | 🚧 Planned (Week 17-18) | N/A |
+| Test Coverage | High across all components | Variable |
+| Unicode Support | Perfect (CJK/emoji) | Broken ([lipgloss#562](https://github.com/charmbracelet/lipgloss/issues/562)) |
+| Dependencies | Zero external TUI deps | Charm ecosystem |
+| Component Count | 7 components | 10+ components |
 
 **Why Phoenix Components?**
 - Modern DDD architecture (clean, testable)
@@ -588,4 +548,4 @@ MIT (planned)
 
 ---
 
-*Built with ❤️ using Domain-Driven Design and Modern Go*
+*Built with Domain-Driven Design and Modern Go*

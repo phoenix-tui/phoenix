@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.4] - 2026-02-24
+
+### Added
+
+- **tea**: InlineRenderer for non-alt-screen rendering — per-line diffing, ANSI-preserving width truncation, height clipping, thread-safe
+- **tea**: InlineRenderer integration in Program — lazy init on first `View()`, automatic `WindowSizeMsg` forwarding, `Repaint()` on `Resume()`
+- **tea**: 35 new InlineRenderer tests (99.4% coverage) covering rendering, diffing, resize, repaint, truncation, concurrency, ANSI handling, Unicode/CJK width
+
+### Fixed
+
+- **tea**: Fix 6 flaky inputReader tests on Windows — replace racy `inputReaderRunning` checks with race-free `inputReaderGeneration` counter
+- **tea**: Remove all `t.Skip("flaky on Windows")` from `exec_process_test.go` (4 tests) and `suspend_resume_test.go` (2 tests)
+
+### Changed
+
+- **docs**: Make all README.md files version-agnostic (no more hardcoded versions, week references, or coverage percentages)
+
+---
+
 ## [0.2.3] - 2026-02-06 (PATCH)
 
 ### Fixed

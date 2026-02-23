@@ -115,7 +115,7 @@ The drag scroll implementation has **14 comprehensive tests** covering:
 - Immutability
 - Disabled state
 
-**Test coverage**: 98.6% (exceeds 95% target)
+**Test coverage**: Extensive (exceeds project targets)
 
 Run tests:
 ```bash

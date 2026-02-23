@@ -19,9 +19,7 @@ results/
 │   └── version.txt       # Baseline version info
 │
 └── history/              # Milestone results (releases only)
-    ├── v0.1.0-beta.1/
-    ├── v0.1.0-beta.2/
-    └── v0.1.0-beta.3/    # Each contains:
+    └── <version>/        # Each release contains:
         ├── render.txt         # Full results
         ├── core-unicode.txt
         └── summary.md         # Human-readable summary
@@ -97,7 +95,7 @@ bash benchmarks/scripts/set_baseline.sh
 3. **Save to history** (for releases):
    ```bash
    # Copy results to history
-   VERSION="v0.1.0-beta.3"
+   VERSION="vX.Y.Z"  # Replace with actual version
    mkdir -p benchmarks/results/history/$VERSION
    cp benchmarks/results/current/*.txt benchmarks/results/history/$VERSION/
 
@@ -198,5 +196,4 @@ For CI/CD integration, see `.github/workflows/` (when added).
 
 ---
 
-**Last Updated**: 2025-10-23
-**Current Baseline**: v0.1.0-beta.3
+*Phoenix TUI - Benchmark Results*

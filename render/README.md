@@ -2,14 +2,11 @@
 
 High-performance differential rendering engine for Phoenix TUI Framework.
 
-**Status**: Week 13-14 Complete ✅  
-**Coverage**: 90%+ target  
-**Performance**: 60 FPS (< 16.67ms per frame)  
-**Version**: v0.1.0-alpha.0
+**Module**: `github.com/phoenix-tui/phoenix/render`
 
 ## Features
 
-- **Differential Rendering**: Only renders changed cells (10x faster than full redraws)
+- **Differential Rendering**: Only renders changed cells (significantly faster than full redraws)
 - **ANSI Optimization**: Batches escape sequences for minimal output
 - **Zero-Allocation Hot Paths**: Buffer pooling for garbage-free rendering
 - **Unicode Perfect**: Correct grapheme cluster handling (emoji, CJK, etc.)
@@ -57,8 +54,7 @@ See full API documentation in this file.
 
 ## Performance
 
-Target: 60 FPS (< 16.67ms per frame)  
-Achieved: ✅ 10x faster than Charm ecosystem
+Target: 60 FPS (< 16.67ms per frame)
 
 Run benchmarks:
 ```bash

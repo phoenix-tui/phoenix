@@ -2,10 +2,8 @@
 
 Elm Architecture implementation for Phoenix TUI Framework.
 
-**Status**: 🟡 Week 6 Complete - v0.1.0-alpha.0 (Development)
-**Coverage**: 95.7% overall, 100% domain layer
-**License**: MIT (planned)
-**Maturity**: Alpha - API may change before v0.1.0 release (Week 20)
+[![Go Reference](https://pkg.go.dev/badge/github.com/phoenix-tui/phoenix/tea.svg)](https://pkg.go.dev/github.com/phoenix-tui/phoenix/tea)
+[![CI](https://github.com/phoenix-tui/phoenix/actions/workflows/test.yml/badge.svg)](https://github.com/phoenix-tui/phoenix/actions)
 
 ---
 
@@ -13,15 +11,15 @@ Elm Architecture implementation for Phoenix TUI Framework.
 
 Phoenix/tea is a modern, type-safe implementation of the Elm Architecture (Model-View-Update) for building terminal user interfaces in Go.
 
-**⚠️ Alpha Quality**: Week 6 complete, but API may change before v0.1.0 release (Week 20). Use for experimentation and feedback.
-
 **Features**:
-- ✅ **Type-safe** - Generic constraints for compile-time safety
-- ✅ **Clean API** - Natural return types, no interface{} casts
-- ✅ **DDD Architecture** - Domain-driven design with clear layers
-- ✅ **High Performance** - Efficient event loop, minimal allocations
-- ✅ **Well-tested** - 95.7% coverage, 100% domain layer
-- ✅ **Go 1.25+** - Modern Go patterns and generics
+- **Type-safe** - Generic constraints for compile-time safety (no `interface{}` casts)
+- **Inline & Alt-Screen rendering** - Differential inline renderer with per-line diffing, or full alternate screen
+- **TTY Control** - Run external processes (vim, shells) with full terminal handoff
+- **Suspend/Resume** - Pause and restore TUI state for job control
+- **DDD Architecture** - Domain-driven design with clear layers
+- **High Performance** - Efficient event loop, minimal allocations
+- **Well-tested** - Extensive coverage across all layers
+- **Go 1.25+** - Modern Go patterns and generics
 
 ---
 
@@ -44,17 +42,12 @@ import (
     "github.com/phoenix-tui/phoenix/tea/api"
 )
 
-// Define your model
 type Model struct {
     message string
 }
 
-// Initialize the model
-func (m Model) Init() api.Cmd {
-    return nil
-}
+func (m Model) Init() api.Cmd { return nil }
 
-// Handle messages and update state
 func (m Model) Update(msg api.Msg) (Model, api.Cmd) {
     switch msg := msg.(type) {
     case api.KeyMsg:
@@ -65,7 +58,6 @@ func (m Model) Update(msg api.Msg) (Model, api.Cmd) {
     return m, nil
 }
 
-// Render the view
 func (m Model) View() string {
     return fmt.Sprintf("Hello, %s!\n\nPress 'q' to quit.", m.message)
 }
@@ -157,6 +149,72 @@ service.Tick(1 * time.Second)  // Wait and send TickMsg
 
 ---
 
+## Rendering Modes
+
+### Alt-Screen Mode
+
+Takes over the full terminal. Best for full-screen TUI applications.
+
+```go
+p := api.New(myModel, api.WithAltScreen[Model]())
+```
+
+### Inline Mode (default)
+
+Renders directly in the terminal scrollback. The built-in **InlineRenderer** uses ANSI cursor-up sequences to overwrite the previous frame, with per-line diffing to minimize I/O. Ideal for CLI tools that show a small live-updating view.
+
+```go
+p := api.New(myModel) // inline mode by default
+```
+
+InlineRenderer features:
+- **Per-line diffing** - Only redraws lines that changed
+- **Width truncation** - Prevents line wrap from corrupting cursor positioning
+- **Height clipping** - Keeps output within terminal bounds
+- **ANSI-preserving** - Color codes pass through without affecting width calculations
+- **Thread-safe** - All methods safe for concurrent use
+
+---
+
+## TTY Control
+
+Phoenix/tea can hand off terminal control to external processes (editors, shells, pagers) and restore TUI state afterwards.
+
+### ExecProcess
+
+Run an external command with full TTY access:
+
+```go
+func (m Model) Update(msg api.Msg) (Model, api.Cmd) {
+    case api.KeyMsg:
+        if msg.String() == "e" {
+            // Open vim — Phoenix suspends, vim takes over, then Phoenix resumes
+            return m, api.ExecProcess("vim", "file.txt")
+        }
+    case api.ExecProcessFinishedMsg:
+        // vim exited, TUI is restored
+        m.status = fmt.Sprintf("Editor exited: %v", msg.Err)
+}
+```
+
+### Suspend / Resume
+
+Manually suspend and resume the TUI for job control:
+
+```go
+// Suspend: exits raw mode, restores alt screen, shows cursor
+err := p.Suspend()
+
+// ... user interacts with normal terminal ...
+
+// Resume: re-enters raw mode, restores alt screen, hides cursor
+err = p.Resume()
+```
+
+Platform support: Linux, macOS, Windows.
+
+---
+
 ## Examples
 
 See the [examples/](examples/) directory for complete applications:
@@ -165,68 +223,53 @@ See the [examples/](examples/) directory for complete applications:
 Simple increment/decrement counter demonstrating basic concepts.
 
 ```bash
-cd examples/counter
-go run main.go
+cd examples/counter && go run main.go
 ```
 
 ### 2. [Todo List](examples/todo/) - Intermediate
 Todo list with add/delete/toggle, demonstrating complex state management.
 
 ```bash
-cd examples/todo
-go run main.go
+cd examples/todo && go run main.go
 ```
 
 ### 3. [Countdown Timer](examples/timer/) - Advanced
 Timer with async commands, demonstrating time-based updates and state machines.
 
 ```bash
-cd examples/timer
-go run main.go
+cd examples/timer && go run main.go
 ```
 
 ---
 
 ## API Reference
 
-### Types
+### Messages
 
-#### Messages
 ```go
 type Msg interface{}              // Base message type
 
 type KeyMsg struct {              // Keyboard input
     Type  KeyType
     Rune  rune
-    Alt   bool
-    Ctrl  bool
-    Shift bool
+    Alt, Ctrl, Shift bool
 }
 
 type MouseMsg struct {            // Mouse events
     X, Y   int
     Button MouseButton
     Action MouseAction
-    Alt, Ctrl, Shift bool
 }
 
 type WindowSizeMsg struct {       // Terminal resize
-    Width  int
-    Height int
+    Width, Height int
 }
 
 type QuitMsg struct{}             // Application quit
-
-type BatchMsg struct {            // Batch command results
-    Messages []Msg
-}
-
-type SequenceMsg struct {         // Sequence command results
-    Messages []Msg
-}
+type ExecProcessFinishedMsg struct { Err error }  // External process done
 ```
 
-#### Key Types
+### Key Types
 ```go
 const (
     KeyRune       KeyType = iota  // Regular character
@@ -234,87 +277,53 @@ const (
     KeyTab                        // Tab
     KeyBackspace                  // Backspace
     KeyEscape                     // Escape
-    KeyUp                         // Arrow up
-    KeyDown                       // Arrow down
-    KeyLeft                       // Arrow left
-    KeyRight                      // Arrow right
-    KeyHome                       // Home
-    KeyEnd                        // End
-    KeyPageUp                     // Page up
-    KeyPageDown                   // Page down
-    KeyDelete                     // Delete
-    KeyInsert                     // Insert
-    KeyF1 - KeyF12                // Function keys
+    KeyUp, KeyDown, KeyLeft, KeyRight
+    KeyHome, KeyEnd, KeyPageUp, KeyPageDown
+    KeyDelete, KeyInsert
+    KeyF1 ... KeyF12              // Function keys
 )
 ```
 
-### Functions
+### Commands
 
-#### Commands
 ```go
-func Quit() Cmd
-// Returns a command that quits the application.
-
-func Batch(cmds ...Cmd) Cmd
-// Executes multiple commands in parallel.
-
-func Sequence(cmds ...Cmd) Cmd
-// Executes multiple commands sequentially.
-```
-
-#### Built-in Commands (domain/service)
-```go
-import "github.com/phoenix-tui/phoenix/tea/domain/service"
-
-func service.Tick(d time.Duration) Cmd
-// Waits for duration d, then sends TickMsg.
-
-func service.Println(msg string) Cmd
-// Sends PrintlnMsg with the given message.
+func Quit() Cmd                   // Quit the application
+func Batch(cmds ...Cmd) Cmd       // Execute commands in parallel
+func Sequence(cmds ...Cmd) Cmd    // Execute commands sequentially
+func ExecProcess(name string, args ...string) Cmd  // Run external process
 ```
 
 ### Program
 
-#### Creation
 ```go
+// Creation
 func New[T modelConstraint[T]](m T, opts ...ProgramOption[T]) *Program[T]
-// Creates a new Program with the given model and options.
-```
 
-#### Methods
-```go
-func (p *Program[T]) Run() error
-// Runs the program synchronously until quit.
+// Lifecycle
+func (p *Program[T]) Run() error      // Run synchronously until quit
+func (p *Program[T]) Start() error    // Start asynchronously
+func (p *Program[T]) Stop()           // Stop gracefully
+func (p *Program[T]) Quit()           // Signal quit
 
-func (p *Program[T]) Start() error
-// Starts the program asynchronously in a goroutine.
+// Communication
+func (p *Program[T]) Send(msg Msg) error  // Send message to event loop
 
-func (p *Program[T]) Stop()
-// Stops a running program gracefully.
-
-func (p *Program[T]) Quit()
-// Signals the program to quit.
-
-func (p *Program[T]) Send(msg Msg) error
-// Sends a message to the program's event loop.
-
+// State
 func (p *Program[T]) IsRunning() bool
-// Returns true if the program is currently running.
+func (p *Program[T]) IsSuspended() bool
+
+// Job control
+func (p *Program[T]) Suspend() error  // Suspend TUI, restore terminal
+func (p *Program[T]) Resume() error   // Resume TUI from suspension
 ```
 
-#### Options
+### Options
+
 ```go
-func WithInput[T any](r io.Reader) ProgramOption[T]
-// Sets a custom input source (default: os.Stdin).
-
-func WithOutput[T any](w io.Writer) ProgramOption[T]
-// Sets a custom output destination (default: os.Stdout).
-
-func WithAltScreen[T any]() ProgramOption[T]
-// Enables alternate screen buffer (takes over terminal).
-
-func WithMouseAllMotion[T any]() ProgramOption[T]
-// Enables mouse tracking for all motion events.
+func WithAltScreen[T any]() ProgramOption[T]       // Alternate screen buffer
+func WithInput[T any](r io.Reader) ProgramOption[T] // Custom input source
+func WithOutput[T any](w io.Writer) ProgramOption[T] // Custom output
+func WithMouseAllMotion[T any]() ProgramOption[T]   // Mouse tracking
 ```
 
 ---
@@ -323,25 +332,16 @@ func WithMouseAllMotion[T any]() ProgramOption[T]
 
 ### Asynchronous Commands
 
-Commands can perform asynchronous operations:
-
 ```go
-import "github.com/phoenix-tui/phoenix/tea/domain/service"
-
 func (m Model) Update(msg api.Msg) (Model, api.Cmd) {
     switch msg := msg.(type) {
     case api.KeyMsg:
         if msg.String() == "t" {
-            // Start a timer
             return m, service.Tick(1 * time.Second)
         }
-
     case service.TickMsg:
-        // Timer fired!
         m.lastTick = msg.Time
-
         if m.keepTicking {
-            // Continue ticking
             return m, service.Tick(1 * time.Second)
         }
     }
@@ -350,8 +350,6 @@ func (m Model) Update(msg api.Msg) (Model, api.Cmd) {
 ```
 
 ### Batch Commands (Parallel)
-
-Execute multiple commands in parallel:
 
 ```go
 func (m Model) Init() api.Cmd {
@@ -363,106 +361,25 @@ func (m Model) Init() api.Cmd {
 }
 ```
 
-All commands run concurrently, and their results arrive as separate messages.
-
 ### Sequence Commands (Sequential)
 
-Execute commands in order, waiting for each to complete:
-
 ```go
-func (m Model) Update(msg api.Msg) (Model, api.Cmd) {
-    if msg == startWorkflow {
-        return m, api.Sequence(
-            stepOne(),
-            stepTwo(),
-            stepThree(),
-        )
-    }
-    return m, nil
-}
+return m, api.Sequence(stepOne(), stepTwo(), stepThree())
 ```
 
-Results arrive as a single `SequenceMsg` with all messages in order.
-
 ### Custom Commands
-
-Create your own commands for side effects:
 
 ```go
 func fetchWeather(city string) api.Cmd {
     return func() api.Msg {
-        // Perform HTTP request
         data, err := http.Get("https://api.weather.com/" + city)
         if err != nil {
             return WeatherErrorMsg{err}
         }
-
-        // Parse response
-        weather := parseWeather(data)
-        return WeatherDataMsg{weather}
+        return WeatherDataMsg{parseWeather(data)}
     }
 }
-
-// Usage
-func (m Model) Update(msg api.Msg) (Model, api.Cmd) {
-    case api.KeyMsg:
-        if msg.String() == "f" {
-            return m, fetchWeather(m.city)
-        }
-
-    case WeatherDataMsg:
-        m.weather = msg.data
-        return m, nil
-}
 ```
-
-### Input Modes
-
-Handle different input modes with state:
-
-```go
-type Mode int
-
-const (
-    ModeNormal Mode = iota
-    ModeInsert
-    ModeCommand
-)
-
-type Model struct {
-    mode Mode
-    // ...
-}
-
-func (m Model) Update(msg api.Msg) (Model, api.Cmd) {
-    switch msg := msg.(type) {
-    case api.KeyMsg:
-        switch m.mode {
-        case ModeNormal:
-            return m.handleNormalMode(msg)
-        case ModeInsert:
-            return m.handleInsertMode(msg)
-        case ModeCommand:
-            return m.handleCommandMode(msg)
-        }
-    }
-    return m, nil
-}
-```
-
----
-
-## Development Status (Week 6 Complete!)
-
-- [x] **Day 1**: Message System (domain/model) - 100% coverage ✅
-- [x] **Day 2**: Model Interface & Commands (domain/model) - 100% coverage ✅
-- [x] **Day 3**: Program Core (application/program) - 100% coverage ✅
-- [x] **Day 4**: Event Loop (application/program) - 100% coverage ✅
-- [x] **Day 5**: Input & ANSI Parser (infrastructure) - 100% coverage ✅
-- [x] **Day 6**: Public API (api/) - 95.7% coverage ✅
-- [x] **Day 7**: Examples & Documentation - Complete! ✅
-
-**Overall**: 🎉 Week 6 Complete - v0.1.0-alpha.0 (API may change)
 
 ---
 
@@ -470,19 +387,19 @@ func (m Model) Update(msg api.Msg) (Model, api.Cmd) {
 
 ```
 tea/
-├── domain/              # Domain layer (100% coverage)
+├── domain/              # Domain layer
 │   ├── model/          # Message types, Model interface, Cmd
 │   └── service/        # Built-in commands (Quit, Tick, Println)
 │
-├── application/         # Application layer (100% coverage)
+├── application/         # Application layer
 │   └── program/        # Program type with lifecycle management
 │
-├── infrastructure/      # Infrastructure layer (100% coverage)
-│   ├── input/          # Input reader
-│   ├── parser/         # ANSI escape sequence parser
-│   └── terminal/       # Terminal operations
+├── infrastructure/      # Infrastructure layer
+│   ├── input/          # Input reader (pipe-based cancellation)
+│   ├── ansi/           # ANSI escape sequence parser
+│   └── renderer/       # InlineRenderer (per-line diff rendering)
 │
-├── api/                # Public API (95.7% coverage)
+├── api/                # Public API
 │   ├── tea.go          # Re-exports and wrappers
 │   └── tea_test.go     # API tests
 │
@@ -496,8 +413,6 @@ tea/
 
 ## Testing
 
-Phoenix/tea has extensive test coverage:
-
 ```bash
 # Run all tests
 go test ./...
@@ -505,17 +420,9 @@ go test ./...
 # Run with coverage
 go test -cover ./...
 
-# View coverage report
-go test -coverprofile=coverage.out ./...
-go tool cover -html=coverage.out
+# Run specific package
+go test ./internal/infrastructure/renderer/
 ```
-
-**Coverage by Layer**:
-- Domain layer: 100%
-- Application layer: 100%
-- Infrastructure layer: 100%
-- API layer: 95.7%
-- **Overall**: 95.7%
 
 ---
 
@@ -523,73 +430,32 @@ go tool cover -html=coverage.out
 
 | Feature | Phoenix/tea | Bubbletea |
 |---------|-------------|-----------|
-| Type Safety | ✅ Generic constraints | ⚠️ interface{} casts |
-| Return Types | ✅ Natural (MyModel) | ⚠️ tea.Model interface |
-| DDD Architecture | ✅ Clear layers | ❌ Monolithic |
-| Test Coverage | ✅ 95.7% | ⚠️ Variable |
-| API Stability | ⚠️ Alpha (may change) | ⚠️ Breaking changes |
-| Performance | ✅ Optimized event loop | ✅ Good |
-| Mouse Support | ✅ Planned (Week 16) | ✅ Full |
-| Components | 🚧 Planned (Week 11-12) | ✅ Bubbles library |
-| Maturity | ⚠️ Alpha (Week 6/20) | ✅ Battle-tested |
+| Type Safety | Generic constraints | `interface{}` casts |
+| Return Types | Natural (`MyModel`) | `tea.Model` interface |
+| Inline Rendering | Per-line diffing | Basic |
+| TTY Control | ExecProcess + Suspend/Resume | ExecProcess only |
+| DDD Architecture | Clear layers | Monolithic |
+| API Stability | Semantic versioning | Breaking changes |
 
-**Migration Path**: Phoenix/tea will provide compatibility layer for Bubbletea migration (Week 17-18).
-**Current Status**: Alpha development - API subject to change before v0.1.0 release (Week 20).
-
----
-
-## Roadmap
-
-### Completed
-- ✅ Week 6: Elm Architecture implementation (phoenix/tea)
-- ✅ Week 5: Styling system (phoenix/style)
-- ✅ Week 4: Unicode foundation (phoenix/core)
-- ✅ Week 3: Core primitives (phoenix/core)
-
-### Coming Soon
-- 🚧 Week 7-8: Alternative event loop implementations
-- 🚧 Week 9-10: Layout system (phoenix/layout)
-- 🚧 Week 11-12: Component library (phoenix/components)
-- 🚧 Week 13-14: High-performance renderer (phoenix/render)
-- 🚧 Week 15-16: Mouse & clipboard support
-- 🚧 Week 17-18: Migration tools from Bubbletea
-- 🚧 Week 19-20: Polish & v0.1.0 release
-
-### Future (Post v0.1.0)
-- Collect community feedback
-- API refinements based on real-world usage
-- Breaking changes as needed
-- v1.0.0 (6-12 months after v0.1.0) - API stability guarantee
-
----
-
-## Contributing
-
-Phoenix/tea is part of the Phoenix TUI Framework project. Contributions welcome!
-
-See [../../docs/dev/](../../docs/dev/) for:
-- Architecture documentation
-- Development roadmap
-- API design principles
-- Master plan
-
----
-
-## License
-
-MIT (planned)
+**Migration**: See [MIGRATION_GUIDE.md](../docs/user/MIGRATION_GUIDE.md) for migrating from Bubbletea.
 
 ---
 
 ## Resources
 
-- **Examples**: [examples/](examples/) - Complete example applications
-- **Architecture**: [../../docs/dev/ARCHITECTURE.md](../../docs/dev/ARCHITECTURE.md)
-- **API Design**: [../../docs/dev/API_DESIGN.md](../../docs/dev/API_DESIGN.md)
-- **Roadmap**: [../../docs/dev/ROADMAP.md](../../docs/dev/ROADMAP.md)
-- **Phoenix Core**: [../core/](../core/) - Terminal primitives
-- **Phoenix Style**: [../style/](../style/) - Styling system
+- **Examples**: [examples/](examples/)
+- **Migration Guide**: [MIGRATION_GUIDE.md](../docs/user/MIGRATION_GUIDE.md)
+- **Architecture**: [docs/dev/ARCHITECTURE.md](../docs/dev/ARCHITECTURE.md)
+- **API Design**: [docs/dev/API_DESIGN.md](../docs/dev/API_DESIGN.md)
+- **Phoenix Core**: [../core/](../core/)
+- **Phoenix Style**: [../style/](../style/)
 
 ---
 
-*Built with ❤️ using Domain-Driven Design and Modern Go*
+## License
+
+MIT
+
+---
+
+*Built with Domain-Driven Design and Modern Go*

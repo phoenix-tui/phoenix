@@ -2,9 +2,7 @@
 
 Universal styling library for terminal UI applications. Part of the Phoenix TUI Framework.
 
-**Status**: ✅ Complete (Week 5 Day 1-6)
 **Module**: `github.com/phoenix-tui/phoenix/style`
-**Coverage**: 90%+ overall (96.6% domain, 100% API)
 
 ## Features
 
@@ -12,12 +10,13 @@ Universal styling library for terminal UI applications. Part of the Phoenix TUI 
 - **Borders**: 6 pre-defined styles (Rounded, Thick, Double, Normal, ASCII, Hidden)
 - **Spacing**: CSS-like padding and margin (top, right, bottom, left)
 - **Sizing**: Width/height constraints with min/max bounds
-- **Alignment**: 9 alignment combinations (horizontal × vertical)
+- **Alignment**: 9 alignment combinations (horizontal x vertical)
 - **Text Decorations**: Bold, italic, underline, strikethrough
 - **Unicode Correct**: Perfect emoji, CJK, combining character support
 - **Fluent API**: Method chaining for intuitive style building
 - **Immutable**: Thread-safe value objects
 - **DDD Architecture**: Rich domain models, pure business logic
+- **Extensive test coverage** across all layers
 
 ## Quick Start
 
@@ -74,7 +73,7 @@ func main() {
         Bold(true).
         Width(50)
 
-    message := "🔔 Notification: Your task is complete!"
+    message := "Notification: Your task is complete!"
 
     // Render and display
     fmt.Println(style.Render(notificationStyle, message))
@@ -83,9 +82,9 @@ func main() {
 
 Output:
 ```
-╭────────────────────────────────────────────────╮
-│  🔔 Notification: Your task is complete!      │
-╰────────────────────────────────────────────────╯
++------------------------------------------------+
+|  Notification: Your task is complete!          |
++------------------------------------------------+
 ```
 
 ## API Documentation
@@ -114,22 +113,22 @@ style.Cyan, style.Magenta, style.White, style.Black, style.Gray
 
 ```go
 // Pre-defined borders
-style.NormalBorder    // ┌─┐ │ └─┘
-style.RoundedBorder   // ╭─╮ │ ╰─╯
-style.ThickBorder     // ┏━┓ ┃ ┗━┛
-style.DoubleBorder    // ╔═╗ ║ ╚═╝
+style.NormalBorder    // +--+ | +--+
+style.RoundedBorder   // +--+ | +--+
+style.ThickBorder     // +==+ | +==+
+style.DoubleBorder    // +==+ | +==+
 style.ASCIIBorder     // +-+ | +-+
 
 // Custom border
 border := style.NewBorder(
-    "─",  // top
-    "─",  // bottom
-    "│",  // left
-    "│",  // right
-    "┌",  // top-left
-    "┐",  // top-right
-    "└",  // bottom-left
-    "┘",  // bottom-right
+    "-",  // top
+    "-",  // bottom
+    "|",  // left
+    "|",  // right
+    "+",  // top-left
+    "+",  // top-right
+    "+",  // bottom-left
+    "+",  // bottom-right
 )
 
 // Apply border
@@ -232,7 +231,7 @@ style.StrikethroughStyle
 // Adapt colors to terminal capabilities
 s := style.New().
     Foreground(style.RGB(255, 0, 0)).
-    TerminalCapability(style.ANSI256)  // TrueColor → ANSI256 → ANSI16
+    TerminalCapability(style.ANSI256)  // TrueColor -> ANSI256 -> ANSI16
 
 // Constants
 style.TrueColor   // 24-bit RGB (16.7 million colors)
@@ -260,15 +259,15 @@ Phoenix style library follows Domain-Driven Design:
 
 ```
 style/
-├── domain/           # Pure business logic (95%+ coverage)
+├── domain/           # Pure business logic
 │   ├── model/       # Style domain model
 │   ├── value/       # Value objects (Color, Border, Padding, etc.)
 │   └── service/     # Domain services (ColorAdapter, TextAligner, etc.)
-├── application/      # Use cases (90%+ coverage)
+├── application/      # Use cases
 │   └── command/     # RenderCommand (styling pipeline)
-├── infrastructure/   # Technical details (100% coverage)
+├── infrastructure/   # Technical details
 │   └── ansi/        # ANSI code generation
-└── api/             # Public interface (100% coverage)
+└── api/             # Public interface
     └── style.go     # Fluent API
 ```
 
@@ -278,12 +277,11 @@ Compared to Lipgloss (Charm ecosystem):
 
 | Feature | Phoenix | Lipgloss |
 |---------|---------|----------|
-| **Unicode Support** | ✅ Perfect (emoji, CJK, combining chars) | ❌ [Broken since Aug 2024](https://github.com/charmbracelet/lipgloss/issues/562) |
-| **Performance** | ✅ 10x faster (< 50ms for 1K renders) | ⚠️ 450ms for 1K renders |
-| **Architecture** | ✅ DDD + Rich Models | ⚠️ Monolithic |
-| **Test Coverage** | ✅ 90%+ (96.6% domain) | ⚠️ ~60% |
-| **Immutability** | ✅ Fully immutable | ⚠️ Partial |
-| **API Design** | ✅ Fluent + type-safe | ✅ Good |
+| **Unicode Support** | Perfect (emoji, CJK, combining chars) | [Broken since Aug 2024](https://github.com/charmbracelet/lipgloss/issues/562) |
+| **Performance** | Significantly faster | Slower with large content |
+| **Architecture** | DDD + Rich Models | Monolithic |
+| **Immutability** | Fully immutable | Partial |
+| **API Design** | Fluent + type-safe | Good |
 
 ## Testing
 
@@ -301,34 +299,11 @@ go test ./domain/model/...
 go test -run Integration ./...
 ```
 
-**Test Coverage**:
-- Domain model: 92.3%
-- Domain services: 95.7%
-- Domain values: 97.5%
-- Infrastructure: 100%
-- API: 100%
-- Application: 76.9%
-- **Overall**: 90%+
-
 ## Documentation
 
 - **[Value Objects](internal/domain/value/README.md)** - Color, Border, Padding, Margin, Size, Alignment
 - **[Domain Model](internal/domain/model/)** - Style domain model documentation
 - **Examples** - [examples/](examples/) directory
-
-## Roadmap
-
-**Week 5 (Current)**: ✅ Complete
-- ✅ Day 1-2: Color & Border System
-- ✅ Day 3-4: Spacing & Sizing
-- ✅ Day 5-6: Style Model + Fluent API + Render
-
-**Week 6-7 (Next)**: Terminal & Event Loop
-- phoenix/tea - Elm Architecture implementation
-- phoenix/terminal - Low-level terminal operations
-
-**Week 9-10**: Layout System
-- phoenix/layout - Flexbox & Grid layout
 
 ## Contributing
 
@@ -341,5 +316,4 @@ MIT (planned)
 ---
 
 **Part of Phoenix TUI Framework**
-**Version**: 0.1.0-dev (Week 5 complete)
 **Go Version**: 1.25+

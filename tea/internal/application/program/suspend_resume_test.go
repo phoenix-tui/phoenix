@@ -1,7 +1,6 @@
 package program
 
 import (
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -332,11 +331,9 @@ func TestProgram_IsSuspended_AfterResume(t *testing.T) {
 // └─────────────────────────────────────────────────────────────────┘.
 
 // TestProgram_Suspend_StopsInputReader verifies Suspend stops input reader.
+// Uses inputReaderGeneration for start verification (race-free) and
+// inputReaderRunning for stopped verification (race-free after stopInputReader blocks).
 func TestProgram_Suspend_StopsInputReader(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("Skipping on Windows: inputReader state timing is non-deterministic due to stdin blocking")
-	}
-
 	mockTerm := phoenixtesting.NewMockTerminal()
 	m := TestModel{}
 	p := New(m, WithTerminal[TestModel](mockTerm))
@@ -344,29 +341,27 @@ func TestProgram_Suspend_StopsInputReader(t *testing.T) {
 	// Start input reader.
 	p.startInputReader()
 
-	// Verify running.
+	// Verify started via generation (race-free).
 	p.mu.Lock()
-	running := p.inputReaderRunning
+	gen := p.inputReaderGeneration
 	p.mu.Unlock()
-	assert.True(t, running, "Input reader should be running")
+	assert.Greater(t, gen, uint64(0), "generation should be > 0 after start")
 
-	// Suspend stops input reader.
+	// Suspend stops input reader (blocks until goroutine exits).
 	err := p.Suspend()
 	require.NoError(t, err)
 
-	// Verify stopped.
+	// Verify stopped — Suspend calls stopInputReader which blocks and
+	// explicitly sets inputReaderRunning=false (race-free).
 	p.mu.Lock()
-	running = p.inputReaderRunning
+	running := p.inputReaderRunning
 	p.mu.Unlock()
 	assert.False(t, running, "Input reader should be stopped after Suspend")
 }
 
 // TestProgram_Resume_RestartsInputReader verifies Resume restarts input reader.
+// Uses inputReaderGeneration to verify restart without timing dependency.
 func TestProgram_Resume_RestartsInputReader(t *testing.T) {
-	if runtime.GOOS == "windows" {
-		t.Skip("Skipping on Windows: inputReader restart timing is non-deterministic due to stdin blocking")
-	}
-
 	mockTerm := phoenixtesting.NewMockTerminal()
 	m := TestModel{}
 	p := New(m, WithTerminal[TestModel](mockTerm))
@@ -376,9 +371,10 @@ func TestProgram_Resume_RestartsInputReader(t *testing.T) {
 	err := p.Suspend()
 	require.NoError(t, err)
 
-	// Verify stopped.
+	// Verify stopped (race-free: stopInputReader blocks).
 	p.mu.Lock()
 	running := p.inputReaderRunning
+	genAfterSuspend := p.inputReaderGeneration
 	p.mu.Unlock()
 	assert.False(t, running)
 
@@ -386,9 +382,10 @@ func TestProgram_Resume_RestartsInputReader(t *testing.T) {
 	err = p.Resume()
 	require.NoError(t, err)
 
-	// Verify restarted.
+	// Verify restarted via generation increase (race-free).
 	p.mu.Lock()
-	running = p.inputReaderRunning
+	genAfterResume := p.inputReaderGeneration
 	p.mu.Unlock()
-	assert.True(t, running, "Input reader should be restarted after Resume")
+	assert.Greater(t, genAfterResume, genAfterSuspend,
+		"generation should increase after Resume (proves restart)")
 }
