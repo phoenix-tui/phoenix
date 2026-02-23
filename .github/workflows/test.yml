@@ -6,23 +6,21 @@ name: Tests
 # - Go 1.25+ required (matches go.mod requirement)
 # - Multi-module monorepo: Each module tested independently with GOWORK=off
 #
-# Branch Strategy (Git Flow):
-# - release/** branches: Pre-release testing (test here BEFORE merging to main)
+# Branch Strategy:
 # - main branch: Production-ready code only (protected)
-# - develop branch: Active development (default for PRs)
-# - Pull requests: Must pass all tests before merge
+# - develop branch: Active development
+# - Pull requests to main/develop: Must pass all tests before merge
+# - Release branches: Tested via PR (no duplicate push trigger)
 
 on:
   push:
     branches:
       - main
       - develop
-      - 'release/**'  # Test release branches before merging to main
   pull_request:
     branches:
       - main
       - develop
-      - 'release/**'
 
 env:
   GOWORK: off  # Disable workspace mode in CI (workspaces are for local dev only)

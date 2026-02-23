@@ -3,7 +3,7 @@ module github.com/phoenix-tui/phoenix/style
 go 1.25.1
 
 require (
-	github.com/phoenix-tui/phoenix/core v0.2.0
+	github.com/phoenix-tui/phoenix/core v0.2.4
 	github.com/stretchr/testify v1.11.1
 )
 

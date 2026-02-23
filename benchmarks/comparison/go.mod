@@ -5,7 +5,7 @@ go 1.25.1
 require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/mattn/go-runewidth v0.0.19
-	github.com/phoenix-tui/phoenix/core v0.1.0-beta.3
+	github.com/phoenix-tui/phoenix/core v0.2.4
 )
 
 require (
