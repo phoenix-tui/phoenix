@@ -287,6 +287,18 @@ spinner := progress.NewSpinner(progress.SpinnerDots).SetLabel("Loading")
 
 Phoenix is part of an active development effort. See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [GoDoc](https://pkg.go.dev/github.com/phoenix-tui/phoenix) for API documentation.
 
+
+
+## Star History
+
+<a href="https://starhistory.io">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.starhistory.io/png?repos=phoenix-tui/phoenix&style=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.starhistory.io/png?repos=phoenix-tui/phoenix&style=professional" />
+   <img alt="Star History Chart" src="https://api.starhistory.io/png?repos=phoenix-tui/phoenix" width="800" />
+ </picture>
+</a>
+
 ## License
 
 MIT License - see [LICENSE](LICENSE) file for details
